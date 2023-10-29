@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:room_notify_discordbot_v2_util/component/page_template.dart';
@@ -11,6 +12,9 @@ class GuildSettingPage extends StatefulWidget {
 }
 
 class _GuildSettingPageState extends State<GuildSettingPage> {
+  // final FirebaseFirestore db = FirebaseFirestore.instance;
+  /* firestoreはコンポーネントまとめたほうが扱いやすそう */
+
   @override
   Widget build(BuildContext context) {
     return Padding(
