@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:room_notify_discordbot_v2_util/component/card_guild.dart';
 import 'package:room_notify_discordbot_v2_util/component/page_template.dart';
 import 'package:room_notify_discordbot_v2_util/component/style/text_style_template.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
+
+import '../../../../model/firestore_data_model.dart';
 
 class GuildSettingPage extends StatefulWidget {
   const GuildSettingPage({super.key});
@@ -13,30 +16,10 @@ class GuildSettingPage extends StatefulWidget {
 }
 
 class _GuildSettingPageState extends State<GuildSettingPage> {
-  FirebaseFirestore db = FirestoreController.db;
-  Future getGuilds() async {
-    final docRef = db
-        .collection('data')
-        .doc('guilds')
-        .collection('1094864997164777522')
-        .doc('guild_info');
-    final docSnapshot = await docRef.get();
-    final data = docSnapshot.exists ? docSnapshot.data() : null;
-
-    /* サーバー側からdocumentに情報置いといたほうが楽？（コレクションのリスト取れないのかよ） */
-    /* ここでやるとアクセス数エグいかさ増しになるのでmainのinit級にデータ保存する */
-    /* discordでのAuthを早いうちに実装したほうが良さげ（ログインしたユーザーと合致するのをギルドから探索。あとfirestoreのルール） */
-
-    print(data!['guild_id']);
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future(() async {
-      await getGuilds();
-    });
   }
 
   @override
@@ -49,6 +32,41 @@ class _GuildSettingPageState extends State<GuildSettingPage> {
           PageTemplate.setPageTitle(
               title: '配信ギルド 設定',
               caption: '教室通知くんv2が配信するギルド( = Discordサーバー)を設定します。'),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: FirestoreDataModel.entryGuilds!.length,
+            itemBuilder: (context, index) {
+              // FirestoreDataModel.entryGuilds!['entryGuilds'][index]
+              final guildId =
+                  FirestoreDataModel.entryGuilds!.keys.elementAt(index);
+              final guildIcon =
+                  FirestoreDataModel.entryGuilds![guildId]['guild_icon'];
+              final guildName =
+                  FirestoreDataModel.entryGuilds![guildId]['guild_name'];
+              final guildState =
+                  FirestoreDataModel.entryGuilds![guildId]['state'];
+              print('👑 ${guildId}');
+              return InkWell(
+                child: CardGuild.setCard(
+                  guildId: guildId,
+                  guildName: guildName,
+                  guildIcon: guildIcon,
+                  guildState: guildState,
+                ),
+                onTap: () {
+                  CardGuild.showGuildInfoModal(
+                    context: context,
+                    guildId: guildId,
+                    guildName: guildName,
+                    guildIcon: guildIcon,
+                    guildState: guildState,
+                    edit: true,
+                  );
+                },
+              );
+            },
+          )
         ],
       ),
     );
