@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 
@@ -9,10 +11,11 @@ class FirestoreController {
     final docSnapshot = await docRef.get();
 
     Map<String, dynamic>? data = docSnapshot.exists ? docSnapshot.data() : null;
+    print(data);
     FirestoreDataModel.entryGuilds = data;
 
     print('👑 GetEntryGuilds');
-    print(data);
+    print(FirestoreDataModel.entryGuilds);
   }
 
   static Future<Map<String, dynamic>?> getGuildInfo(
@@ -27,5 +30,33 @@ class FirestoreController {
     final data = docSnapshot.exists ? docSnapshot.data() : null;
     print('👑 GetGuildInfo');
     return data;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getGuildUsers(
+      {required String guildId}) {
+    final docRef = db.collection('data').doc('users').collection(guildId);
+    final snapshots = docRef.snapshots();
+    //final docSnapshot = await docRef.get();
+
+    // final data = docSnapshot.exists ? docSnapshot.data() : null;
+    return snapshots;
+  }
+
+  static void setGuildInfo(
+      {required guildId, required field, required data}) async {
+    final docRef = db.collection('data').doc('guilds');
+
+    await docRef.update({'$guildId.$field': data});
+  }
+
+  static void setGuildUserInfo(
+      {required guildId,
+      required userId,
+      required field,
+      required data}) async {
+    final docRef =
+        db.collection('data').doc('users').collection(guildId).doc(userId);
+
+    await docRef.update({field: data});
   }
 }

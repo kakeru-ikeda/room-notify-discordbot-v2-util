@@ -13,22 +13,23 @@ module.exports.entry = async () => {
 
             console.log(guild);
 
-            const collection_guild = firestore.db.collection(`data/guilds/${guild.id}`);
-            const doc_guild_info = collection_guild.doc('guild_info');
-            await doc_guild_info.set({
-                'guild_id': guild.id,
-                'guild_name': guild.name,
-                'guild_icon': guild.icon,
-                'state': true
-            });
+            // const collection_guild = firestore.db.collection(`data/guilds/${guild.id}`);
+            // const doc_guild_info = collection_guild.doc('guild_info');
+            // await doc_guild_info.set({
+            //     'guild_id': guild.id,
+            //     'guild_name': guild.name,
+            //     'guild_icon': guild.icon,
+            //     'state': true
+            // });
 
             entryGuilds[guild.id] = {
+                'guild_id': guild.id,
                 'guild_name': guild.name,
                 'guild_icon': guild.icon,
                 'state': true
             };
 
-            let entryChannels = {};
+            // let entryChannels = {};
             for (const fetch of channels) {
                 const channel = fetch[1];
 
@@ -36,17 +37,25 @@ module.exports.entry = async () => {
                     continue;
                 }
 
-                entryChannels[channel.id] = {
+                // entryChannels[channel.id] = {
+                //     'channel_id': channel.id,
+                //     'channel_name': channel.name,
+                //     'subject': '',
+                //     'state': true
+                // }
+
+                await firestore.db.collection(`data/channels/${guild.id}`).doc(channel.id).set({
+                    'channel_id': channel.id,
                     'channel_name': channel.name,
                     'subject': '',
                     'state': true
-                };
+                });
             }
-            await collection_guild.doc(`channels`).set(entryChannels);
+            // await firestore.db.collection('channels').doc(guild.id).set(entryChannels);
 
             const users = await guild.members.fetch();
 
-            let entryUsers = {};
+            // let entryUsers = {};
             for (const fetch of users) {
                 const user = fetch[1].user;
 
@@ -54,19 +63,30 @@ module.exports.entry = async () => {
                     continue;
                 }
 
-                entryUsers[user.id] = {
+                // entryUsers[user.id] = {
+                //     'user_id': user.id,
+                //     'user_name': user.username,
+                //     'discriminator': user.discriminator,
+                //     'user_global_name': user.globalName,
+                //     'avatar': user.avatar,
+                //     'is_admin': false,
+                //     'state': true
+                // }
+
+                await firestore.db.collection(`data/users/${guild.id}`).doc(user.id).set({
                     'user_id': user.id,
                     'user_name': user.username,
                     'discriminator': user.discriminator,
                     'user_global_name': user.globalName,
                     'avatar': user.avatar,
+                    'is_admin': false,
                     'state': true
-                };
+                })
             }
-            await collection_guild.doc(`users`).set(entryUsers);
+            // await firestore.db.collection('users').doc(guild.id).set(entryUsers);
         }
 
-        await firestore.db.collection('data').doc('guilds').set(entryGuilds)
+        await firestore.db.collection('data').doc('guilds').set(entryGuilds);
 
         console.log('guildInit: Done');
     } catch (error) {

@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_guild.dart';
 import 'package:room_notify_discordbot_v2_util/component/page_template.dart';
 import 'package:room_notify_discordbot_v2_util/component/style/text_style_template.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 
+import 'guild_modal_contents.dart';
 import '../../../../model/firestore_data_model.dart';
 
 class GuildSettingPage extends StatefulWidget {
@@ -34,7 +36,7 @@ class _GuildSettingPageState extends State<GuildSettingPage> {
               caption: '教室通知くんv2が配信するギルド( = Discordサーバー)を設定します。'),
           ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: FirestoreDataModel.entryGuilds!.length,
             itemBuilder: (context, index) {
               // FirestoreDataModel.entryGuilds!['entryGuilds'][index]
@@ -55,14 +57,25 @@ class _GuildSettingPageState extends State<GuildSettingPage> {
                   guildState: guildState,
                 ),
                 onTap: () {
-                  CardGuild.showGuildInfoModal(
+                  showModalBottomSheet<void>(
                     context: context,
-                    guildId: guildId,
-                    guildName: guildName,
-                    guildIcon: guildIcon,
-                    guildState: guildState,
-                    edit: true,
-                  );
+                    constraints: BoxConstraints.expand(),
+                    enableDrag: false,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return GuildModalContents(
+                        context: context,
+                        guildId: guildId,
+                        guildName: guildName,
+                        guildIcon: guildIcon,
+                        guildState: guildState,
+                      );
+                    },
+                  ).whenComplete(() async {
+                    await FirestoreController.getEntryGuilds();
+                    Fluttertoast.showToast(msg: '情報を更新しました。');
+                    setState(() {});
+                  });
                 },
               );
             },

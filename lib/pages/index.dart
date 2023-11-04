@@ -35,6 +35,7 @@ class _IndexPageState extends State<IndexPage> {
         title: const Text('教室通知くんv2'),
         elevation: 0,
         backgroundColor: Colors.amber,
+        centerTitle: false,
       ),
       drawer: MediaQuery.of(context).size.width <= 768
           ? const CommonDrawer()

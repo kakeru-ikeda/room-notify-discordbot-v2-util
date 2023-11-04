@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:room_notify_discordbot_v2_util/component/user_list.dart';
+import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 
-class ModalContents extends StatefulWidget {
-  const ModalContents({
+class GuildModalContents extends StatefulWidget {
+  const GuildModalContents({
     super.key,
     required BuildContext context,
     required this.guildId,
@@ -18,10 +20,10 @@ class ModalContents extends StatefulWidget {
   final bool edit;
 
   @override
-  State<ModalContents> createState() => _ModalContentsState();
+  State<GuildModalContents> createState() => _GuildModalContentsState();
 }
 
-class _ModalContentsState extends State<ModalContents> {
+class _GuildModalContentsState extends State<GuildModalContents> {
   late String guildId;
   late String guildName;
   late String guildIcon;
@@ -64,7 +66,6 @@ class _ModalContentsState extends State<ModalContents> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  _modalWillPop();
                 },
               ),
             ),
@@ -83,16 +84,31 @@ class _ModalContentsState extends State<ModalContents> {
                     color: Colors.grey,
                   ),
                 ),
-                SwitchListTile(
-                  title: const Text('このギルドへの配信を行う'),
-                  value: guildState,
-                  onChanged: (value) {
-                    setState(() {
-                      guildState = value;
-                    });
+                Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: Text('◯ 配信設定'),
+                ),
+                StatefulBuilder(
+                  builder: (context, changeValue) {
+                    return SwitchListTile(
+                      title: const Text('このギルドへの配信を行う'),
+                      value: guildState,
+                      onChanged: (value) {
+                        changeValue(() {
+                          guildState = value;
+                        });
+                        FirestoreController.setGuildInfo(
+                            guildId: guildId, field: 'state', data: value);
+                      },
+                      secondary: const Icon(Icons.send),
+                    );
                   },
-                  secondary: const Icon(Icons.send),
-                )
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: Text('◯ ユーザーの一覧とロール'),
+                ),
+                UserList(guildId: guildId),
               ],
             ),
           ],

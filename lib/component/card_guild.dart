@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:room_notify_discordbot_v2_util/component/modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/owner/setting/guilld/guild_modal_contents.dart';
 
 class CardGuild {
-  static setCard({
+  static Widget setCard({
     required guildId,
     required guildName,
     required guildIcon,
@@ -51,28 +51,30 @@ class CardGuild {
     );
   }
 
-  static showGuildInfoModal({
-    required BuildContext context,
-    required guildId,
-    required guildName,
-    required guildIcon,
-    required guildState,
-    bool edit = false,
-  }) {
-    showModalBottomSheet<void>(
-      context: context,
-      constraints: BoxConstraints.expand(),
-      builder: (BuildContext context) {
-        return ModalContents(
-          context: context,
-          guildId: guildId,
-          guildName: guildName,
-          guildIcon: guildIcon,
-          guildState: guildState,
-        );
-      },
-    );
-  }
+  // static showGuildInfoModal({
+  //   required BuildContext context,
+  //   required guildId,
+  //   required guildName,
+  //   required guildIcon,
+  //   required guildState,
+  //   bool edit = false,
+  // }) {
+  //   showModalBottomSheet<void>(
+  //     context: context,
+  //     constraints: BoxConstraints.expand(),
+  //     enableDrag: false,
+  //     isScrollControlled: true,
+  //     builder: (BuildContext context) {
+  //       return ModalContents(
+  //         context: context,
+  //         guildId: guildId,
+  //         guildName: guildName,
+  //         guildIcon: guildIcon,
+  //         guildState: guildState,
+  //       );
+  //     },
+  //   );
+  // }
 
   static Future<bool> _modalWillPop() async {
     print('👑 Willpop');
