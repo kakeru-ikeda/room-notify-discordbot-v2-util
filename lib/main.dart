@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
+import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/index.dart';
 
 import 'firebase_options.dart';
