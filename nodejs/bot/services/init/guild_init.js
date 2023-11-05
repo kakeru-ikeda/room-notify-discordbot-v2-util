@@ -44,12 +44,19 @@ module.exports.entry = async () => {
                 //     'state': true
                 // }
 
-                await firestore.db.collection(`data/channels/${guild.id}`).doc(channel.id).set({
-                    'channel_id': channel.id,
-                    'channel_name': channel.name,
-                    'subject': '',
-                    'state': true
-                });
+                const target = firestore.db.collection(`data/channels/${guild.id}`).doc(channel.id);
+
+                if (!(await (target.get())).exists) {
+                    await target.set({
+                        'channel_id': channel.id,
+                        'channel_name': channel.name,
+                        'subject': '',
+                        'state': true
+                    });
+                    console.log(`channel_id  ${channel.id}: Done`);
+                } else {
+                    console.log(`channel_id  ${channel.id}: Already`);
+                }
             }
             // await firestore.db.collection('channels').doc(guild.id).set(entryChannels);
 
@@ -73,20 +80,55 @@ module.exports.entry = async () => {
                 //     'state': true
                 // }
 
-                await firestore.db.collection(`data/users/${guild.id}`).doc(user.id).set({
-                    'user_id': user.id,
-                    'user_name': user.username,
-                    'discriminator': user.discriminator,
-                    'user_global_name': user.globalName,
-                    'avatar': user.avatar,
-                    'is_admin': false,
-                    'state': true
-                })
+                const target = firestore.db.collection(`data/users/${guild.id}`).doc(user.id);
+
+                if (!(await target.get()).exists) {
+                    await target.set({
+                        'user_id': user.id,
+                        'user_name': user.username,
+                        'discriminator': user.discriminator,
+                        'user_global_name': user.globalName,
+                        'avatar': user.avatar,
+                        'is_admin': false,
+                        'state': true
+                    });
+                    console.log(`user_id  ${user.id}: Done`);
+                } else {
+                    console.log(`user_id  ${user.id}: Already`);
+                }
             }
             // await firestore.db.collection('users').doc(guild.id).set(entryUsers);
+
+            /* RoomNotify (i: 曜日, j: 時限) */
+            const WEEK = { 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday' };
+            for (i = 1; i <= 5; i++) {
+                const target = firestore.db.collection(`data/room_notify/${guild.id}`).doc(`${WEEK[i]}`);
+
+                if (!(await (target.get())).exists) {
+                    let entryRoomNotify = {};
+                    for (j = 1; j <= 6; j++) {
+
+                        entryRoomNotify[j] = {
+                            'room_number': 0,
+                            'subject': '',
+                            'type': '',
+                            'zoom_id': '',
+                            'zoom_pw': '',
+                            'zoom_url': '',
+                            'contents': '',
+                            'state': false
+                        }
+                    }
+                    await target.set(entryRoomNotify);
+
+                    console.log(`room_notify ${guild.id} ${WEEK[i]}: Done`);
+                } else {
+                    console.log(`room_notify ${guild.id} ${WEEK[i]}: Already`);
+                }
+            }
         }
 
-        await firestore.db.collection('data').doc('guilds').set(entryGuilds);
+        await firestore.db.collection('data').doc('guilds').update(entryGuilds);
 
         console.log('guildInit: Done');
     } catch (error) {

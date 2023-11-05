@@ -42,6 +42,26 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getGuildChannels(
+      {required guildId}) {
+    final docRef = db.collection('data').doc('channels').collection(guildId);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>>
+      getSubjectEnabledForChannels({required guildId}) {
+    final docRef = db
+        .collection('data')
+        .doc('channels')
+        .collection(guildId)
+        .where('subject', isNotEqualTo: '');
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
   static void setGuildInfo(
       {required guildId, required field, required data}) async {
     final docRef = db.collection('data').doc('guilds');
@@ -56,6 +76,20 @@ class FirestoreController {
       required data}) async {
     final docRef =
         db.collection('data').doc('users').collection(guildId).doc(userId);
+
+    await docRef.update({field: data});
+  }
+
+  static void setChannelInfo(
+      {required guildId,
+      required channelId,
+      required field,
+      required data}) async {
+    final docRef = db
+        .collection('data')
+        .doc('channels')
+        .collection(guildId)
+        .doc(channelId);
 
     await docRef.update({field: data});
   }

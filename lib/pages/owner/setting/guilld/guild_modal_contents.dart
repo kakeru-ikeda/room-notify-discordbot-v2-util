@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:room_notify_discordbot_v2_util/component/modal_contents_template.dart';
+import 'package:room_notify_discordbot_v2_util/component/page_template.dart';
 import 'package:room_notify_discordbot_v2_util/component/user_list.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 
@@ -48,71 +50,38 @@ class _GuildModalContentsState extends State<GuildModalContents> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () => _modalWillPop(),
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: InkWell(
-                child: Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(
-                    Icons.close,
-                    size: 24,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
+    return ModalContentsTemplate.setContents(
+      context: context,
+      contents: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PageTemplate.setGuildInfoTitle(guildId: guildId),
+          Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: Text('◯ 配信設定'),
+          ),
+          StatefulBuilder(
+            builder: (context, changeValue) {
+              return SwitchListTile(
+                title: const Text('このギルドへの配信を行う'),
+                value: guildState,
+                onChanged: (value) {
+                  changeValue(() {
+                    guildState = value;
+                  });
+                  FirestoreController.setGuildInfo(
+                      guildId: guildId, field: 'state', data: value);
                 },
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  guildName,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'GuildID: $guildId',
-                  style: TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 24),
-                  child: Text('◯ 配信設定'),
-                ),
-                StatefulBuilder(
-                  builder: (context, changeValue) {
-                    return SwitchListTile(
-                      title: const Text('このギルドへの配信を行う'),
-                      value: guildState,
-                      onChanged: (value) {
-                        changeValue(() {
-                          guildState = value;
-                        });
-                        FirestoreController.setGuildInfo(
-                            guildId: guildId, field: 'state', data: value);
-                      },
-                      secondary: const Icon(Icons.send),
-                    );
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 24),
-                  child: Text('◯ ユーザーの一覧とロール'),
-                ),
-                UserList(guildId: guildId),
-              ],
-            ),
-          ],
-        ),
+                secondary: const Icon(Icons.send),
+              );
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: Text('◯ ユーザーの一覧とロール'),
+          ),
+          UserList(guildId: guildId),
+        ],
       ),
     );
   }
