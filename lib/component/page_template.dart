@@ -14,7 +14,7 @@ class PageTemplate {
           style: TextStyleTemplate.pageTitle,
         ),
         Padding(
-          padding: const EdgeInsets.only(bottom: 32),
+          padding: const EdgeInsets.only(bottom: 16),
           child: Text(caption),
         ),
       ],
@@ -25,7 +25,7 @@ class PageTemplate {
     guildId = guildId ?? LoginUserModel.currentGuildId;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 16),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
           Image.network(

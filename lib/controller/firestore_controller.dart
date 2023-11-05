@@ -50,13 +50,22 @@ class FirestoreController {
     return snapshots;
   }
 
-  static Stream<QuerySnapshot<Map<String, dynamic>>>
-      getSubjectEnabledForChannels({required guildId}) {
+  static Future<QuerySnapshot<Map<String, dynamic>>>
+      getSubjectEnabledForChannels({required guildId}) async {
     final docRef = db
         .collection('data')
         .doc('channels')
         .collection(guildId)
         .where('subject', isNotEqualTo: '');
+    final result = await docRef.get();
+
+    return result;
+  }
+
+  static Stream<DocumentSnapshot<Map<String, dynamic>>> getRoomNotify(
+      {required guildId, required week}) {
+    final docRef =
+        db.collection('data').doc('room_notify').collection(guildId).doc(week);
     final snapshots = docRef.snapshots();
 
     return snapshots;
@@ -90,6 +99,14 @@ class FirestoreController {
         .doc('channels')
         .collection(guildId)
         .doc(channelId);
+
+    await docRef.update({field: data});
+  }
+
+  static setRoomNotifyInfo(
+      {required guildId, required week, required field, required data}) async {
+    final docRef =
+        db.collection('data').doc('room_notify').collection(guildId).doc(week);
 
     await docRef.update({field: data});
   }
