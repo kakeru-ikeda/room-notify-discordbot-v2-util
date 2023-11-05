@@ -45,7 +45,7 @@ class _UserListState extends State<UserList> {
             ),
           );
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
