@@ -1,6 +1,9 @@
 const { log } = require('console');
 const bot = require('../../module/bot');
 const firestore = require('../../module/firestore');
+const fetchData = require('../../model/fetch_data');
+const { QuerySnapshot } = require('@google-cloud/firestore');
+const { channel } = require('diagnostics_channel');
 
 module.exports.entry = async () => {
     try {
@@ -10,17 +13,6 @@ module.exports.entry = async () => {
         for (const fetch of guilds) {
             const guild = fetch[1];
             const channels = guild.channels.cache;
-
-            console.log(guild);
-
-            // const collection_guild = firestore.db.collection(`data/guilds/${guild.id}`);
-            // const doc_guild_info = collection_guild.doc('guild_info');
-            // await doc_guild_info.set({
-            //     'guild_id': guild.id,
-            //     'guild_name': guild.name,
-            //     'guild_icon': guild.icon,
-            //     'state': true
-            // });
 
             entryGuilds[guild.id] = {
                 'guild_id': guild.id,
@@ -112,6 +104,7 @@ module.exports.entry = async () => {
                             'room_number': 0,
                             'subject': '',
                             'type': '',
+                            'alart_week': 0,
                             'alart_hour': 0,
                             'alart_min': 0,
                             'zoom_id': '',
@@ -136,5 +129,37 @@ module.exports.entry = async () => {
     } catch (error) {
         console.log(error);
     }
+}
+
+module.exports.fetch = async () => {
+    fetchData.entryGuilds = (await firestore.db.collection('data').doc('guilds').get()).data();
+
+    for (const guildId in fetchData.entryGuilds) {
+        const channelsQuery = firestore.db.collection(`data/channels/${guildId}/`);
+        channelsQuery.onSnapshot(querySnapshot => {
+            let channels = {};
+            querySnapshot.forEach((e) => {
+                const channelData = e.data();
+                channels[channelData['channel_id']] = channelData;
+            })
+            fetchData.entryChannels[guildId] = channels;
+        })
+
+        const roomNotifyQuery = firestore.db.collection(`data/room_notify/${guildId}/`);
+        roomNotifyQuery.onSnapshot(querySnapshot => {
+            let roomNotify = [];
+            querySnapshot.forEach((e) => {
+                const roomNotifyData = e.data();
+
+                for (const key in roomNotifyData) {
+                    if (roomNotifyData[key]['state']) {
+                        roomNotify.push(roomNotifyData[key]);
+                    }
+                }
+            })
+            fetchData.roomNotify[guildId] = roomNotify;
+        })
+    }
+
 
 }

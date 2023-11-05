@@ -54,6 +54,14 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
       'friday': '金曜日'
     };
 
+    final Map<String, int> WEEKS_NUM = {
+      'monday': 1,
+      'tuesday': 2,
+      'wednesday': 3,
+      'thursday': 4,
+      'friday': 5
+    };
+
     final Map<int, String> TIME_SCHEDULE = {
       1: '9:30',
       2: '11:15',
@@ -369,6 +377,7 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
                 'room_number': int.parse(roomNumberEditingController.text),
                 'subject': isSelectedSubject,
                 'type': typeBool ? 'zoom' : 'room',
+                'alart_week': WEEKS_NUM[week],
                 'alart_hour': selectedTime.hour,
                 'alart_min': selectedTime.minute,
                 'zoom_id': zoomIdEditingController.text,
