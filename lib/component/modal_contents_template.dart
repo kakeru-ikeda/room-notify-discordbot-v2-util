@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 
 class ModalContentsTemplate {
   static setContents(
-      {required BuildContext context, required Widget contents}) {
+      {required BuildContext context,
+      required Widget contents,
+      Function? willPopFunction}) {
     return WillPopScope(
       onWillPop: () async {
+        if (willPopFunction != null) {
+          willPopFunction();
+        }
         return true;
       },
       child: Padding(
@@ -22,6 +27,9 @@ class ModalContentsTemplate {
                   ),
                 ),
                 onTap: () {
+                  if (willPopFunction != null) {
+                    willPopFunction();
+                  }
                   Navigator.pop(context);
                 },
               ),

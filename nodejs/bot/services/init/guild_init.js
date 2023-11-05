@@ -112,6 +112,8 @@ module.exports.entry = async () => {
                             'room_number': 0,
                             'subject': '',
                             'type': '',
+                            'alart_hour': 0,
+                            'alart_min': 0,
                             'zoom_id': '',
                             'zoom_pw': '',
                             'zoom_url': '',
