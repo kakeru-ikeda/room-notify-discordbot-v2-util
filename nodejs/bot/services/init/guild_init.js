@@ -18,6 +18,7 @@ module.exports.entry = async () => {
                 'guild_id': guild.id,
                 'guild_name': guild.name,
                 'guild_icon': guild.icon,
+                'room_notify_channel': '',
                 'state': true
             };
 
