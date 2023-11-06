@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_room_notify.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
+import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 
 import '../../../../component/page_template.dart';
@@ -30,7 +32,8 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
       5: '金曜日',
     };
 
-    String isSelectedChannel = '';
+    String isSelectedChannel = FirestoreDataModel
+        .entryGuilds![LoginUserModel.currentGuildId]['room_notify_channel'];
 
     return Padding(
       padding: const EdgeInsets.all(32),
@@ -41,41 +44,56 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
               title: '教室通知 登録・編集',
               caption:
                   '毎日の教室通知の配信を登録します。配信内容の変更や長期休暇時の配信停止の設定もこちらから。Adminユーザーのみ編集可能です。'),
-          PageTemplate.setGuildInfoTitle(
-              guildId: LoginUserModel.currentGuildId),
-          StatefulBuilder(builder: (context, changeValue) {
-            return FutureBuilder(
-              future: FirestoreController.getGuildChannelsData(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              PageTemplate.setGuildInfoTitle(
                   guildId: LoginUserModel.currentGuildId),
-              builder: (context, snapshot) {
-                print(snapshot.data);
-                if (snapshot.hasData) {
-                  return DropdownButton(
-                      value: isSelectedChannel,
-                      items: [
-                        ...snapshot.data!.docs
-                            .map((entry) => DropdownMenuItem(
-                                  value: entry.data()['channel_name'],
-                                  child:
-                                      Text('${entry.data()['channel_name']}'),
-                                ))
-                            .toList(),
-                        const DropdownMenuItem(
-                          value: '',
-                          child: Text('未設定'),
-                        )
-                      ],
-                      onChanged: (newValue) {
-                        changeValue(() {
-                          isSelectedChannel = newValue.toString();
-                        });
-                      });
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            );
-          }),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text('教室通知 配信チャネル:'),
+              ),
+              StatefulBuilder(builder: (context, changeValue) {
+                return FutureBuilder(
+                  future: FirestoreController.getGuildChannelsData(
+                      guildId: LoginUserModel.currentGuildId),
+                  builder: (context, snapshot) {
+                    print(snapshot.data);
+                    if (snapshot.hasData) {
+                      return DropdownButton(
+                          value: isSelectedChannel,
+                          items: [
+                            ...snapshot.data!.docs
+                                .map((entry) => DropdownMenuItem(
+                                      value: entry.data()['channel_id'],
+                                      child: Text(
+                                          '${entry.data()['channel_name']}'),
+                                    ))
+                                .toList(),
+                            const DropdownMenuItem(
+                              value: '',
+                              child: Text('未設定'),
+                            )
+                          ],
+                          onChanged: (newValue) {
+                            changeValue(() {
+                              isSelectedChannel = newValue.toString();
+
+                              FirestoreController.setGuildInfo(
+                                  guildId: LoginUserModel.currentGuildId,
+                                  field: 'room_notify_channel',
+                                  data: isSelectedChannel);
+                              Fluttertoast.showToast(msg: '情報を更新しました。');
+                            });
+                          });
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
+                );
+              }),
+            ],
+          ),
           Row(
             children: [
               Column(
