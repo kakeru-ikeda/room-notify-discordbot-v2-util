@@ -30,6 +30,8 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
       5: '金曜日',
     };
 
+    String isSelectedChannel = '';
+
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -41,6 +43,39 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                   '毎日の教室通知の配信を登録します。配信内容の変更や長期休暇時の配信停止の設定もこちらから。Adminユーザーのみ編集可能です。'),
           PageTemplate.setGuildInfoTitle(
               guildId: LoginUserModel.currentGuildId),
+          StatefulBuilder(builder: (context, changeValue) {
+            return FutureBuilder(
+              future: FirestoreController.getGuildChannelsData(
+                  guildId: LoginUserModel.currentGuildId),
+              builder: (context, snapshot) {
+                print(snapshot.data);
+                if (snapshot.hasData) {
+                  return DropdownButton(
+                      value: isSelectedChannel,
+                      items: [
+                        ...snapshot.data!.docs
+                            .map((entry) => DropdownMenuItem(
+                                  value: entry.data()['channel_name'],
+                                  child:
+                                      Text('${entry.data()['channel_name']}'),
+                                ))
+                            .toList(),
+                        const DropdownMenuItem(
+                          value: '',
+                          child: Text('未設定'),
+                        )
+                      ],
+                      onChanged: (newValue) {
+                        changeValue(() {
+                          isSelectedChannel = newValue.toString();
+                        });
+                      });
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            );
+          }),
           Row(
             children: [
               Column(
