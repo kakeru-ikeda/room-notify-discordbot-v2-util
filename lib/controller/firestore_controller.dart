@@ -62,6 +62,14 @@ class FirestoreController {
     return result;
   }
 
+  static Future<QuerySnapshot<Map<String, dynamic>>> getGuildChannelsData(
+      {required guildId}) async {
+    final docRef = db.collection('data').doc('channels').collection(guildId);
+    final result = await docRef.get();
+
+    return result;
+  }
+
   static Stream<DocumentSnapshot<Map<String, dynamic>>> getRoomNotify(
       {required guildId, required week}) {
     final docRef =
