@@ -37,8 +37,6 @@ class _CardUserState extends State<CardUser> {
     final List<String> choices = <String>['メンバー', '管理者'];
     String isSelectedValue = isAdmin ? choices.last : choices.first;
 
-    print(isAdmin.toString());
-
     return Card(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

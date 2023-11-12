@@ -59,8 +59,8 @@ class _CommonDrawerState extends State<CommonDrawer> {
             child: Text('管理者用ページ'),
           ),
           ListTile(
-            title: Text('教室通知 登録・編集'),
-            leading: Icon(Icons.note_alt),
+            title: Text('教員情報 登録'),
+            leading: Icon(Icons.person),
             onTap: () {
               setState(() {
                 MediaQuery.of(context).size.width <= 768
@@ -71,14 +71,26 @@ class _CommonDrawerState extends State<CommonDrawer> {
             },
           ),
           ListTile(
-            title: Text('チャネル 設定'),
-            leading: Icon(Icons.settings),
+            title: Text('科目チャネル 登録'),
+            leading: Icon(Icons.subject),
             onTap: () {
               setState(() {
                 MediaQuery.of(context).size.width <= 768
                     ? Navigator.pop(context)
                     : null;
                 IndexPageController.screen.jumpToPage(4);
+              });
+            },
+          ),
+          ListTile(
+            title: Text('教室通知 登録'),
+            leading: Icon(Icons.note_alt),
+            onTap: () {
+              setState(() {
+                MediaQuery.of(context).size.width <= 768
+                    ? Navigator.pop(context)
+                    : null;
+                IndexPageController.screen.jumpToPage(5);
               });
             },
           ),
@@ -94,7 +106,7 @@ class _CommonDrawerState extends State<CommonDrawer> {
                 MediaQuery.of(context).size.width <= 768
                     ? Navigator.pop(context)
                     : null;
-                IndexPageController.screen.jumpToPage(5);
+                IndexPageController.screen.jumpToPage(6);
               });
             },
           ),
