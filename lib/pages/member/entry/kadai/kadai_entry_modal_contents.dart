@@ -24,12 +24,6 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
 
   bool discordEvent = false;
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
   Future<void> _datePicker(BuildContext context) async {
     datePicked = await showDatePicker(
         context: context,

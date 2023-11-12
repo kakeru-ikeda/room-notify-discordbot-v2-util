@@ -104,6 +104,18 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getReminds(
+      {required guildId}) {
+    final docRef = db
+        .collection('notice')
+        .doc('remind')
+        .collection(guildId)
+        .orderBy('deadline', descending: false);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
   static void setGuildInfo(
       {required guildId, required field, required data}) async {
     final docRef = db.collection('data').doc('guilds');
@@ -178,6 +190,14 @@ class FirestoreController {
     // }
   }
 
+  static setRemindInfo(
+      {required guildId, required remindId, required data}) async {
+    final docRef =
+        db.collection('notice').doc('remind').collection(guildId).doc(remindId);
+
+    await docRef.set(data);
+  }
+
   static removeTeacher({required guildId, required teacherName}) {
     final docRef = db
         .collection('data')
@@ -191,6 +211,13 @@ class FirestoreController {
   static removeKadai({required guildId, required kadaiId}) {
     final docRef =
         db.collection('notice').doc('kadai').collection(guildId).doc(kadaiId);
+
+    docRef.delete();
+  }
+
+  static removeRemind({required guildId, required remindId}) {
+    final docRef =
+        db.collection('notice').doc('remind').collection(guildId).doc(remindId);
 
     docRef.delete();
   }
