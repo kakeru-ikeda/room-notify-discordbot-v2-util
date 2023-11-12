@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
 import 'package:room_notify_discordbot_v2_util/pages/admin/entry/room_notify/room_notify_entry_page.dart';
-import 'package:room_notify_discordbot_v2_util/pages/admin/setting/channel/channel_setting_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/admin/entry/teacher/teacher_entry_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/admin/entry/channel/channel_setting_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/member/entry/kadai/kadai_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/member/entry/remind/remind_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/owner/setting/guilld/guild_setting_page.dart';
@@ -53,8 +54,9 @@ class _IndexPageState extends State<IndexPage> {
                 HomePage(),
                 KadaiEntryPage(),
                 RemindEntryPage(),
-                RoomNotifyEntryPage(),
+                TeacherEntryPage(),
                 ChannelSettingPage(),
+                RoomNotifyEntryPage(),
                 GuildSettingPage(),
               ],
             ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_channel.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
-import 'package:room_notify_discordbot_v2_util/pages/admin/setting/channel/channel_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/admin/entry/channel/channel_modal_contents.dart';
 
 import '../../../../component/page_template.dart';
 import '../../../../controller/firestore_controller.dart';
@@ -27,18 +27,45 @@ class _ChannelSettingPageState extends State<ChannelSettingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           PageTemplate.setPageTitle(
-              title: 'チャネル 設定',
+              title: '科目チャネル 登録',
               caption: '課題通知とリマインドの配信先となるチャネルの設定です。Adminユーザーのみ編集可能です。'),
           // Guild
           PageTemplate.setGuildInfoTitle(),
+          ElevatedButton.icon(
+            onPressed: () async {
+              showModalBottomSheet<void>(
+                context: context,
+                constraints: BoxConstraints.expand(),
+                enableDrag: false,
+                // isScrollControlled: true,
+                builder: (BuildContext context) {
+                  return ChannelModalContents(
+                    guildId: LoginUserModel.currentGuildId,
+                  );
+                },
+              ).whenComplete(() async {});
+            },
+            icon: Icon(Icons.add),
+            label: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                '科目追加',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Divider(),
+          ),
           StreamBuilder(
-            stream: FirestoreController.getGuildChannels(
+            stream: FirestoreController.getSubjectEnabledForChannels(
                 guildId: LoginUserModel.currentGuildId),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.docs.isNotEmpty) {
                   return SizedBox(
-                    height: 600,
+                    height: 500,
                     child: SingleChildScrollView(
                       child: ListView(
                         shrinkWrap: true,

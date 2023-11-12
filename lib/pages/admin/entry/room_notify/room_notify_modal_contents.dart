@@ -140,8 +140,8 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: StatefulBuilder(
                     builder: (context, setState) {
-                      return FutureBuilder(
-                        future:
+                      return StreamBuilder(
+                        stream:
                             FirestoreController.getSubjectEnabledForChannels(
                                 guildId: guildId),
                         builder: (context, snapshot) {
@@ -229,7 +229,6 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
                         setState(() {
                           typeBool = value;
                         });
-                        // FirestoreController.setRoomNotifyInfo(guildId: guildId, week: week, field: field, data: data)
                       },
                     ),
                     Divider(),
