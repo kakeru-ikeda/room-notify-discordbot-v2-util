@@ -93,24 +93,39 @@ class FirestoreController {
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getKadai(
-      {required guildId}) {
-    final docRef = db
-        .collection('notice')
-        .doc('kadai')
-        .collection(guildId)
-        .orderBy('deadline', descending: false);
+      {required guildId, bool isEnabled = false}) {
+    final docRef = isEnabled
+        ? db
+            .collection('notice')
+            .doc('kadai')
+            .collection(guildId)
+            // .orderBy('deadline', descending: false)
+            .where('state', isEqualTo: true)
+        : db
+            .collection('notice')
+            .doc('kadai')
+            .collection(guildId)
+            .orderBy('deadline', descending: false);
     final snapshots = docRef.snapshots();
 
     return snapshots;
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getReminds(
-      {required guildId}) {
-    final docRef = db
-        .collection('notice')
-        .doc('remind')
-        .collection(guildId)
-        .orderBy('deadline', descending: false);
+      {required guildId, bool isEnabled = false}) {
+    Query<Map<String, dynamic>> docRef = isEnabled
+        ? db
+            .collection('notice')
+            .doc('remind')
+            .collection(guildId)
+            .where('state', isEqualTo: true)
+        // .orderBy('deadline', descending: false)
+        : db
+            .collection('notice')
+            .doc('remind')
+            .collection(guildId)
+            .orderBy('deadline', descending: false);
+
     final snapshots = docRef.snapshots();
 
     return snapshots;
