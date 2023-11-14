@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
 import 'package:room_notify_discordbot_v2_util/pages/admin/entry/room_notify/room_notify_entry_page.dart';
-import 'package:room_notify_discordbot_v2_util/pages/admin/setting/channel/channel_setting_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/admin/entry/teacher/teacher_entry_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/admin/entry/channel/channel_setting_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/member/entry/kadai/kadai_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/member/entry/remind/remind_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/owner/setting/guilld/guild_setting_page.dart';
 import 'package:room_notify_discordbot_v2_util/component/common_drawer.dart';
 
+import '../controller/firestore_controller.dart';
+import '../model/firestore_data_model.dart';
 import 'home/home_page.dart';
 
 class IndexPage extends StatefulWidget {
@@ -20,12 +23,20 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirestoreController.getEntryGuilds();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('教室通知くんv2'),
         elevation: 0,
         backgroundColor: Colors.amber,
+        centerTitle: false,
       ),
       drawer: MediaQuery.of(context).size.width <= 768
           ? const CommonDrawer()
@@ -43,8 +54,9 @@ class _IndexPageState extends State<IndexPage> {
                 HomePage(),
                 KadaiEntryPage(),
                 RemindEntryPage(),
-                RoomNotifyEntryPage(),
+                TeacherEntryPage(),
                 ChannelSettingPage(),
+                RoomNotifyEntryPage(),
                 GuildSettingPage(),
               ],
             ),
