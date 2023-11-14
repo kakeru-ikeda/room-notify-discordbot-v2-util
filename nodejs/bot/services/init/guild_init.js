@@ -188,6 +188,7 @@ module.exports.fetch = async () => {
                     firestore.db.collection(`data/channels/${guildId}/`).where('subject', '==', changeData['subject']).get()
                         .then(async (res) => {
                             const channelId = res.docs[0].data()['channel_id'];
+                            console.log(channelId);
                             messageController.send({ channel: channelId, isEmbeds: true, embedsMode: 'kadai', optionalData: changeData, isEvent: changeData['is_event'] })
                             await firestore.db.collection(`notice/kadai/${guildId}`).doc(change.doc.id).update({ 'entry_notify': true });
                         });

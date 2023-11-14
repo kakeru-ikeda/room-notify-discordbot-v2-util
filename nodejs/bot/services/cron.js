@@ -35,7 +35,10 @@ let notice = cron.schedule('* * * * *', () => {
 
             /* 当日9時の課題通知 */
             if (year == dl_year && month == dl_month && day == dl_day && hour == 9 && minutes == 0) {
-                const text = `${kadaiData['subject']} 課題No.${kadaiData['kadai_number']} 「${kadaiData['kadai_title']}」は、本日 ${dl_year}/${dl_month}/${dl_day} ${dl_hour}:${dl_minutes} で提出期限です！`;
+
+                const text = kadaiData['kadai_number'] != ''
+                    ? `${kadaiData['subject']} 課題No.${kadaiData['kadai_number']} 「${kadaiData['kadai_title']}」は、本日 ${dl_year}/${dl_month}/${dl_day} ${dl_hour}:${dl_minutes} で提出期限です！`
+                    : `${kadaiData['subject']} 「${kadaiData['kadai_title']}」は、本日 ${dl_year}/${dl_month}/${dl_day} ${dl_hour}:${dl_minutes} で提出期限です！`;
 
                 firestore.db.collection(`data/channels/${kadaiData['guildId']}/`).where('subject', '==', kadaiData['subject']).get()
                     .then(async (res) => {
@@ -60,7 +63,9 @@ let notice = cron.schedule('* * * * *', () => {
 
             /* 前日21時の課題通知 */
             if (year == dl_yd_year && month == dl_yd_month && day == dl_yd_day && hour == 21 && minutes == 0) {
-                const text = `${kadaiData['subject']} 課題No.${kadaiData['kadai_number']} 「${kadaiData['kadai_title']}」は、明日 ${dl_year}/${dl_month}/${dl_day} ${dl_hour}:${dl_minutes} で提出期限です！`;
+                const text = kadaiData['kadai_number'] != ''
+                    ? `${kadaiData['subject']} 課題No.${kadaiData['kadai_number']} 「${kadaiData['kadai_title']}」は、明日 ${dl_year}/${dl_month}/${dl_day} ${dl_hour}:${dl_minutes} で提出期限です！`
+                    : `${kadaiData['subject']} 「${kadaiData['kadai_title']}」は、本日 ${dl_year}/${dl_month}/${dl_day} ${dl_hour}:${dl_minutes} で提出期限です！`;
 
                 firestore.db.collection(`data/channels/${kadaiData['guildId']}/`).where('subject', '==', kadaiData['subject']).get()
                     .then(async (res) => {

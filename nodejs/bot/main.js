@@ -16,7 +16,7 @@ const observer = require('./services/observer')
 bot.client.once(Events.ClientReady, async c => {
     const text = 'Init';
     bot.client.channels.cache.get('982998698239852634').send(text);
-    // await guildInit.entry();
+    await guildInit.entry();
     await guildInit.fetch();
     // setTimeout(() => {
     //     console.log(fetchData.kadai);

@@ -18,7 +18,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
                 .setThumbnail('https://cdn.discordapp.com/attachments/862951519052627968/966499934440419348/unknown.png')
                 .addFields(
                     { name: '科目記号', value: optionalData['subject'] },
-                    { name: '課題No.', value: optionalData['kadai_number'] != '' ? optionalData['kadai_numbe'] : '未設定' },
+                    { name: '課題No.', value: optionalData['kadai_number'] != '' ? optionalData['kadai_number'] : '未設定' },
                     { name: '課題主題', value: optionalData['kadai_title'] },
                     {
                         name: '納期', value: `${optionalData['deadline'].toDate().toLocaleDateString('ja-JP')} ${optionalData['deadline'].toDate().toLocaleTimeString('ja-JP')}`
@@ -92,6 +92,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         }
     } else {
         if (isEmbeds) {
+            console.log(channel);
             const embeds = embedsBuilder(embedsMode, optionalData);
             bot.client.channels.cache.get(`${channel}`).send({ embeds: [embeds] }) // (embeds 本番)
         } else if (channel != '') {
