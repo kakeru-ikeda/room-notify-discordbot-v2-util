@@ -55,8 +55,7 @@ class _KadaiEntryPageState extends State<KadaiEntryPage> {
           ),
           StreamBuilder(
             stream: FirestoreController.getKadai(
-              guildId: LoginUserModel.currentGuildId,
-            ),
+                guildId: LoginUserModel.currentGuildId, isEnabled: true),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return SizedBox(

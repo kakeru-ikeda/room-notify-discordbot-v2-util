@@ -93,9 +93,11 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
     } else {
         if (isEmbeds) {
             const embeds = embedsBuilder(embedsMode, optionalData);
-            bot.client.channels.cache.get(`${channel}`).send({ embeds: [embeds] }) // (本番)
+            bot.client.channels.cache.get(`${channel}`).send({ embeds: [embeds] }) // (embeds 本番)
+        } else if (channel != '') {
+            bot.client.channels.cache.get(`${channel}`).send(`${contents}`) // (チャネル配信 本番)
         } else {
-            bot.client.channels.cache.get('1097310091276996728').send(`${contents}`) // 教室通知 (本番)
+            bot.client.channels.cache.get('1097310091276996728').send(`${contents}`) // (教室通知 本番)
         }
 
         if (isEvent && optionalData != null) {

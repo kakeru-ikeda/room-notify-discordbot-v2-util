@@ -54,8 +54,10 @@ class _RemindEntryPageState extends State<RemindEntryPage> {
           StreamBuilder(
             stream: FirestoreController.getReminds(
               guildId: LoginUserModel.currentGuildId,
+              isEnabled: true,
             ),
             builder: (context, snapshot) {
+              print(snapshot.data);
               if (snapshot.hasData) {
                 return SizedBox(
                   height: 500,
