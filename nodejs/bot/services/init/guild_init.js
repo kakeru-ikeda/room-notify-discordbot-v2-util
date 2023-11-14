@@ -4,6 +4,9 @@ const firestore = require('../../module/firestore');
 const fetchData = require('../../model/fetch_data');
 const { QuerySnapshot } = require('@google-cloud/firestore');
 const { channel } = require('diagnostics_channel');
+const { resolve } = require('path');
+const { rejects } = require('assert');
+const messageController = require('../../module/message');
 
 module.exports.entry = async () => {
     try {
@@ -76,6 +79,7 @@ module.exports.entry = async () => {
                 const target = firestore.db.collection(`data/users/${guild.id}`).doc(user.id);
 
                 if (!(await target.get()).exists) {
+                    // if (true) {
                     await target.set({
                         'user_id': user.id,
                         'user_name': user.username,
@@ -160,6 +164,79 @@ module.exports.fetch = async () => {
             })
             fetchData.roomNotify[guildId] = roomNotify;
         })
+
+        const kadaiQuery = firestore.db.collection(`notice/kadai/${guildId}/`);
+        kadaiQuery.onSnapshot(querySnapshot => {
+            let kadai = [];
+            querySnapshot.forEach((e) => {
+                const kadaiData = e.data();
+
+                if (kadaiData['state']) {
+                    kadai.push(kadaiData);
+                }
+            })
+            fetchData.kadai[guildId] = kadai;
+
+            querySnapshot.docChanges().forEach(change => {
+                const changeData = change.doc.data();
+                if (change.type === 'added') {
+                    console.log('Add: ', changeData);
+                    if (changeData['entry_notify']) {
+                        return;
+                    }
+
+                    firestore.db.collection(`data/channels/${guildId}/`).where('subject', '==', changeData['subject']).get()
+                        .then(async (res) => {
+                            const channelId = res.docs[0].data()['channel_id'];
+                            messageController.send({ channel: channelId, isEmbeds: true, embedsMode: 'kadai', optionalData: changeData, isEvent: changeData['is_event'] })
+                            await firestore.db.collection(`notice/kadai/${guildId}`).doc(change.doc.id).update({ 'entry_notify': true });
+                        });
+                }
+                if (change.type === 'modified') {
+                    console.log('Modified: ', change.doc.data());
+                }
+                if (change.type === 'removed') {
+                    console.log('Removed: ', change.doc.data());
+                }
+            })
+        })
+
+        const remindsQuery = firestore.db.collection(`notice/remind/${guildId}/`).where('state', '==', true);
+        remindsQuery.onSnapshot(querySnapshot => {
+            let reminds = [];
+            querySnapshot.forEach((e) => {
+                const remindsData = e.data();
+
+                if (remindsData['state']) {
+                    reminds.push(remindsData);
+                }
+            })
+            fetchData.reminds[guildId] = reminds;
+
+            querySnapshot.docChanges().forEach(change => {
+                const changeData = change.doc.data();
+                if (change.type === 'added') {
+                    console.log('Add: ', changeData);
+                    if (changeData['entry_notify']) {
+                        return;
+                    }
+
+                    firestore.db.collection(`data/channels/${guildId}/`).where('subject', '==', changeData['subject']).get()
+                        .then(async (res) => {
+                            const channelId = res.docs[0].data()['channel_id'];
+                            messageController.send({ channel: channelId, isEmbeds: true, embedsMode: 'remind', optionalData: changeData, isEvent: changeData['is_event'] })
+                            await firestore.db.collection(`notice/remind/${guildId}`).doc(change.doc.id).update({ 'entry_notify': true });
+                        });
+                }
+                if (change.type === 'modified') {
+                    console.log('Modified: ', change.doc.data());
+                }
+                if (change.type === 'removed') {
+                    console.log('Removed: ', change.doc.data());
+                }
+            })
+        })
+
     }
 
 

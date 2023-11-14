@@ -7,17 +7,20 @@ const { token } = require('./config.json');
 const bot = require('./module/bot');
 const fetchData = require('./model/fetch_data');
 
-const notifyRoom = require('./services/notify-room');
+const cron = require('./services/cron');
 const firestore = require('./module/firestore');
 
 const guildInit = require('./services/init/guild_init');
+const observer = require('./services/observer')
 
 bot.client.once(Events.ClientReady, async c => {
-    const text = 'Init\nb'
+    const text = 'Init';
     bot.client.channels.cache.get('982998698239852634').send(text);
-    // guildInit.entry();
+    // await guildInit.entry();
     await guildInit.fetch();
-    setTimeout(() => { console.log(fetchData.roomNotify); }, 3000)
+    // setTimeout(() => {
+    //     console.log(fetchData.kadai);
+    // }, 3000)
 
 
     // firestore.db.collection('users').doc('TestUser').set({
@@ -40,7 +43,7 @@ bot.client.once(Events.ClientReady, async c => {
     // console.log(res);
 
 
-    notifyRoom.start();
+    cron.start();
 });
 
 bot.client.login(token);
