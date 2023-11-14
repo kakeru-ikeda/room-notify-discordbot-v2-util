@@ -348,8 +348,9 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
                         ),
                         SizedBox(
                           width: width / 2,
-                          child: TextField(
+                          child: TextFormField(
                             controller: contentsEditingController,
+                            maxLines: 5,
                             decoration: InputDecoration(
                               hintText: '未設定',
                               contentPadding:
@@ -366,8 +367,22 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
           ],
         ),
         willPopFunction: () async {
-          String text =
-              '【${typeBool ? "Zoom通知" : "教室通知"}】${WEEKS_JP[week]} ${TIME_SCHEDULE[period]}〜 $isSelectedSubject ${typeBool ? "¥nID: ${zoomIdEditingController.text}¥nPW: ${zoomPwEditingController.text}¥n${zoomUrlEditingController.text}" : "${roomNumberEditingController.text}教室"} ${contentsEditingController.text != "" ? "¥n${contentsEditingController.text}" : ""}';
+          String text = '';
+          if (typeBool) {
+            text = '''
+【Zoom通知】${WEEKS_JP[week]} ${TIME_SCHEDULE[period]}〜 $isSelectedSubject
+ID: ${zoomIdEditingController.text}
+PW: ${zoomPwEditingController.text}
+${zoomUrlEditingController.text}
+${contentsEditingController.text != "" ? contentsEditingController.text : ""}
+''';
+          } else {
+            text = '''
+【教室通知】${WEEKS_JP[week]} ${TIME_SCHEDULE[period]}〜 $isSelectedSubject ${roomNumberEditingController.text}教室
+${contentsEditingController.text != "" ? contentsEditingController.text : ""}
+''';
+          }
+
           FirestoreController.setRoomNotifyInfo(
               guildId: guildId,
               week: week,
