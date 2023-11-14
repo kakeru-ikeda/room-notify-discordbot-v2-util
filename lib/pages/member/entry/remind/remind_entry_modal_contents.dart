@@ -224,8 +224,11 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                           'memo': remindMemoEditingController.text,
                           'guildId': guildId,
                           'entry_date': entryDate,
-                          'entry_user': LoginUserModel.userId,
+                          'entry_user_id': LoginUserModel.userId,
+                          'entry_user_name': LoginUserModel.userName,
+                          'entry_user_avater': LoginUserModel.userAvater,
                           'attachment': 'URL(Comming soon...)',
+                          'entry_notify': false,
                           'state': true,
                         });
 
