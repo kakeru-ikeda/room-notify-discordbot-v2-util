@@ -2,7 +2,9 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
+import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 
 class FirestoreController {
   static final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -12,24 +14,16 @@ class FirestoreController {
     final docSnapshot = await docRef.get();
 
     Map<String, dynamic>? data = docSnapshot.exists ? docSnapshot.data() : null;
-    print(data);
     FirestoreDataModel.entryGuilds = data;
 
     print('👑 GetEntryGuilds');
     print(FirestoreDataModel.entryGuilds);
   }
 
-  static Future<Map<String, dynamic>?> getGuildInfo(
-      {required String guildId}) async {
-    final docRef = db
-        .collection('data')
-        .doc('guilds')
-        .collection(guildId)
-        .doc('guild_info');
-    final docSnapshot = await docRef.get();
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getGuildData() {
+    final docRef = db.collection('data').doc('guilds');
+    final data = docRef.get();
 
-    final data = docSnapshot.exists ? docSnapshot.data() : null;
-    print('👑 GetGuildInfo');
     return data;
   }
 
@@ -41,6 +35,15 @@ class FirestoreController {
 
     // final data = docSnapshot.exists ? docSnapshot.data() : null;
     return snapshots;
+  }
+
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getGuildEntryUser(
+      {required String guildId, required String userId}) {
+    final docRef =
+        db.collection('data').doc('users').collection(guildId).doc(userId);
+    final data = docRef.get();
+
+    return data;
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getGuildChannels(
@@ -211,6 +214,47 @@ class FirestoreController {
         db.collection('notice').doc('remind').collection(guildId).doc(remindId);
 
     await docRef.set(data);
+  }
+
+  static setLoginUser({
+    required uid,
+    required discordId,
+    required userName,
+    required globalUserName,
+    required avatar,
+  }) async {
+    final docRef = db.collection('login_user').doc(uid);
+
+    await docRef.set({
+      'id': discordId,
+      'user_name': userName,
+      'user_global_name': globalUserName,
+      'avatar': avatar
+    });
+
+    LoginUserModel.userId = discordId;
+    LoginUserModel.userName = globalUserName;
+    LoginUserModel.avatar = avatar;
+  }
+
+  static setLoginUserData({
+    required uid,
+    required currentGuildId,
+    required currentGuildName,
+  }) async {
+    final docRef = db
+        .collection('login_user')
+        .doc(uid)
+        .collection('user_data')
+        .doc('current');
+
+    await docRef.set({
+      'guild_id': currentGuildId,
+      'guild_name': currentGuildName,
+    });
+
+    LoginUserModel.currentGuildId = currentGuildId;
+    LoginUserModel.currentGuildName = currentGuildName;
   }
 
   static removeTeacher({required guildId, required teacherName}) {

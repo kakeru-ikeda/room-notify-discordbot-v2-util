@@ -56,8 +56,14 @@ app.get('/discord-redirect', async (req, res) => {
     const userData = await userResponse.json();
 
     // ユーザー情報をFirebaseやデータベースに保存するなど、必要な処理を行う
+    const userId = userData["id"];
+    const email = userData["email"];
+    const username = userData["username"];
+    const global_name = userData["global_name"];
+    const avatar = userData["avatar"];
 
-    res.send(userData); // ユーザー情報をレスポンスとして返す（サンプル）
+    // res.send(userData); // ユーザー情報をレスポンスとして返す（サンプル）
+    res.redirect('http://localhost:5555/#/auth/?id=' + userId + '&email=' + email + '&username=' + username + '&global_name=' + global_name + '&avatar=' + avatar);
 
 });
 
