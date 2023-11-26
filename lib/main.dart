@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:room_notify_discordbot_v2_util/auth_gate.dart';
@@ -43,10 +44,16 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'login',
           builder: (context, state) {
-            html.window.open(
-              'https://discord.com/api/oauth2/authorize?client_id=1166005725886156860&redirect_uri=https%3A%2F%2Fus-central1-room-notify-v2.cloudfunctions.net%2FdiscordAuth%2Fdiscord-redirect&response_type=code&scope=identify%20guilds%20email',
-              '_self',
-            );
+            if (kDebugMode) {
+              html.window.open(
+                  'https://discord.com/api/oauth2/authorize?client_id=1166005725886156860&redirect_uri=https%3A%2F%2Fus-central1-room-notify-v2.cloudfunctions.net%2FdiscordAuth%2Fdevelop&response_type=code&scope=guilds%20email%20identify',
+                  '_self');
+            } else {
+              html.window.open(
+                  'https://discord.com/api/oauth2/authorize?client_id=1166005725886156860&redirect_uri=https%3A%2F%2Fus-central1-room-notify-v2.cloudfunctions.net%2FdiscordAuth%2Frelease&response_type=code&scope=guilds%20email%20identify',
+                  '_self');
+            }
+
             return const Center(
               child: CircularProgressIndicator(),
             );

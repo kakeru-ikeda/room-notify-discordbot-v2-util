@@ -56,15 +56,21 @@ class _IndexPageState extends State<IndexPage> {
             userId: LoginUserModel.userId,
           );
           print('👑 PAPAPA');
+          print(userDocData.data());
+          print(LoginUserModel.userId);
+
+          if (userDocData.data().isNull) {
+            continue;
+          }
 
           if (userDocData.exists &&
               userDocData.data()!['user_id'] == LoginUserModel.userId) {
             isEntry = true;
             print(guildId);
             userEntryGuild.add(guildId);
+            userEntryGuild.sort(((a, b) => a.compareTo(b)));
           }
 
-          userEntryGuild.sort(((a, b) => a.compareTo(b)));
           final guildDocData = await FirestoreController.getGuildData();
           print(guildDocData.data());
           final currentGuildName = guildDocData

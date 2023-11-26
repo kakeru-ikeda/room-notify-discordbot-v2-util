@@ -25,7 +25,7 @@ const express = require('express');
 
 const app = express();
 
-app.get('/discord-redirect', async (req, res) => {
+app.get('/release', async (req, res) => {
     const code = req.query.code; // Discordからの認証コード
 
     // DiscordのTokenエンドポイントにPOSTリクエストを送信してアクセストークンを取得
@@ -39,7 +39,50 @@ app.get('/discord-redirect', async (req, res) => {
             client_secret: '8D80bUhN9cJhHHK1L2gXVFD8ZteZ_LxD',
             code: code,
             grant_type: 'authorization_code',
-            redirect_uri: 'https://us-central1-room-notify-v2.cloudfunctions.net/discordAuth/discord-redirect'
+            redirect_uri: 'https://us-central1-room-notify-v2.cloudfunctions.net/discordAuth/release'
+        })
+    });
+
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+
+    // DiscordのAPIを使用してユーザー情報を取得
+    const userResponse = await fetch('https://discord.com/api/v10/users/@me', {
+        headers: {
+            authorization: `Bearer ${accessToken}`
+        }
+    });
+
+    const userData = await userResponse.json();
+
+    // ユーザー情報をFirebaseやデータベースに保存するなど、必要な処理を行う
+    const userId = userData["id"];
+    const email = userData["email"];
+    const username = userData["username"];
+    const global_name = userData["global_name"];
+    const avatar = userData["avatar"];
+
+    // res.send(userData); // ユーザー情報をレスポンスとして返す（サンプル）
+    // res.redirect('http://localhost:5555/#/auth/?id=' + userId + '&email=' + email + '&username=' + username + '&global_name=' + global_name + '&avatar=' + avatar);
+    res.redirect('https://room-notify-v2.web.app/#/auth/?id=' + userId + '&email=' + email + '&username=' + username + '&global_name=' + global_name + '&avatar=' + avatar);
+
+});
+
+app.get('/develop', async (req, res) => {
+    const code = req.query.code; // Discordからの認証コード
+
+    // DiscordのTokenエンドポイントにPOSTリクエストを送信してアクセストークンを取得
+    const tokenResponse = await fetch('https://discord.com/api/v10/oauth2/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            client_id: '1166005725886156860',
+            client_secret: '8D80bUhN9cJhHHK1L2gXVFD8ZteZ_LxD',
+            code: code,
+            grant_type: 'authorization_code',
+            redirect_uri: 'https://us-central1-room-notify-v2.cloudfunctions.net/discordAuth/develop'
         })
     });
 
@@ -64,7 +107,9 @@ app.get('/discord-redirect', async (req, res) => {
 
     // res.send(userData); // ユーザー情報をレスポンスとして返す（サンプル）
     res.redirect('http://localhost:5555/#/auth/?id=' + userId + '&email=' + email + '&username=' + username + '&global_name=' + global_name + '&avatar=' + avatar);
+    // res.redirect('https://room-notify-v2.web.app/#/auth/?id=' + userId + '&email=' + email + '&username=' + username + '&global_name=' + global_name + '&avatar=' + avatar);
 
 });
+
 
 exports.discordAuth = functions.https.onRequest(app);
