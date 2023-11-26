@@ -4,8 +4,12 @@ import 'package:intl/intl.dart';
 import '../controller/firestore_controller.dart';
 
 class CardRemind {
-  static Widget setCard(
-      {required guildId, required remindData, required context}) {
+  static Widget setCard({
+    required guildId,
+    required remindData,
+    required context,
+    required isHomeView,
+  }) {
     final String subject = remindData['subject'];
     final String remindMemo = remindData['memo'].replaceAll('\n', ' ');
     final DateTime deadline = remindData['deadline'].toDate();
@@ -37,36 +41,38 @@ class CardRemind {
                 Text(formatter.format(deadline)),
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
-                  child: IconButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text('リマインドを削除します'),
-                                content: Text('本当によろしいですか？'),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Cancel"),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                  TextButton(
-                                    child: Text("OK"),
-                                    onPressed: () {
-                                      FirestoreController.removeRemind(
-                                          guildId: guildId,
-                                          remindId: entryDate.toString());
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            });
-                      },
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      )),
+                  child: isHomeView
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('リマインドを削除します'),
+                                    content: Text('本当によろしいですか？'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("Cancel"),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text("OK"),
+                                        onPressed: () {
+                                          FirestoreController.removeRemind(
+                                              guildId: guildId,
+                                              remindId: entryDate.toString());
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          )),
                 )
               ],
             ),

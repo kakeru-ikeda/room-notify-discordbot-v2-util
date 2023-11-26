@@ -137,7 +137,8 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                                       roomNotifyData:
                                           snapshot.data!.data()!['$j'],
                                       week: WEEK[i],
-                                      period: j),
+                                      period: j,
+                                      isHomeView: false),
                                 }
                               ],
                             );

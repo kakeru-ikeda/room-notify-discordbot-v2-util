@@ -112,7 +112,7 @@ class FirestoreController {
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getReminds(
-      {required guildId, bool isEnabled = false}) {
+      {required guildId, isEnabled = false}) {
     Query<Map<String, dynamic>> docRef = isEnabled
         ? db
             .collection('notice')
