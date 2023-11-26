@@ -49,15 +49,15 @@ class _IndexPageState extends State<IndexPage> {
 
       await FirestoreController.getEntryGuilds();
       if (user != null) {
-        print('👑 ${LoginUserModel.userId}');
+        if (LoginUserModel.userId.isEmpty) {
+          context.go('/login_error');
+        }
+
         for (String guildId in FirestoreDataModel.entryGuilds!.keys) {
           final userDocData = await FirestoreController.getGuildEntryUser(
             guildId: guildId,
             userId: LoginUserModel.userId,
           );
-          print('👑 PAPAPA');
-          print(userDocData.data());
-          print(LoginUserModel.userId);
 
           if (userDocData.data().isNull) {
             continue;
@@ -66,13 +66,12 @@ class _IndexPageState extends State<IndexPage> {
           if (userDocData.exists &&
               userDocData.data()!['user_id'] == LoginUserModel.userId) {
             isEntry = true;
-            print(guildId);
             userEntryGuild.add(guildId);
             userEntryGuild.sort(((a, b) => a.compareTo(b)));
           }
 
           final guildDocData = await FirestoreController.getGuildData();
-          print(guildDocData.data());
+
           final currentGuildName = guildDocData
               .data()![userEntryGuild.first.toString()]['guild_name'];
 
@@ -81,14 +80,12 @@ class _IndexPageState extends State<IndexPage> {
             currentGuildId: userEntryGuild.first.toString(),
             currentGuildName: currentGuildName,
           );
-          print(userEntryGuild);
         }
 
         if (!isEntry) {
-          context.go('/login_error');
+          Fluttertoast.showToast(msg: 'Login Error');
+          context.go('/user_undefind');
         }
-
-        print(user.uid);
       }
     });
 
@@ -98,7 +95,21 @@ class _IndexPageState extends State<IndexPage> {
         elevation: 0,
         backgroundColor: Colors.amber,
         centerTitle: false,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: MediaQuery.of(context).size.width <= 768,
+        actions: [
+          Row(
+            children: [
+              Image.network(LoginUserModel.userAvater),
+              Container(
+                height: double.infinity,
+                alignment: Alignment.center,
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(LoginUserModel.userName),
+              )
+            ],
+          )
+        ],
       ),
       drawer: MediaQuery.of(context).size.width <= 768
           ? const CommonDrawer()

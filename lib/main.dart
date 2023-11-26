@@ -6,6 +6,7 @@ import 'package:room_notify_discordbot_v2_util/auth_gate.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/auth/auth_error_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/auth/user_undefind_error_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/index.dart';
 import 'dart:html' as html;
 import 'firebase_options.dart';
@@ -24,8 +25,24 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const Center(
-          child: CircularProgressIndicator(),
+        return const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(
+              height: 6,
+            ),
+            Text(
+              'お待ち下さい...',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                decoration: TextDecoration.none,
+              ),
+            ),
+          ],
         );
       },
       routes: <RouteBase>[
@@ -63,6 +80,12 @@ final GoRouter _router = GoRouter(
           path: 'login_error',
           builder: (BuildContext context, GoRouterState state) {
             return const AuthErrorPage();
+          },
+        ),
+        GoRoute(
+          path: 'user_undefind',
+          builder: (BuildContext context, GoRouterState state) {
+            return const UserUndefindErrorPage();
           },
         ),
       ],

@@ -46,103 +46,16 @@ class _AuthGateState extends State<AuthGate> {
     final String url = Uri.base.toString();
     String fragment = getFragment(url);
     Map<String, String> params = extractQueryParams(fragment);
-    print(params);
 
     id = params['id'];
     email = params['email'];
-    userName = params['username'];
-    globalUserName = params['global_name'];
+    userName = Uri.decodeFull(params['username'] ?? '');
+    globalUserName = Uri.decodeFull(params['global_name'] ?? '');
     avatar = params['avatar'];
-    print(id);
-    print(email);
   }
-
-  // final loginPhase = Future.sync(() async {
-  //   print('POPOPO');
-  //   String errorText = '';
-
-  //   String getFragment(String url) {
-  //     return Uri.parse(url).fragment;
-  //   }
-
-  //   Map<String, String> extractQueryParams(String fragment) {
-  //     Map<String, String> params = {};
-  //     List<String> pairs = fragment.split('&');
-  //     pairs.forEach((pair) {
-  //       List<String> keyValue = pair.split('=');
-  //       if (keyValue.length == 2) {
-  //         params[keyValue[0].replaceFirst('/auth?', '')] = keyValue[1];
-  //       }
-  //     });
-  //     return params;
-  //   }
-
-  //   final String url = Uri.base.toString();
-  //   String fragment = getFragment(url);
-  //   Map<String, String> params = extractQueryParams(fragment);
-
-  //   String? id = params['id'];
-  //   String? email = params['email'];
-  //   String? userName = params['username'];
-  //   String? globalUserName = params['global_name'];
-  //   String? avatar = params['avatar'];
-
-  //   print('MMMM');
-
-  //   final credential = await FirebaseAuth.instance
-  //       .signInWithEmailAndPassword(email: email!, password: id!);
-
-  //   print(credential.user);
-
-  //   try {
-  //     final credential =
-  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-  //       email: email!,
-  //       password: id!,
-  //     );
-
-  //     await FirestoreController.setLoginUser(
-  //         uid: credential.user!.uid,
-  //         discordId: id,
-  //         userName: userName,
-  //         globalUserName: globalUserName,
-  //         avatar: avatar);
-
-  //     print('AAAA');
-
-  //     return 'Done';
-  //   } on FirebaseAuthException catch (e) {
-  //     print('CCC');
-  //     if (e.code == 'email-already-in-use') {
-  //       final credential = await FirebaseAuth.instance
-  //           .signInWithEmailAndPassword(email: email!, password: id!);
-
-  //       await FirestoreController.setLoginUser(
-  //           uid: credential.user!.uid,
-  //           discordId: id,
-  //           userName: userName,
-  //           globalUserName: globalUserName,
-  //           avatar: avatar);
-
-  //       print('AAAA');
-
-  //       return 'Done';
-  //     }
-  //     if (e.code == 'user-not-found') {
-  //       print('No user found for that email.');
-  //       errorText = e.code;
-  //     } else if (e.code == 'wrong-password') {
-  //       print('Wrong password provided for that user.');
-  //       errorText = e.code;
-  //     }
-  //     print('BBBB');
-  //     return errorText;
-  //   }
-  // });
 
   @override
   Widget build(BuildContext context) {
-    print(email);
     return FutureBuilder(
       future: FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email!, password: id!)
@@ -151,9 +64,7 @@ class _AuthGateState extends State<AuthGate> {
                 .createUserWithEmailAndPassword(email: email!, password: id!),
           ),
       builder: (context, snapshot) {
-        print("👑 snapshot: ${snapshot.data}");
         if (snapshot.hasData) {
-          final additionalUserInfo = snapshot.data!.additionalUserInfo;
           final userData = snapshot.data!.user;
           FirestoreController.setLoginUser(
               uid: userData?.uid ?? '',
@@ -162,19 +73,28 @@ class _AuthGateState extends State<AuthGate> {
               globalUserName: globalUserName,
               avatar: avatar);
 
-          if (snapshot.data != 'Done') {
-            Future.delayed(Duration(seconds: 3)).then((_) {
-              print('3秒後に実行される');
-              context.go('/login_error');
-            });
-          }
-          Future.delayed(Duration(seconds: 3)).then((_) {
-            print('3秒後に実行される');
+          Future.delayed(const Duration(seconds: 3)).then((_) {
             context.go('/home');
           });
         }
-        return const Center(
-          child: CircularProgressIndicator(),
+        return const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(
+              height: 6,
+            ),
+            Text(
+              'ログインを検証中...',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                decoration: TextDecoration.none,
+              ),
+            ),
+          ],
         );
       },
     );

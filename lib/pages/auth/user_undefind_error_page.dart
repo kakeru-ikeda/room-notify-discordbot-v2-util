@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class AuthErrorPage extends StatelessWidget {
-  const AuthErrorPage({super.key});
+class UserUndefindErrorPage extends StatelessWidget {
+  const UserUndefindErrorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class AuthErrorPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
-            'Discordの認証に失敗しました',
+            '教室通知くんが実装されているギルドに所属していません',
             style: TextStyle(
               color: Colors.black,
               fontSize: 16,
