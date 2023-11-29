@@ -9,7 +9,7 @@ class CardRoomNotify {
     required context,
     required week,
     required period,
-    required isHomeView,
+    bool isHomeView = false,
   }) {
     int roomNumber = roomNotifyData['room_number'];
     String subject = roomNotifyData['subject'];

@@ -66,10 +66,10 @@ class _KadaiEntryPageState extends State<KadaiEntryPage> {
                       physics: NeverScrollableScrollPhysics(),
                       children: snapshot.data!.docs
                           .map((user) => CardKadai.setCard(
-                              guildId: LoginUserModel.currentGuildId,
-                              context: context,
-                              kadaiData: user.data(),
-                              isHomeView: false))
+                                guildId: LoginUserModel.currentGuildId,
+                                context: context,
+                                kadaiData: user.data(),
+                              ))
                           .toList(),
                     ),
                   ),

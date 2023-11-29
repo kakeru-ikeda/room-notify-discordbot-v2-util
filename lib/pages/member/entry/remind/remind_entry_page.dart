@@ -70,7 +70,6 @@ class _RemindEntryPageState extends State<RemindEntryPage> {
                                 guildId: LoginUserModel.currentGuildId,
                                 context: context,
                                 remindData: user.data(),
-                                isHomeView: false,
                               ))
                           .toList(),
                     ),
