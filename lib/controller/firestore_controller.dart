@@ -71,10 +71,22 @@ class FirestoreController {
     return result;
   }
 
-  static Stream<DocumentSnapshot<Map<String, dynamic>>> getRoomNotify(
+  static Stream<DocumentSnapshot<Map<String, dynamic>>>? getRoomNotify(
       {required guildId, required week}) {
     final docRef =
         db.collection('data').doc('room_notify').collection(guildId).doc(week);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getRoomNotifyHome(
+      {required guildId, required week}) {
+    final docRef = db
+        .collection('data')
+        .doc('room_notify')
+        .collection(guildId)
+        .where('state', isEqualTo: true);
     final snapshots = docRef.snapshots();
 
     return snapshots;
@@ -111,6 +123,29 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getKadaiHome(
+      {required guildId,
+      bool isEnabled = false,
+      remindStartDate,
+      remindLastDate}) {
+    final docRef = isEnabled
+        ? db
+            .collection('notice')
+            .doc('kadai')
+            .collection(guildId)
+            // .orderBy('deadline', descending: false)
+            .where('deadline', isLessThan: remindStartDate)
+            .where('deadline', isGreaterThan: remindLastDate)
+        : db
+            .collection('notice')
+            .doc('kadai')
+            .collection(guildId)
+            .orderBy('deadline', descending: false);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
   static Stream<QuerySnapshot<Map<String, dynamic>>> getReminds(
       {required guildId, bool isEnabled = false}) {
     Query<Map<String, dynamic>> docRef = isEnabled
@@ -119,6 +154,32 @@ class FirestoreController {
             .doc('remind')
             .collection(guildId)
             .where('state', isEqualTo: true)
+
+        // .orderBy('deadline', descending: false)
+        : db
+            .collection('notice')
+            .doc('remind')
+            .collection(guildId)
+            .orderBy('deadline', descending: false);
+
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getRemindsHome({
+    required guildId,
+    bool isEnabled = false,
+    remindStartDate,
+    remindLastDate,
+  }) {
+    Query<Map<String, dynamic>> docRef = isEnabled
+        ? db
+            .collection('notice')
+            .doc('remind')
+            .collection(guildId)
+            .where('deadline', isLessThan: remindStartDate)
+            .where('deadline', isGreaterThan: remindLastDate)
         // .orderBy('deadline', descending: false)
         : db
             .collection('notice')

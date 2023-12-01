@@ -132,12 +132,13 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                                     j <= snapshot.data!.data()!.length;
                                     j++) ...{
                                   CardRoomNotify.setCard(
-                                      context: context,
-                                      guildId: LoginUserModel.currentGuildId,
-                                      roomNotifyData:
-                                          snapshot.data!.data()!['$j'],
-                                      week: WEEK[i],
-                                      period: j),
+                                    context: context,
+                                    guildId: LoginUserModel.currentGuildId,
+                                    roomNotifyData:
+                                        snapshot.data!.data()!['$j'],
+                                    week: WEEK[i],
+                                    period: j,
+                                  ),
                                 }
                               ],
                             );
