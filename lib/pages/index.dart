@@ -41,53 +41,57 @@ class _IndexPageState extends State<IndexPage> {
     );
   }
 
+  Future<void> checkLogin(User? user) async {
+    List userEntryGuild = [];
+    bool isEntry = false;
+
+    await FirestoreController.getEntryGuilds();
+    if (user != null) {
+      if (LoginUserModel.userId.isEmpty) {
+        context.go('/login_error');
+      }
+
+      for (String guildId in FirestoreDataModel.entryGuilds!.keys) {
+        final userDocData = await FirestoreController.getGuildEntryUser(
+          guildId: guildId,
+          userId: LoginUserModel.userId,
+        );
+
+        if (userDocData.data().isNull) {
+          continue;
+        }
+
+        if (userDocData.exists &&
+            userDocData.data()!['user_id'] == LoginUserModel.userId) {
+          isEntry = true;
+          userEntryGuild.add(guildId);
+          userEntryGuild.sort(((a, b) => a.compareTo(b)));
+        }
+
+        final guildDocData = await FirestoreController.getGuildData();
+
+        final currentGuildName =
+            guildDocData.data()![userEntryGuild.first.toString()]['guild_name'];
+
+        await FirestoreController.setLoginUserData(
+          uid: user.uid,
+          currentGuildId: userEntryGuild.first.toString(),
+          currentGuildName: currentGuildName,
+        );
+      }
+
+      if (!isEntry) {
+        Fluttertoast.showToast(msg: 'Login Error');
+        context.go('/user_undefind');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      List userEntryGuild = [];
-      bool isEntry = false;
-
-      await FirestoreController.getEntryGuilds();
-      if (user != null) {
-        if (LoginUserModel.userId.isEmpty) {
-          context.go('/login_error');
-        }
-
-        for (String guildId in FirestoreDataModel.entryGuilds!.keys) {
-          final userDocData = await FirestoreController.getGuildEntryUser(
-            guildId: guildId,
-            userId: LoginUserModel.userId,
-          );
-
-          if (userDocData.data().isNull) {
-            continue;
-          }
-
-          if (userDocData.exists &&
-              userDocData.data()!['user_id'] == LoginUserModel.userId) {
-            isEntry = true;
-            userEntryGuild.add(guildId);
-            userEntryGuild.sort(((a, b) => a.compareTo(b)));
-          }
-
-          final guildDocData = await FirestoreController.getGuildData();
-
-          final currentGuildName = guildDocData
-              .data()![userEntryGuild.first.toString()]['guild_name'];
-
-          await FirestoreController.setLoginUserData(
-            uid: user.uid,
-            currentGuildId: userEntryGuild.first.toString(),
-            currentGuildName: currentGuildName,
-          );
-        }
-
-        if (!isEntry) {
-          Fluttertoast.showToast(msg: 'Login Error');
-          context.go('/user_undefind');
-        }
-      }
-    });
+    FirebaseAuth.instance
+        .authStateChanges()
+        .listen((User? user) async => checkLogin(user));
 
     return Scaffold(
       appBar: AppBar(
@@ -120,18 +124,29 @@ class _IndexPageState extends State<IndexPage> {
               ? const CommonDrawer()
               : Container(),
           Expanded(
-            child: PageView(
-              controller: IndexPageController.screen,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                HomePage(),
-                KadaiEntryPage(),
-                RemindEntryPage(),
-                TeacherEntryPage(),
-                ChannelSettingPage(),
-                RoomNotifyEntryPage(),
-                GuildSettingPage(),
-              ],
+            child: FutureBuilder(
+              future: Future.delayed(const Duration(seconds: 2)),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return PageView(
+                    controller: IndexPageController.screen,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      HomePage(),
+                      KadaiEntryPage(),
+                      RemindEntryPage(),
+                      TeacherEntryPage(),
+                      ChannelSettingPage(),
+                      RoomNotifyEntryPage(),
+                      GuildSettingPage(),
+                    ],
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
             ),
           ),
         ],

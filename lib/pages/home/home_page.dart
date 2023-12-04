@@ -109,9 +109,12 @@ class _HomePageState extends State<HomePage> {
                         ),
                         (now.weekday == 6 || now.weekday == 7)
                             ? Center(
-                                child: Text(
-                                  '今日のリマインド内容はありません',
-                                  style: TextStyle(fontSize: 25),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Text(
+                                    '今日のリマインド内容はありません',
+                                    style: TextStyle(fontSize: 25),
+                                  ),
                                 ),
                               )
                             : StreamBuilder(
@@ -162,9 +165,12 @@ class _HomePageState extends State<HomePage> {
                               return SingleChildScrollView(
                                   child: (snapshot.data!.docs.isEmpty)
                                       ? Center(
-                                          child: Text(
-                                            '今日のリマインド内容はありません',
-                                            style: TextStyle(fontSize: 25),
+                                          child: Padding(
+                                            padding: EdgeInsets.only(bottom: 8),
+                                            child: Text(
+                                              '今日のリマインド内容はありません',
+                                              style: TextStyle(fontSize: 25),
+                                            ),
                                           ),
                                         )
                                       : Column(
@@ -200,9 +206,12 @@ class _HomePageState extends State<HomePage> {
                               return SingleChildScrollView(
                                 child: (snapshot.data!.docs.isEmpty)
                                     ? Center(
-                                        child: Text(
-                                          '今日が期限の課題はありません',
-                                          style: TextStyle(fontSize: 25),
+                                        child: Padding(
+                                          padding: EdgeInsets.only(bottom: 8),
+                                          child: Text(
+                                            '今日が期限の課題はありません',
+                                            style: TextStyle(fontSize: 25),
+                                          ),
                                         ),
                                       )
                                     : Column(

@@ -73,7 +73,7 @@ class _AuthGateState extends State<AuthGate> {
               globalUserName: globalUserName,
               avatar: avatar);
 
-          Future.delayed(const Duration(seconds: 3)).then((_) {
+          Future.delayed(const Duration(seconds: 2)).then((_) {
             context.go('/home');
           });
         }

@@ -76,6 +76,7 @@ class FirestoreController {
 
   static Stream<DocumentSnapshot<Map<String, dynamic>>>? getRoomNotify(
       {required guildId, required week}) {
+    print('👑 $guildId');
     final docRef =
         db.collection('data').doc('room_notify').collection(guildId).doc(week);
     final snapshots = docRef.snapshots();

@@ -50,11 +50,11 @@ class CardRoomNotifyHome {
                   ],
                 ),
                 (type == "room")
-                    ? Text('${subject} ' '${roomNumber}',
+                    ? Text('$subject ' '$roomNumber教室',
                         style: TextStyle(
                             fontSize: 28, fontWeight: FontWeight.bold))
                     : Text(
-                        '${subject} ' 'ZOOM',
+                        '$subject ' 'ZOOM',
                         style: TextStyle(
                             fontSize: 28, fontWeight: FontWeight.bold),
                       )
