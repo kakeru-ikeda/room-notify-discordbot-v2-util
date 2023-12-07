@@ -3,10 +3,15 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirestoreController {
+  static SharedPreferencesController prefs =
+      SharedPreferencesController.instance;
+
   static final FirebaseFirestore db = FirebaseFirestore.instance;
 
   static getEntryGuilds() async {
@@ -283,7 +288,7 @@ class FirestoreController {
     required discordId,
     required userName,
     required globalUserName,
-    required avatar,
+    required avater,
   }) async {
     final docRef = db.collection('login_user').doc(uid);
 
@@ -291,12 +296,16 @@ class FirestoreController {
       'id': discordId,
       'user_name': userName,
       'user_global_name': globalUserName,
-      'avatar': avatar
+      'avater': avater
     });
+
+    await prefs.saveData('userId', discordId);
+    await prefs.saveData('userName', globalUserName);
+    await prefs.saveData('avater', avater);
 
     LoginUserModel.userId = discordId;
     LoginUserModel.userName = globalUserName;
-    LoginUserModel.avatar = avatar;
+    LoginUserModel.avatar = avater;
   }
 
   static setLoginUserData({
@@ -314,6 +323,9 @@ class FirestoreController {
       'guild_id': currentGuildId,
       'guild_name': currentGuildName,
     });
+
+    await prefs.saveData('currentGuildId', currentGuildId);
+    await prefs.saveData('currentGuildName', currentGuildName);
 
     LoginUserModel.currentGuildId = currentGuildId;
     LoginUserModel.currentGuildName = currentGuildName;

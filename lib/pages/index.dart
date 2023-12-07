@@ -17,6 +17,7 @@ import 'package:room_notify_discordbot_v2_util/pages/owner/setting/guilld/guild_
 import 'package:room_notify_discordbot_v2_util/component/common_drawer.dart';
 
 import '../controller/firestore_controller.dart';
+import '../controller/shared_preference_controller.dart';
 import '../model/firestore_data_model.dart';
 import '../model/firestore_data_model.dart';
 import 'home/home_page.dart';
@@ -29,16 +30,29 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
+  SharedPreferencesController prfs = SharedPreferencesController.instance;
+  String? userId;
+  String? userName;
+  String? userAvater;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     Future(
-      () async {
-        // await FirestoreController.getEntryGuilds();
-      },
+      () async {},
     );
+  }
+
+  Future<void> getPrfsData() async {
+    userId = await prfs.getData('userId');
+    userName = await prfs.getData('userName');
+    userAvater = await prfs.getData('avater');
+    userAvater = 'https://cdn.discordapp.com/avatars/$userId/$userAvater';
+
+    print('👑 User ID: $userId');
+    print('👑 User Name: $userName');
+    print('👑 User Avater: $userAvater');
   }
 
   Future<void> checkLogin(User? user) async {
@@ -47,22 +61,23 @@ class _IndexPageState extends State<IndexPage> {
 
     await FirestoreController.getEntryGuilds();
     if (user != null) {
-      if (LoginUserModel.userId.isEmpty) {
+      print('user: ${user.uid}');
+      if (userId.isNull || userId!.isEmpty) {
+        print('👑 User ID is Empty');
         context.go('/login_error');
       }
 
       for (String guildId in FirestoreDataModel.entryGuilds!.keys) {
         final userDocData = await FirestoreController.getGuildEntryUser(
           guildId: guildId,
-          userId: LoginUserModel.userId,
+          userId: userId!,
         );
 
         if (userDocData.data().isNull) {
           continue;
         }
 
-        if (userDocData.exists &&
-            userDocData.data()!['user_id'] == LoginUserModel.userId) {
+        if (userDocData.exists && userDocData.data()!['user_id'] == userId!) {
           isEntry = true;
           userEntryGuild.add(guildId);
           userEntryGuild.sort(((a, b) => a.compareTo(b)));
@@ -93,64 +108,75 @@ class _IndexPageState extends State<IndexPage> {
         .authStateChanges()
         .listen((User? user) async => checkLogin(user));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('教室通知くんv2'),
-        elevation: 0,
-        backgroundColor: Colors.amber,
-        centerTitle: false,
-        automaticallyImplyLeading: MediaQuery.of(context).size.width <= 768,
-        actions: [
-          Row(
-            children: [
-              Image.network(LoginUserModel.userAvater),
-              Container(
-                height: double.infinity,
-                alignment: Alignment.center,
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(LoginUserModel.userName),
-              )
-            ],
-          )
-        ],
-      ),
-      drawer: MediaQuery.of(context).size.width <= 768
-          ? const CommonDrawer()
-          : null,
-      body: Row(
-        children: [
-          MediaQuery.of(context).size.width > 768
-              ? const CommonDrawer()
-              : Container(),
-          Expanded(
-            child: FutureBuilder(
-              future: Future.delayed(const Duration(seconds: 2)),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return PageView(
-                    controller: IndexPageController.screen,
-                    physics: const NeverScrollableScrollPhysics(),
+    return FutureBuilder(
+        future: getPrfsData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('教室通知くんv2'),
+                elevation: 0,
+                backgroundColor: Colors.amber,
+                centerTitle: false,
+                automaticallyImplyLeading:
+                    MediaQuery.of(context).size.width <= 768,
+                actions: [
+                  Row(
                     children: [
-                      HomePage(),
-                      KadaiEntryPage(),
-                      RemindEntryPage(),
-                      TeacherEntryPage(),
-                      ChannelSettingPage(),
-                      RoomNotifyEntryPage(),
-                      GuildSettingPage(),
+                      Image.network('$userAvater'),
+                      Container(
+                        height: double.infinity,
+                        alignment: Alignment.center,
+                        color: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('$userName'),
+                      )
                     ],
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+                  )
+                ],
+              ),
+              drawer: MediaQuery.of(context).size.width <= 768
+                  ? const CommonDrawer()
+                  : null,
+              body: Row(
+                children: [
+                  MediaQuery.of(context).size.width > 768
+                      ? const CommonDrawer()
+                      : Container(),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: Future.delayed(const Duration(seconds: 2)),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return PageView(
+                            controller: IndexPageController.screen,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              HomePage(),
+                              KadaiEntryPage(),
+                              RemindEntryPage(),
+                              TeacherEntryPage(),
+                              ChannelSettingPage(),
+                              RoomNotifyEntryPage(),
+                              GuildSettingPage(),
+                            ],
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
   }
 }
