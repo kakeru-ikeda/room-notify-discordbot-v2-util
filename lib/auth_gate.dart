@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
+import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthGate extends StatefulWidget {
@@ -43,6 +44,10 @@ class _AuthGateState extends State<AuthGate> {
 
     print('👑 InitState');
 
+    Future(
+      () async {},
+    );
+
     final String url = Uri.base.toString();
     String fragment = getFragment(url);
     Map<String, String> params = extractQueryParams(fragment);
@@ -71,7 +76,7 @@ class _AuthGateState extends State<AuthGate> {
               discordId: id,
               userName: userName,
               globalUserName: globalUserName,
-              avatar: avatar);
+              avater: avatar);
 
           Future.delayed(const Duration(seconds: 2)).then((_) {
             context.go('/home');

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:room_notify_discordbot_v2_util/auth_gate.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
+import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/auth/auth_error_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/auth/user_undefind_error_page.dart';
@@ -17,6 +18,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  SharedPreferencesController prfs = SharedPreferencesController.instance;
+  final String? userId = await prfs.getData('userId');
+  print('👑 User ID: $userId');
+
   runApp(const MyApp());
 }
 
@@ -25,25 +30,47 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 6,
-            ),
-            Text(
-              'お待ち下さい...',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-          ],
-        );
+        return FutureBuilder(
+            future: Future.delayed(const Duration(seconds: 2)),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                Future(
+                  () async {
+                    SharedPreferencesController prfs =
+                        SharedPreferencesController.instance;
+                    final String? userId = await prfs.getData('userId');
+
+                    print('👑 User ID: $userId');
+
+                    if (userId == null) {
+                      context.go('/login');
+                      return;
+                    } else {
+                      context.go('/home');
+                    }
+                  },
+                );
+              }
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 6,
+                  ),
+                  Text(
+                    'お待ち下さい...',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ],
+              );
+            });
       },
       routes: <RouteBase>[
         GoRoute(
