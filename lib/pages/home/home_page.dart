@@ -38,6 +38,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     DateTime remindLastDate = DateTime(
       now.year,
       now.month,
@@ -77,7 +80,9 @@ class _HomePageState extends State<HomePage> {
                       "${now.day}" +
                       "日" +
                       " ${WEEKS_JP[now.weekday]}",
-                  style: TextStyle(fontSize: 40),
+                  style: TextStyle(
+                    fontSize: 24,
+                  ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
@@ -91,8 +96,8 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             SizedBox(
-              width: 2000,
-              height: 750,
+              width: deviceWidth * 0.9,
+              height: deviceHeight * 0.7,
               child: Padding(
                   padding: EdgeInsets.all(10),
                   child: SingleChildScrollView(
@@ -161,7 +166,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                              print('💩${snapshot.data}');
                               return SingleChildScrollView(
                                   child: (snapshot.data!.docs.isEmpty)
                                       ? Center(
@@ -180,6 +184,7 @@ class _HomePageState extends State<HomePage> {
                                                       .currentGuildId,
                                                   context: context,
                                                   remindData: user.data(),
+                                                  deviceWidth: deviceWidth,
                                                   isHomeView: true))
                                               .toList()));
                             } else {
@@ -221,6 +226,7 @@ class _HomePageState extends State<HomePage> {
                                                       .currentGuildId,
                                                   context: context,
                                                   kadaiData: user.data(),
+                                                  deviceWidth: deviceWidth,
                                                   isHomeView: true,
                                                 ))
                                             .toList()),

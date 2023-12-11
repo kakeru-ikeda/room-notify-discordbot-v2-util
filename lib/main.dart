@@ -12,6 +12,7 @@ import 'package:room_notify_discordbot_v2_util/pages/index.dart';
 import 'dart:html' as html;
 import 'firebase_options.dart';
 
+String? userId;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -19,7 +20,7 @@ void main() async {
   );
 
   SharedPreferencesController prfs = SharedPreferencesController.instance;
-  final String? userId = await prfs.getData('userId');
+  userId = await prfs.getData('userId');
   print('👑 User ID: $userId');
 
   runApp(const MyApp());
@@ -33,24 +34,23 @@ final GoRouter _router = GoRouter(
         return FutureBuilder(
             future: Future.delayed(const Duration(seconds: 2)),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                Future(
-                  () async {
-                    SharedPreferencesController prfs =
-                        SharedPreferencesController.instance;
-                    final String? userId = await prfs.getData('userId');
+              print("👑 ${state.extra}");
 
-                    print('👑 User ID: $userId');
-
-                    if (userId == null) {
-                      context.go('/login');
-                      return;
-                    } else {
-                      context.go('/home');
-                    }
-                  },
-                );
+              if (userId != null) {
+                context.pushReplacement('/home');
               }
+
+              Future.delayed(const Duration(seconds: 5)).then((_) async {
+                SharedPreferencesController prfs =
+                    SharedPreferencesController.instance;
+                userId = await prfs.getData('userId');
+                print('💎 User ID: $userId');
+                if (userId == null) {
+                  context.go('/login');
+                  return;
+                }
+              });
+
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,

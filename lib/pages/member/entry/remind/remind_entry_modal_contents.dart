@@ -8,8 +8,10 @@ import '../../../../controller/firestore_controller.dart';
 import '../../../../model/login_user_model.dart';
 
 class RemindEntryModalContents extends StatefulWidget {
-  const RemindEntryModalContents({super.key, required this.guildId});
+  const RemindEntryModalContents(
+      {super.key, required this.guildId, this.remindData});
   final String guildId;
+  final Map? remindData;
 
   @override
   State<RemindEntryModalContents> createState() =>
@@ -17,14 +19,13 @@ class RemindEntryModalContents extends StatefulWidget {
 }
 
 class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
-  DateTime selectedDateTime = DateTime.now().add(const Duration(days: 1));
   DateTime? datePicked;
-  TimeOfDay selectedTime = TimeOfDay(hour: 12, minute: 0);
   TimeOfDay? timePicked;
 
   bool discordEvent = false;
 
-  Future<void> _datePicker(BuildContext context) async {
+  Future<void> _datePicker(BuildContext context, DateTime selectedDateTime,
+      TimeOfDay selectedTime) async {
     datePicked = await showDatePicker(
         context: context,
         initialDate: selectedDateTime,
@@ -40,9 +41,20 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
   @override
   Widget build(BuildContext context) {
     String guildId = widget.guildId;
-    String isSelectedSubject = '';
+    Map? remindData = widget.remindData;
 
-    TextEditingController remindMemoEditingController = TextEditingController();
+    DateTime selectedDateTime = remindData == null
+        ? DateTime.now().add(const Duration(days: 1))
+        : remindData['deadline'].toDate();
+
+    TimeOfDay selectedTime = remindData == null
+        ? TimeOfDay(hour: 12, minute: 0)
+        : TimeOfDay.fromDateTime(remindData['deadline'].toDate());
+
+    TextEditingController remindMemoEditingController = TextEditingController(
+        text: remindData != null ? remindData['memo'] : '');
+
+    String isSelectedSubject = remindData != null ? remindData['subject'] : '';
 
     double width = MediaQuery.of(context).size.width;
 
@@ -130,7 +142,8 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                       padding: const EdgeInsets.only(left: 16),
                       child: ElevatedButton(
                         onPressed: () async {
-                          _datePicker(context).whenComplete(
+                          _datePicker(context, selectedDateTime, selectedTime)
+                              .whenComplete(
                             () => changeValue(
                               () {
                                 if (datePicked != null) {
@@ -152,18 +165,20 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
             );
           }),
           Divider(),
-          StatefulBuilder(builder: (context, setState) {
-            return SwitchListTile(
-              title: const Text('Discordのイベントに登録する'),
-              value: discordEvent,
-              onChanged: (value) {
-                setState(() {
-                  discordEvent = value;
-                });
-              },
-            );
-          }),
-          Divider(),
+          remindData == null
+              ? StatefulBuilder(builder: (context, setState) {
+                  return SwitchListTile(
+                    title: const Text('Discordのイベントに登録する'),
+                    value: discordEvent,
+                    onChanged: (value) {
+                      setState(() {
+                        discordEvent = value;
+                      });
+                    },
+                  );
+                })
+              : Container(),
+          remindData == null ? Divider() : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -206,31 +221,37 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                       return;
                     }
 
-                    final entryDate = DateTime.now();
+                    final entryDate = remindData == null
+                        ? DateTime.now()
+                        : remindData['entry_date'];
 
                     FirestoreController.setRemindInfo(
-                        guildId: guildId,
-                        remindId: Timestamp.fromDate(entryDate).toString(),
-                        data: {
-                          'subject': isSelectedSubject,
-                          'deadline': DateTime(
-                            selectedDateTime.year,
-                            selectedDateTime.month,
-                            selectedDateTime.day,
-                            selectedTime.hour,
-                            selectedTime.minute,
-                          ),
-                          'is_event': discordEvent,
-                          'memo': remindMemoEditingController.text,
-                          'guildId': guildId,
-                          'entry_date': entryDate,
-                          'entry_user_id': LoginUserModel.userId,
-                          'entry_user_name': LoginUserModel.userName,
-                          'entry_user_avater': LoginUserModel.userAvater,
-                          'attachment': 'URL(Comming soon...)',
-                          'entry_notify': false,
-                          'state': true,
-                        });
+                      guildId: guildId,
+                      remindId: entryDate.runtimeType == Timestamp
+                          ? entryDate.toString()
+                          : Timestamp.fromDate(entryDate).toString(),
+                      data: {
+                        'subject': isSelectedSubject,
+                        'deadline': DateTime(
+                          selectedDateTime.year,
+                          selectedDateTime.month,
+                          selectedDateTime.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        ),
+                        'is_event': discordEvent,
+                        'memo': remindMemoEditingController.text,
+                        'guildId': guildId,
+                        'entry_date': entryDate,
+                        'entry_user_id': LoginUserModel.userId,
+                        'entry_user_name': LoginUserModel.userName,
+                        'entry_user_avater': LoginUserModel.userAvater,
+                        'attachment': 'URL(Comming soon...)',
+                        'entry_notify': false,
+                        'state': true,
+                      },
+                      isUpdate: remindData != null,
+                    );
 
                     Navigator.pop(context);
                     Fluttertoast.showToast(msg: '情報を更新しました。');

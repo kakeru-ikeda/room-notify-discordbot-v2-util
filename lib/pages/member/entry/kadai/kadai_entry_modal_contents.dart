@@ -9,22 +9,22 @@ import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 import '../../../../controller/firestore_controller.dart';
 
 class KadaiModalContents extends StatefulWidget {
-  const KadaiModalContents({super.key, required this.guildId});
+  const KadaiModalContents({super.key, required this.guildId, this.kadaiData});
   final String guildId;
+  final Map? kadaiData;
 
   @override
   State<KadaiModalContents> createState() => _KadaiModalContentsState();
 }
 
 class _KadaiModalContentsState extends State<KadaiModalContents> {
-  DateTime selectedDateTime = DateTime.now();
   DateTime? datePicked;
-  TimeOfDay selectedTime = TimeOfDay(hour: 23, minute: 59);
   TimeOfDay? timePicked;
 
   bool discordEvent = false;
 
-  Future<void> _datePicker(BuildContext context) async {
+  Future<void> _datePicker(BuildContext context, DateTime selectedDateTime,
+      TimeOfDay selectedTime) async {
     datePicked = await showDatePicker(
         context: context,
         initialDate: selectedDateTime,
@@ -40,13 +40,25 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
   @override
   Widget build(BuildContext context) {
     String guildId = widget.guildId;
+    Map? kadaiData = widget.kadaiData;
 
-    TextEditingController kadaiNumEditingController = TextEditingController();
-    TextEditingController kadaiTitleEditingController = TextEditingController();
-    TextEditingController kadaiMemoEditingController = TextEditingController();
+    DateTime selectedDateTime =
+        kadaiData == null ? DateTime.now() : kadaiData['deadline'].toDate();
+    TimeOfDay selectedTime = kadaiData == null
+        ? TimeOfDay(hour: 23, minute: 59)
+        : TimeOfDay.fromDateTime(kadaiData['deadline'].toDate());
 
-    String isSelectedSubject = '';
-    String isSelectedTeacher = '';
+    print('👑 kadaiDate: $kadaiData');
+
+    TextEditingController kadaiNumEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData['kadai_number'] : '');
+    TextEditingController kadaiTitleEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData['kadai_title'] : '');
+    TextEditingController kadaiMemoEditingController =
+        TextEditingController(text: kadaiData != null ? kadaiData['memo'] : '');
+
+    String isSelectedSubject = kadaiData != null ? kadaiData['subject'] : '';
+    String isSelectedTeacher = kadaiData != null ? kadaiData['teacher'] : '';
 
     double width = MediaQuery.of(context).size.width;
 
@@ -180,7 +192,8 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
                       padding: const EdgeInsets.only(left: 16),
                       child: ElevatedButton(
                         onPressed: () async {
-                          _datePicker(context).whenComplete(
+                          _datePicker(context, selectedDateTime, selectedTime)
+                              .whenComplete(
                             () => changeValue(
                               () {
                                 if (datePicked != null) {
@@ -251,18 +264,20 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
             ],
           ),
           Divider(),
-          StatefulBuilder(builder: (context, setState) {
-            return SwitchListTile(
-              title: const Text('Discordのイベントに登録する'),
-              value: discordEvent,
-              onChanged: (value) {
-                setState(() {
-                  discordEvent = value;
-                });
-              },
-            );
-          }),
-          Divider(),
+          kadaiData == null
+              ? StatefulBuilder(builder: (context, setState) {
+                  return SwitchListTile(
+                    title: const Text('Discordのイベントに登録する'),
+                    value: discordEvent,
+                    onChanged: (value) {
+                      setState(() {
+                        discordEvent = value;
+                      });
+                    },
+                  );
+                })
+              : Container(),
+          kadaiData == null ? Divider() : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -305,34 +320,42 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
                       return;
                     }
 
-                    final entryDate = DateTime.now();
+                    final entryDate = kadaiData == null
+                        ? DateTime.now()
+                        : kadaiData['entry_date'];
+
+                    print('👑 runtimeType ${entryDate.runtimeType}');
 
                     FirestoreController.setKadaiInfo(
-                        guildId: guildId,
-                        kadaiId: Timestamp.fromDate(entryDate).toString(),
-                        data: {
-                          'subject': isSelectedSubject,
-                          'kadai_number': kadaiNumEditingController.text,
-                          'kadai_title': kadaiTitleEditingController.text,
-                          'deadline': DateTime(
-                            selectedDateTime.year,
-                            selectedDateTime.month,
-                            selectedDateTime.day,
-                            selectedTime.hour,
-                            selectedTime.minute,
-                          ),
-                          'teacher': isSelectedTeacher,
-                          'is_event': discordEvent,
-                          'memo': kadaiMemoEditingController.text,
-                          'guildId': guildId,
-                          'entry_date': entryDate,
-                          'entry_user_id': LoginUserModel.userId,
-                          'entry_user_name': LoginUserModel.userName,
-                          'entry_user_avater': LoginUserModel.userAvater,
-                          'attachment': 'URL(Comming soon...)',
-                          'entry_notify': false,
-                          'state': true,
-                        });
+                      guildId: guildId,
+                      kadaiId: entryDate.runtimeType == Timestamp
+                          ? entryDate.toString()
+                          : Timestamp.fromDate(entryDate).toString(),
+                      data: {
+                        'subject': isSelectedSubject,
+                        'kadai_number': kadaiNumEditingController.text,
+                        'kadai_title': kadaiTitleEditingController.text,
+                        'deadline': DateTime(
+                          selectedDateTime.year,
+                          selectedDateTime.month,
+                          selectedDateTime.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        ),
+                        'teacher': isSelectedTeacher,
+                        'is_event': discordEvent,
+                        'memo': kadaiMemoEditingController.text,
+                        'guildId': guildId,
+                        'entry_date': entryDate,
+                        'entry_user_id': LoginUserModel.userId,
+                        'entry_user_name': LoginUserModel.userName,
+                        'entry_user_avater': LoginUserModel.userAvater,
+                        'attachment': 'URL(Comming soon...)',
+                        'entry_notify': false,
+                        'state': true,
+                      },
+                      isUpdate: kadaiData != null,
+                    );
 
                     Navigator.pop(context);
                     Fluttertoast.showToast(msg: '情報を更新しました。');

@@ -16,6 +16,9 @@ class RemindEntryPage extends StatefulWidget {
 class _RemindEntryPageState extends State<RemindEntryPage> {
   @override
   Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -70,6 +73,7 @@ class _RemindEntryPageState extends State<RemindEntryPage> {
                                 guildId: LoginUserModel.currentGuildId,
                                 context: context,
                                 remindData: user.data(),
+                                deviceWidth: deviceWidth,
                               ))
                           .toList(),
                     ),
