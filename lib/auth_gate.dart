@@ -44,10 +44,6 @@ class _AuthGateState extends State<AuthGate> {
 
     print('👑 InitState');
 
-    Future(
-      () async {},
-    );
-
     final String url = Uri.base.toString();
     String fragment = getFragment(url);
     Map<String, String> params = extractQueryParams(fragment);

@@ -261,26 +261,34 @@ class FirestoreController {
     required guildId,
     required kadaiId,
     required Map<String, dynamic> data,
+    bool isUpdate = false,
   }) async {
     final docRef =
         db.collection('notice').doc('kadai').collection(guildId).doc(kadaiId);
 
-    await docRef.set(data);
-
-    // for (var element in data.entries) {
-    //   await docRef.set({element.key: element.value});
-    //   // element == data.entries.first
-    //   //     ? await docRef.set({element.key: element.value})
-    //   //     : await docRef.update({element.key: element.value});
-    // }
+    if (isUpdate) {
+      print('👑 Update');
+      await docRef.update(data);
+    } else {
+      await docRef.set(data);
+    }
   }
 
-  static setRemindInfo(
-      {required guildId, required remindId, required data}) async {
+  static setRemindInfo({
+    required guildId,
+    required remindId,
+    required Map<String, dynamic> data,
+    bool isUpdate = false,
+  }) async {
     final docRef =
         db.collection('notice').doc('remind').collection(guildId).doc(remindId);
 
-    await docRef.set(data);
+    if (isUpdate) {
+      print('👑 Update');
+      await docRef.update(data);
+    } else {
+      await docRef.set(data);
+    }
   }
 
   static setLoginUser({

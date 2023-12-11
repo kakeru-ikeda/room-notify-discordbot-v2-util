@@ -35,20 +35,15 @@ class _IndexPageState extends State<IndexPage> {
   String? userName;
   String? userAvater;
 
-  @override
-  void initState() {
-    super.initState();
-
-    Future(
-      () async {},
-    );
-  }
-
   Future<void> getPrfsData() async {
     userId = await prfs.getData('userId');
     userName = await prfs.getData('userName');
     userAvater = await prfs.getData('avater');
     userAvater = 'https://cdn.discordapp.com/avatars/$userId/$userAvater';
+
+    LoginUserModel.userId = userId!;
+    LoginUserModel.userName = userName!;
+    LoginUserModel.userAvater = userAvater!;
 
     print('👑 User ID: $userId');
     print('👑 User Name: $userName');
