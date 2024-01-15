@@ -2,9 +2,16 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
+import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirestoreController {
+  static SharedPreferencesController prefs =
+      SharedPreferencesController.instance;
+
   static final FirebaseFirestore db = FirebaseFirestore.instance;
 
   static getEntryGuilds() async {
@@ -12,24 +19,18 @@ class FirestoreController {
     final docSnapshot = await docRef.get();
 
     Map<String, dynamic>? data = docSnapshot.exists ? docSnapshot.data() : null;
-    print(data);
-    FirestoreDataModel.entryGuilds = data;
+    SplayTreeMap<String, dynamic> entryGuilds = SplayTreeMap.from(
+        data!, (a, b) => a.toString().compareTo(b.toString()));
+    FirestoreDataModel.entryGuilds = entryGuilds;
 
     print('👑 GetEntryGuilds');
     print(FirestoreDataModel.entryGuilds);
   }
 
-  static Future<Map<String, dynamic>?> getGuildInfo(
-      {required String guildId}) async {
-    final docRef = db
-        .collection('data')
-        .doc('guilds')
-        .collection(guildId)
-        .doc('guild_info');
-    final docSnapshot = await docRef.get();
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getGuildData() {
+    final docRef = db.collection('data').doc('guilds');
+    final data = docRef.get();
 
-    final data = docSnapshot.exists ? docSnapshot.data() : null;
-    print('👑 GetGuildInfo');
     return data;
   }
 
@@ -41,6 +42,15 @@ class FirestoreController {
 
     // final data = docSnapshot.exists ? docSnapshot.data() : null;
     return snapshots;
+  }
+
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getGuildEntryUser(
+      {required String guildId, required String userId}) {
+    final docRef =
+        db.collection('data').doc('users').collection(guildId).doc(userId);
+    final data = docRef.get();
+
+    return data;
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getGuildChannels(
@@ -71,10 +81,23 @@ class FirestoreController {
     return result;
   }
 
-  static Stream<DocumentSnapshot<Map<String, dynamic>>> getRoomNotify(
+  static Stream<DocumentSnapshot<Map<String, dynamic>>>? getRoomNotify(
       {required guildId, required week}) {
+    print('👑 $guildId');
     final docRef =
         db.collection('data').doc('room_notify').collection(guildId).doc(week);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getRoomNotifyHome(
+      {required guildId, required week}) {
+    final docRef = db
+        .collection('data')
+        .doc('room_notify')
+        .collection(guildId)
+        .where('state', isEqualTo: true);
     final snapshots = docRef.snapshots();
 
     return snapshots;
@@ -111,6 +134,29 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getKadaiHome(
+      {required guildId,
+      bool isEnabled = false,
+      remindStartDate,
+      remindLastDate}) {
+    final docRef = isEnabled
+        ? db
+            .collection('notice')
+            .doc('kadai')
+            .collection(guildId)
+            // .orderBy('deadline', descending: false)
+            .where('deadline', isLessThan: remindStartDate)
+            .where('deadline', isGreaterThan: remindLastDate)
+        : db
+            .collection('notice')
+            .doc('kadai')
+            .collection(guildId)
+            .orderBy('deadline', descending: false);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
   static Stream<QuerySnapshot<Map<String, dynamic>>> getReminds(
       {required guildId, bool isEnabled = false}) {
     Query<Map<String, dynamic>> docRef = isEnabled
@@ -119,6 +165,7 @@ class FirestoreController {
             .doc('remind')
             .collection(guildId)
             .where('state', isEqualTo: true)
+
         // .orderBy('deadline', descending: false)
         : db
             .collection('notice')
@@ -129,6 +176,38 @@ class FirestoreController {
     final snapshots = docRef.snapshots();
 
     return snapshots;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getRemindsHome({
+    required guildId,
+    bool isEnabled = false,
+    remindStartDate,
+    remindLastDate,
+  }) {
+    Query<Map<String, dynamic>> docRef = isEnabled
+        ? db
+            .collection('notice')
+            .doc('remind')
+            .collection(guildId)
+            .where('deadline', isLessThan: remindStartDate)
+            .where('deadline', isGreaterThan: remindLastDate)
+        // .orderBy('deadline', descending: false)
+        : db
+            .collection('notice')
+            .doc('remind')
+            .collection(guildId)
+            .orderBy('deadline', descending: false);
+
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getOwner() async {
+    final docRef = db.collection('data').doc('users');
+    final result = await docRef.get();
+
+    return result;
   }
 
   static void setGuildInfo(
@@ -191,26 +270,86 @@ class FirestoreController {
     required guildId,
     required kadaiId,
     required Map<String, dynamic> data,
+    bool isUpdate = false,
   }) async {
     final docRef =
         db.collection('notice').doc('kadai').collection(guildId).doc(kadaiId);
 
-    await docRef.set(data);
-
-    // for (var element in data.entries) {
-    //   await docRef.set({element.key: element.value});
-    //   // element == data.entries.first
-    //   //     ? await docRef.set({element.key: element.value})
-    //   //     : await docRef.update({element.key: element.value});
-    // }
+    if (isUpdate) {
+      print('👑 Update');
+      await docRef.update(data);
+    } else {
+      await docRef.set(data);
+    }
   }
 
-  static setRemindInfo(
-      {required guildId, required remindId, required data}) async {
+  static setRemindInfo({
+    required guildId,
+    required remindId,
+    required Map<String, dynamic> data,
+    bool isUpdate = false,
+  }) async {
     final docRef =
         db.collection('notice').doc('remind').collection(guildId).doc(remindId);
 
-    await docRef.set(data);
+    if (isUpdate) {
+      print('👑 Update');
+      await docRef.update(data);
+    } else {
+      await docRef.set(data);
+    }
+  }
+
+  static setLoginUser({
+    required uid,
+    required discordId,
+    required userName,
+    required globalUserName,
+    required avater,
+  }) async {
+    final docRef = db.collection('login_user').doc(uid);
+
+    await docRef.set({
+      'id': discordId,
+      'user_name': userName,
+      'user_global_name': globalUserName,
+      'avater': avater
+    });
+
+    await prefs.saveData('userId', discordId);
+    await prefs.saveData('userName', globalUserName);
+    await prefs.saveData('avater', avater);
+
+    LoginUserModel.userId = discordId;
+    LoginUserModel.userName = globalUserName;
+    LoginUserModel.avatar = avater;
+  }
+
+  static setLoginUserData({
+    required uid,
+    required currentGuildId,
+    required currentGuildName,
+    isAdministrator = false,
+  }) async {
+    final docRef = db
+        .collection('login_user')
+        .doc(uid)
+        .collection('user_data')
+        .doc('current');
+
+    await docRef.set({
+      'guild_id': currentGuildId,
+      'guild_name': currentGuildName,
+      'is_admin': isAdministrator,
+    });
+
+    await prefs.saveData('currentGuildId', currentGuildId);
+    await prefs.saveData('currentGuildName', currentGuildName);
+    await prefs.saveBoolData('isAdministrator', isAdministrator);
+
+    LoginUserModel.currentGuildId = currentGuildId;
+    LoginUserModel.currentGuildName = currentGuildName;
+    LoginUserModel.isAdministrator = isAdministrator;
   }
 
   static removeTeacher({required guildId, required teacherName}) {

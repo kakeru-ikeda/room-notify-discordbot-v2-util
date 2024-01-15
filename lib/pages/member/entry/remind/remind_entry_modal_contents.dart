@@ -8,8 +8,10 @@ import '../../../../controller/firestore_controller.dart';
 import '../../../../model/login_user_model.dart';
 
 class RemindEntryModalContents extends StatefulWidget {
-  const RemindEntryModalContents({super.key, required this.guildId});
+  const RemindEntryModalContents(
+      {super.key, required this.guildId, this.remindData});
   final String guildId;
+  final Map? remindData;
 
   @override
   State<RemindEntryModalContents> createState() =>
@@ -17,14 +19,13 @@ class RemindEntryModalContents extends StatefulWidget {
 }
 
 class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
-  DateTime selectedDateTime = DateTime.now().add(const Duration(days: 1));
   DateTime? datePicked;
-  TimeOfDay selectedTime = TimeOfDay(hour: 12, minute: 0);
   TimeOfDay? timePicked;
 
   bool discordEvent = false;
 
-  Future<void> _datePicker(BuildContext context) async {
+  Future<void> _datePicker(BuildContext context, DateTime selectedDateTime,
+      TimeOfDay selectedTime) async {
     datePicked = await showDatePicker(
         context: context,
         initialDate: selectedDateTime,
@@ -40,79 +41,85 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
   @override
   Widget build(BuildContext context) {
     String guildId = widget.guildId;
-    String isSelectedSubject = '';
+    Map? remindData = widget.remindData;
 
-    TextEditingController remindMemoEditingController = TextEditingController();
+    DateTime selectedDateTime = remindData == null
+        ? DateTime.now().add(const Duration(days: 1))
+        : remindData['deadline'].toDate();
+
+    TimeOfDay selectedTime = remindData == null
+        ? TimeOfDay(hour: 12, minute: 0)
+        : TimeOfDay.fromDateTime(remindData['deadline'].toDate());
+
+    TextEditingController remindMemoEditingController = TextEditingController(
+        text: remindData != null ? remindData['memo'] : '');
+
+    String isSelectedSubject = remindData != null ? remindData['subject'] : '';
 
     double width = MediaQuery.of(context).size.width;
 
     return ModalContentsTemplate.setContents(
       context: context,
-      contents: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'リマインド 新規登録',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    '配信チャネル',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return StreamBuilder(
-                        stream:
-                            FirestoreController.getSubjectEnabledForChannels(
-                                guildId: guildId),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return DropdownButton(
-                                value: isSelectedSubject,
-                                items: [
-                                  ...snapshot.data!.docs
-                                      .map(
-                                        (entry) => DropdownMenuItem(
-                                          value: entry.data()['subject'],
-                                          child: Text(
-                                              '${entry.data()['subject']}'),
-                                        ),
-                                      )
-                                      .toList(),
-                                  const DropdownMenuItem(
-                                    value: '',
-                                    child: Text('未設定'),
-                                  )
-                                ],
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    isSelectedSubject = newValue.toString();
-                                  });
-                                });
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
-                        },
-                      );
-                    },
-                  ),
-                )
-              ],
+      contents: StatefulBuilder(builder: (context, setState) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'リマインド 新規登録',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-          ),
-          Divider(),
-          StatefulBuilder(builder: (context, changeValue) {
-            return Row(
+            Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Text(
+                      '配信チャネル',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: StreamBuilder(
+                      stream: FirestoreController.getSubjectEnabledForChannels(
+                          guildId: guildId),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownButton(
+                              value: isSelectedSubject,
+                              items: [
+                                ...snapshot.data!.docs
+                                    .map(
+                                      (entry) => DropdownMenuItem(
+                                        value: entry.data()['subject'],
+                                        child:
+                                            Text('${entry.data()['subject']}'),
+                                      ),
+                                    )
+                                    .toList(),
+                                const DropdownMenuItem(
+                                  value: '',
+                                  child: Text('未設定'),
+                                )
+                              ],
+                              onChanged: (newValue) {
+                                setState(() {
+                                  isSelectedSubject = newValue.toString();
+                                });
+                              });
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Divider(),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
@@ -130,8 +137,9 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                       padding: const EdgeInsets.only(left: 16),
                       child: ElevatedButton(
                         onPressed: () async {
-                          _datePicker(context).whenComplete(
-                            () => changeValue(
+                          _datePicker(context, selectedDateTime, selectedTime)
+                              .whenComplete(
+                            () => setState(
                               () {
                                 if (datePicked != null) {
                                   selectedDateTime = datePicked!;
@@ -149,68 +157,71 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                   ],
                 ),
               ],
-            );
-          }),
-          Divider(),
-          StatefulBuilder(builder: (context, setState) {
-            return SwitchListTile(
-              title: const Text('Discordのイベントに登録する'),
-              value: discordEvent,
-              onChanged: (value) {
-                setState(() {
-                  discordEvent = value;
-                });
-              },
-            );
-          }),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  'リマインド内容',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              SizedBox(
-                width: width * 0.5,
-                child: TextFormField(
-                  controller: remindMemoEditingController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            Divider(),
+            remindData == null
+                ? SwitchListTile(
+                    title: const Text('Discordのイベントに登録する'),
+                    value: discordEvent,
+                    onChanged: (value) {
+                      setState(() {
+                        discordEvent = value;
+                      });
+                    },
+                  )
+                : Container(),
+            remindData == null ? Divider() : Container(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    if (isSelectedSubject == '') {
-                      Fluttertoast.showToast(
-                          msg: '配信チャネルは必須入力項目です。',
-                          webBgColor:
-                              'linear-gradient(to right, #c93d3d, #c93d3d)');
-                      return;
-                    }
-                    if (remindMemoEditingController.text == '') {
-                      Fluttertoast.showToast(
-                          msg: 'リマインド内容は必須入力項目です。',
-                          webBgColor:
-                              'linear-gradient(to right, #c93d3d, #c93d3d)');
-                      return;
-                    }
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    'リマインド内容',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  width: width * 0.5,
+                  child: TextFormField(
+                    controller: remindMemoEditingController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                  ),
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      if (isSelectedSubject == '') {
+                        Fluttertoast.showToast(
+                            msg: '配信チャネルは必須入力項目です。',
+                            webBgColor:
+                                'linear-gradient(to right, #c93d3d, #c93d3d)');
+                        return;
+                      }
+                      if (remindMemoEditingController.text == '') {
+                        Fluttertoast.showToast(
+                            msg: 'リマインド内容は必須入力項目です。',
+                            webBgColor:
+                                'linear-gradient(to right, #c93d3d, #c93d3d)');
+                        return;
+                      }
 
-                    final entryDate = DateTime.now();
+                      final entryDate = remindData == null
+                          ? DateTime.now()
+                          : remindData['entry_date'];
 
-                    FirestoreController.setRemindInfo(
+                      FirestoreController.setRemindInfo(
                         guildId: guildId,
-                        remindId: Timestamp.fromDate(entryDate).toString(),
+                        remindId: entryDate.runtimeType == Timestamp
+                            ? entryDate.toString()
+                            : Timestamp.fromDate(entryDate).toString(),
                         data: {
                           'subject': isSelectedSubject,
                           'deadline': DateTime(
@@ -230,25 +241,28 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                           'attachment': 'URL(Comming soon...)',
                           'entry_notify': false,
                           'state': true,
-                        });
+                        },
+                        isUpdate: remindData != null,
+                      );
 
-                    Navigator.pop(context);
-                    Fluttertoast.showToast(msg: '情報を更新しました。');
-                  },
-                  icon: Icon(Icons.save),
-                  label: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      '保存',
-                      style: TextStyle(fontSize: 18),
+                      Navigator.pop(context);
+                      Fluttertoast.showToast(msg: '情報を更新しました。');
+                    },
+                    icon: Icon(Icons.save),
+                    label: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        '保存',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 }

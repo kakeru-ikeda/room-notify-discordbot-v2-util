@@ -9,22 +9,22 @@ import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 import '../../../../controller/firestore_controller.dart';
 
 class KadaiModalContents extends StatefulWidget {
-  const KadaiModalContents({super.key, required this.guildId});
+  const KadaiModalContents({super.key, required this.guildId, this.kadaiData});
   final String guildId;
+  final Map? kadaiData;
 
   @override
   State<KadaiModalContents> createState() => _KadaiModalContentsState();
 }
 
 class _KadaiModalContentsState extends State<KadaiModalContents> {
-  DateTime selectedDateTime = DateTime.now();
   DateTime? datePicked;
-  TimeOfDay selectedTime = TimeOfDay(hour: 23, minute: 59);
   TimeOfDay? timePicked;
 
   bool discordEvent = false;
 
-  Future<void> _datePicker(BuildContext context) async {
+  Future<void> _datePicker(BuildContext context, DateTime selectedDateTime,
+      TimeOfDay selectedTime) async {
     datePicked = await showDatePicker(
         context: context,
         initialDate: selectedDateTime,
@@ -40,129 +40,136 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
   @override
   Widget build(BuildContext context) {
     String guildId = widget.guildId;
+    Map? kadaiData = widget.kadaiData;
 
-    TextEditingController kadaiNumEditingController = TextEditingController();
-    TextEditingController kadaiTitleEditingController = TextEditingController();
-    TextEditingController kadaiMemoEditingController = TextEditingController();
+    DateTime selectedDateTime =
+        kadaiData == null ? DateTime.now() : kadaiData['deadline'].toDate();
+    TimeOfDay selectedTime = kadaiData == null
+        ? TimeOfDay(hour: 23, minute: 59)
+        : TimeOfDay.fromDateTime(kadaiData['deadline'].toDate());
 
-    String isSelectedSubject = '';
-    String isSelectedTeacher = '';
+    print('👑 kadaiDate: $kadaiData');
+
+    TextEditingController kadaiNumEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData['kadai_number'] : '');
+    TextEditingController kadaiTitleEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData['kadai_title'] : '');
+    TextEditingController kadaiMemoEditingController =
+        TextEditingController(text: kadaiData != null ? kadaiData['memo'] : '');
+
+    String isSelectedSubject = kadaiData != null ? kadaiData['subject'] : '';
+    String isSelectedTeacher = kadaiData != null ? kadaiData['teacher'] : '';
 
     double width = MediaQuery.of(context).size.width;
 
     return ModalContentsTemplate.setContents(
       context: context,
-      contents: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '課題通知 新規登録',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Row(
+      contents: StatefulBuilder(builder: (context, setState) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '課題通知 新規登録',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Text(
+                      '科目',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: StreamBuilder(
+                      stream: FirestoreController.getSubjectEnabledForChannels(
+                          guildId: guildId),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownButton(
+                              value: isSelectedSubject,
+                              items: [
+                                ...snapshot.data!.docs
+                                    .map(
+                                      (entry) => DropdownMenuItem(
+                                        value: entry.data()['subject'],
+                                        child:
+                                            Text('${entry.data()['subject']}'),
+                                      ),
+                                    )
+                                    .toList(),
+                                const DropdownMenuItem(
+                                  value: '',
+                                  child: Text('未設定'),
+                                )
+                              ],
+                              onChanged: (newValue) {
+                                setState(() {
+                                  isSelectedSubject = newValue.toString();
+                                });
+                              });
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Divider(),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: Text(
-                    '科目',
+                    '課題No',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return StreamBuilder(
-                        stream:
-                            FirestoreController.getSubjectEnabledForChannels(
-                                guildId: guildId),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return DropdownButton(
-                                value: isSelectedSubject,
-                                items: [
-                                  ...snapshot.data!.docs
-                                      .map(
-                                        (entry) => DropdownMenuItem(
-                                          value: entry.data()['subject'],
-                                          child: Text(
-                                              '${entry.data()['subject']}'),
-                                        ),
-                                      )
-                                      .toList(),
-                                  const DropdownMenuItem(
-                                    value: '',
-                                    child: Text('未設定'),
-                                  )
-                                ],
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    isSelectedSubject = newValue.toString();
-                                  });
-                                });
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
-                        },
-                      );
-                    },
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: kadaiNumEditingController,
+                    decoration: InputDecoration(
+                      hintText: '課題No',
+                      contentPadding: EdgeInsets.symmetric(vertical: 16),
+                    ),
                   ),
                 )
               ],
             ),
-          ),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  '課題No',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextField(
-                  controller: kadaiNumEditingController,
-                  decoration: InputDecoration(
-                    hintText: '課題No',
-                    contentPadding: EdgeInsets.symmetric(vertical: 16),
+            Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    '課題主題',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
-              )
-            ],
-          ),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  '課題主題',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: kadaiTitleEditingController,
-                  decoration: InputDecoration(
-                    hintText: '課題主題',
-                    contentPadding: EdgeInsets.symmetric(vertical: 16),
+                SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: kadaiTitleEditingController,
+                    decoration: InputDecoration(
+                      hintText: '課題主題',
+                      contentPadding: EdgeInsets.symmetric(vertical: 16),
+                    ),
                   ),
-                ),
-              )
-            ],
-          ),
-          Divider(),
-          StatefulBuilder(builder: (context, changeValue) {
-            return Row(
+                )
+              ],
+            ),
+            Divider(),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
@@ -180,8 +187,9 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
                       padding: const EdgeInsets.only(left: 16),
                       child: ElevatedButton(
                         onPressed: () async {
-                          _datePicker(context).whenComplete(
-                            () => changeValue(
+                          _datePicker(context, selectedDateTime, selectedTime)
+                              .whenComplete(
+                            () => setState(
                               () {
                                 if (datePicked != null) {
                                   selectedDateTime = datePicked!;
@@ -199,117 +207,117 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
                   ],
                 ),
               ],
-            );
-          }),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  '教員',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: StatefulBuilder(
-                  builder: (context, setState) {
-                    return StreamBuilder(
-                      stream: FirestoreController.getTeachers(guildId: guildId),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return DropdownButton(
-                              value: isSelectedTeacher,
-                              items: [
-                                ...snapshot.data!.docs
-                                    .map((entry) => DropdownMenuItem(
-                                          value: entry.data()['name'],
-                                          child:
-                                              Text('${entry.data()['name']}'),
-                                        ))
-                                    .toList(),
-                                const DropdownMenuItem(
-                                  value: '',
-                                  child: Text('未設定'),
-                                )
-                              ],
-                              onChanged: (newValue) {
-                                setState(() {
-                                  isSelectedTeacher = newValue.toString();
-                                });
-                              });
-                        } else {
-                          return const CircularProgressIndicator();
-                        }
-                      },
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
-          Divider(),
-          StatefulBuilder(builder: (context, setState) {
-            return SwitchListTile(
-              title: const Text('Discordのイベントに登録する'),
-              value: discordEvent,
-              onChanged: (value) {
-                setState(() {
-                  discordEvent = value;
-                });
-              },
-            );
-          }),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  'メモ',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              SizedBox(
-                width: width * 0.5,
-                child: TextFormField(
-                  controller: kadaiMemoEditingController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    if (isSelectedSubject == '') {
-                      Fluttertoast.showToast(
-                          msg: '科目は必須入力項目です。',
-                          webBgColor:
-                              'linear-gradient(to right, #c93d3d, #c93d3d)');
-                      return;
-                    }
-                    if (kadaiTitleEditingController.text == '') {
-                      Fluttertoast.showToast(
-                          msg: '課題主題は必須入力項目です。',
-                          webBgColor:
-                              'linear-gradient(to right, #c93d3d, #c93d3d)');
-                      return;
-                    }
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    '教員',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: StreamBuilder(
+                    stream: FirestoreController.getTeachers(guildId: guildId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return DropdownButton(
+                            value: isSelectedTeacher,
+                            items: [
+                              ...snapshot.data!.docs
+                                  .map((entry) => DropdownMenuItem(
+                                        value: entry.data()['name'],
+                                        child: Text('${entry.data()['name']}'),
+                                      ))
+                                  .toList(),
+                              const DropdownMenuItem(
+                                value: '',
+                                child: Text('未設定'),
+                              )
+                            ],
+                            onChanged: (newValue) {
+                              setState(() {
+                                isSelectedTeacher = newValue.toString();
+                              });
+                            });
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+                    },
+                  ),
+                )
+              ],
+            ),
+            Divider(),
+            kadaiData == null
+                ? SwitchListTile(
+                    title: const Text('Discordのイベントに登録する'),
+                    value: discordEvent,
+                    onChanged: (value) {
+                      setState(() {
+                        discordEvent = value;
+                      });
+                    },
+                  )
+                : Container(),
+            kadaiData == null ? Divider() : Container(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    'メモ',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                SizedBox(
+                  width: width * 0.5,
+                  child: TextFormField(
+                    controller: kadaiMemoEditingController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                  ),
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      if (isSelectedSubject == '') {
+                        Fluttertoast.showToast(
+                            msg: '科目は必須入力項目です。',
+                            webBgColor:
+                                'linear-gradient(to right, #c93d3d, #c93d3d)');
+                        return;
+                      }
+                      if (kadaiTitleEditingController.text == '') {
+                        Fluttertoast.showToast(
+                            msg: '課題主題は必須入力項目です。',
+                            webBgColor:
+                                'linear-gradient(to right, #c93d3d, #c93d3d)');
+                        return;
+                      }
 
-                    final entryDate = DateTime.now();
+                      final entryDate = kadaiData == null
+                          ? DateTime.now()
+                          : kadaiData['entry_date'];
 
-                    FirestoreController.setKadaiInfo(
+                      print('👑 runtimeType ${entryDate.runtimeType}');
+
+                      FirestoreController.setKadaiInfo(
                         guildId: guildId,
-                        kadaiId: Timestamp.fromDate(entryDate).toString(),
+                        kadaiId: entryDate.runtimeType == Timestamp
+                            ? entryDate.toString()
+                            : Timestamp.fromDate(entryDate).toString(),
                         data: {
                           'subject': isSelectedSubject,
                           'kadai_number': kadaiNumEditingController.text,
@@ -332,25 +340,28 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
                           'attachment': 'URL(Comming soon...)',
                           'entry_notify': false,
                           'state': true,
-                        });
+                        },
+                        isUpdate: kadaiData != null,
+                      );
 
-                    Navigator.pop(context);
-                    Fluttertoast.showToast(msg: '情報を更新しました。');
-                  },
-                  icon: Icon(Icons.save),
-                  label: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      '保存',
-                      style: TextStyle(fontSize: 18),
+                      Navigator.pop(context);
+                      Fluttertoast.showToast(msg: '情報を更新しました。');
+                    },
+                    icon: Icon(Icons.save),
+                    label: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        '保存',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 }

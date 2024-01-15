@@ -9,6 +9,7 @@ class CardRoomNotify {
     required context,
     required week,
     required period,
+    bool isHomeView = false,
   }) {
     int roomNumber = roomNotifyData['room_number'];
     String subject = roomNotifyData['subject'];
@@ -25,24 +26,26 @@ class CardRoomNotify {
         state ? (type == 'room' ? Colors.green : Colors.blue) : Colors.white;
 
     return InkWell(
-      onTap: () {
-        showModalBottomSheet<void>(
-          context: context,
-          constraints: BoxConstraints.expand(),
-          enableDrag: false,
-          isScrollControlled: true,
-          builder: (BuildContext context) {
-            return RoomNotifyModalContents(
-              guildId: guildId,
-              roomNotifyData: roomNotifyData,
-              week: week,
-              period: period,
-            );
-          },
-        ).whenComplete(() async {
-          Fluttertoast.showToast(msg: '情報を更新しました。');
-        });
-      },
+      onTap: isHomeView
+          ? null
+          : () {
+              showModalBottomSheet<void>(
+                context: context,
+                constraints: BoxConstraints.expand(),
+                enableDrag: false,
+                isScrollControlled: true,
+                builder: (BuildContext context) {
+                  return RoomNotifyModalContents(
+                    guildId: guildId,
+                    roomNotifyData: roomNotifyData,
+                    week: week,
+                    period: period,
+                  );
+                },
+              ).whenComplete(() async {
+                Fluttertoast.showToast(msg: '情報を更新しました。');
+              });
+            },
       child: Card(
         color: cardColor,
         child: state

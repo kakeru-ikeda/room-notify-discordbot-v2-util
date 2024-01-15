@@ -18,6 +18,9 @@ class KadaiEntryPage extends StatefulWidget {
 class _KadaiEntryPageState extends State<KadaiEntryPage> {
   @override
   Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -69,6 +72,7 @@ class _KadaiEntryPageState extends State<KadaiEntryPage> {
                                 guildId: LoginUserModel.currentGuildId,
                                 context: context,
                                 kadaiData: user.data(),
+                                deviceWidth: deviceWidth,
                               ))
                           .toList(),
                     ),

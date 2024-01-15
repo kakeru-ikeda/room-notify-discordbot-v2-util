@@ -165,7 +165,7 @@ module.exports.fetch = async () => {
             fetchData.roomNotify[guildId] = roomNotify;
         })
 
-        const kadaiQuery = firestore.db.collection(`notice/kadai/${guildId}/`);
+        const kadaiQuery = firestore.db.collection(`notice/kadai/${guildId}/`).where('state', '==', true);
         kadaiQuery.onSnapshot(querySnapshot => {
             let kadai = [];
             querySnapshot.forEach((e) => {
