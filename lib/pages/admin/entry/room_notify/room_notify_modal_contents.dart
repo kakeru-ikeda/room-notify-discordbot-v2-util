@@ -96,276 +96,255 @@ class _RoomNotifyModalContentsState extends State<RoomNotifyModalContents> {
 
     return ModalContentsTemplate.setContents(
         context: context,
-        contents: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${WEEKS_JP[week]} $period限 (${TIME_SCHEDULE[period]}〜)',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 24),
-              child: Text('◯ 配信設定'),
-            ),
-            StatefulBuilder(
-              builder: (context, changeValue) {
-                return SwitchListTile(
-                  title: const Text('このコマで教室通知の配信を行う'),
-                  value: state,
-                  onChanged: (value) {
-                    changeValue(() {
-                      state = value;
-                    });
-                    // FirestoreController.setRoomNotifyInfo(guildId: guildId, week: week, field: field, data: data)
-                  },
-                  secondary: const Icon(Icons.send),
-                );
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 24),
-              child: Text('◯ 配信内容登録'),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    '科目',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return StreamBuilder(
-                        stream:
-                            FirestoreController.getSubjectEnabledForChannels(
-                                guildId: guildId),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return DropdownButton(
-                                value: isSelectedSubject,
-                                items: [
-                                  ...snapshot.data!.docs
-                                      .map((entry) => DropdownMenuItem(
-                                            value: entry.data()['subject'],
-                                            child: Text(
-                                                '${entry.data()['subject']}'),
-                                          ))
-                                      .toList(),
-                                  const DropdownMenuItem(
-                                    value: '',
-                                    child: Text('未設定'),
-                                  )
-                                ],
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    isSelectedSubject = newValue.toString();
-                                  });
-                                });
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
-                        },
-                      );
-                    },
-                  ),
-                )
-              ],
-            ),
-            Divider(),
-            StatefulBuilder(
-              builder: (context, changeValue) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: Text(
-                        '配信時刻',
-                        style: TextStyle(fontSize: 16),
-                      ),
+        contents: StatefulBuilder(builder: (context, setState) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${WEEKS_JP[week]} $period限 (${TIME_SCHEDULE[period]}〜)',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: Text('◯ 配信設定'),
+              ),
+              SwitchListTile(
+                title: const Text('このコマで教室通知の配信を行う'),
+                value: state,
+                onChanged: (value) {
+                  setState(() {
+                    state = value;
+                  });
+                  // FirestoreController.setRoomNotifyInfo(guildId: guildId, week: week, field: field, data: data)
+                },
+                secondary: const Icon(Icons.send),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: Text('◯ 配信内容登録'),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Text(
+                      '科目',
+                      style: TextStyle(fontSize: 16),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          '${selectedTime.hour.toString().padLeft(2, "0")}:${selectedTime.minute.toString().padLeft(2, "0")}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16, right: 32, top: 8, bottom: 8),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                _selectTime(context)
-                                    .whenComplete(() => changeValue(
-                                          () {
-                                            if (picked != null) {
-                                              selectedTime = picked!;
-                                            }
-                                          },
-                                        ));
-                              },
-                              child: Text('変更')),
-                        ),
-                      ],
-                    )
-                  ],
-                );
-              },
-            ),
-            Divider(),
-            StatefulBuilder(
-              builder: (context, setState) {
-                return Column(
-                  children: [
-                    SwitchListTile(
-                      title: const Text('オンライン授業'),
-                      value: typeBool,
-                      onChanged: (value) {
-                        setState(() {
-                          typeBool = value;
-                        });
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: StreamBuilder(
+                      stream: FirestoreController.getSubjectEnabledForChannels(
+                          guildId: guildId),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownButton(
+                              value: isSelectedSubject,
+                              items: [
+                                ...snapshot.data!.docs
+                                    .map((entry) => DropdownMenuItem(
+                                          value: entry.data()['subject'],
+                                          child: Text(
+                                              '${entry.data()['subject']}'),
+                                        ))
+                                    .toList(),
+                                const DropdownMenuItem(
+                                  value: '',
+                                  child: Text('未設定'),
+                                )
+                              ],
+                              onChanged: (newValue) {
+                                setState(() {
+                                  isSelectedSubject = newValue.toString();
+                                });
+                              });
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
                       },
                     ),
-                    Divider(),
-                    Column(
-                      children: typeBool
-                          ? [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    child: Text(
-                                      'Zoom ID',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 120,
-                                    child: TextField(
-                                      controller: zoomIdEditingController,
-                                      decoration: InputDecoration(
-                                        hintText: '未設定',
-                                        contentPadding:
-                                            EdgeInsets.symmetric(vertical: 16),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    child: Text(
-                                      'Zoom パスワード',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 120,
-                                    child: TextField(
-                                      controller: zoomPwEditingController,
-                                      decoration: InputDecoration(
-                                        hintText: '未設定',
-                                        contentPadding:
-                                            EdgeInsets.symmetric(vertical: 16),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    child: Text(
-                                      'Zoom URL',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 250,
-                                    child: TextField(
-                                      controller: zoomUrlEditingController,
-                                      decoration: InputDecoration(
-                                        hintText: '未設定',
-                                        contentPadding:
-                                            EdgeInsets.symmetric(vertical: 16),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )
-                            ]
-                          : [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    child: Text(
-                                      '教室番号',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 60,
-                                    child: TextField(
-                                      controller: roomNumberEditingController,
-                                      decoration: InputDecoration(
-                                        hintText: '未設定',
-                                        contentPadding:
-                                            EdgeInsets.symmetric(vertical: 16),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
+                  )
+                ],
+              ),
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Text(
+                      '配信時刻',
+                      style: TextStyle(fontSize: 16),
                     ),
-                    Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16),
-                          child: Text(
-                            'メモ',
-                            style: TextStyle(fontSize: 16),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        '${selectedTime.hour.toString().padLeft(2, "0")}:${selectedTime.minute.toString().padLeft(2, "0")}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 32, top: 8, bottom: 8),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              _selectTime(context).whenComplete(() => setState(
+                                    () {
+                                      if (picked != null) {
+                                        selectedTime = picked!;
+                                      }
+                                    },
+                                  ));
+                            },
+                            child: Text('変更')),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              Divider(),
+              Column(
+                children: [
+                  SwitchListTile(
+                    title: const Text('オンライン授業'),
+                    value: typeBool,
+                    onChanged: (value) {
+                      setState(() {
+                        typeBool = value;
+                      });
+                    },
+                  ),
+                  Divider(),
+                  Column(
+                    children: typeBool
+                        ? [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(
+                                    'Zoom ID',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 120,
+                                  child: TextField(
+                                    controller: zoomIdEditingController,
+                                    decoration: InputDecoration(
+                                      hintText: '未設定',
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 16),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(
+                                    'Zoom パスワード',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 120,
+                                  child: TextField(
+                                    controller: zoomPwEditingController,
+                                    decoration: InputDecoration(
+                                      hintText: '未設定',
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(
+                                    'Zoom URL',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 250,
+                                  child: TextField(
+                                    controller: zoomUrlEditingController,
+                                    decoration: InputDecoration(
+                                      hintText: '未設定',
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 16),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          ]
+                        : [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(
+                                    '教室番号',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 60,
+                                  child: TextField(
+                                    controller: roomNumberEditingController,
+                                    decoration: InputDecoration(
+                                      hintText: '未設定',
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 16),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                  ),
+                  Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Text(
+                          'メモ',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      SizedBox(
+                        width: width / 2,
+                        child: TextFormField(
+                          controller: contentsEditingController,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: '未設定',
+                            contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                         ),
-                        SizedBox(
-                          width: width / 2,
-                          child: TextFormField(
-                            controller: contentsEditingController,
-                            maxLines: 5,
-                            decoration: InputDecoration(
-                              hintText: '未設定',
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 16),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                );
-              },
-            )
-          ],
-        ),
+                      )
+                    ],
+                  )
+                ],
+              )
+            ],
+          );
+        }),
         willPopFunction: () async {
           String text = '';
           if (typeBool) {
