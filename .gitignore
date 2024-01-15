@@ -679,5 +679,5 @@ Temporary Items
 ### USER DEFINED ###
 node_modules/
 nodejs/bot/node_modules/
-nodejs/bot/config.js
+nodejs/bot/config.json
 nodejs/bot/serviceAccount.json
