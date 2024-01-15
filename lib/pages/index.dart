@@ -19,7 +19,6 @@ import 'package:room_notify_discordbot_v2_util/component/common_drawer.dart';
 import '../controller/firestore_controller.dart';
 import '../controller/shared_preference_controller.dart';
 import '../model/firestore_data_model.dart';
-import '../model/firestore_data_model.dart';
 import 'home/home_page.dart';
 
 class IndexPage extends StatefulWidget {
@@ -34,20 +33,26 @@ class _IndexPageState extends State<IndexPage> {
   String? userId;
   String? userName;
   String? userAvater;
+  bool? isAdministrator;
+  bool isOwner = false;
 
   Future<void> getPrfsData() async {
     userId = await prfs.getData('userId');
     userName = await prfs.getData('userName');
     userAvater = await prfs.getData('avater');
     userAvater = 'https://cdn.discordapp.com/avatars/$userId/$userAvater';
+    isAdministrator = await prfs.getBoolData('isAdministrator');
+    FirestoreController.getOwner()
+        .then((value) => isOwner = value.data()!['owner'] == userId);
+    print('👑 isOwner: $isOwner');
 
     LoginUserModel.userId = userId!;
     LoginUserModel.userName = userName!;
     LoginUserModel.userAvater = userAvater!;
+    LoginUserModel.isAdministrator = isAdministrator!;
+    LoginUserModel.isOwner = isOwner;
 
-    print('👑 User ID: $userId');
-    print('👑 User Name: $userName');
-    print('👑 User Avater: $userAvater');
+    await prfs.removeData('isAdministrator');
   }
 
   Future<void> checkLogin(User? user) async {
@@ -78,6 +83,10 @@ class _IndexPageState extends State<IndexPage> {
           userEntryGuild.sort(((a, b) => a.compareTo(b)));
         }
 
+        if (guildId == FirestoreDataModel.entryGuilds!.keys.last) {
+          continue;
+        }
+
         final guildDocData = await FirestoreController.getGuildData();
 
         final currentGuildName =
@@ -87,7 +96,11 @@ class _IndexPageState extends State<IndexPage> {
           uid: user.uid,
           currentGuildId: userEntryGuild.first.toString(),
           currentGuildName: currentGuildName,
+          isAdministrator: userDocData.data()!['is_admin'],
         );
+
+        getPrfsData();
+        setState(() {});
       }
 
       if (!isEntry) {
@@ -98,11 +111,15 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     FirebaseAuth.instance
         .authStateChanges()
         .listen((User? user) async => checkLogin(user));
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder(
         future: getPrfsData(),
         builder: (context, snapshot) {

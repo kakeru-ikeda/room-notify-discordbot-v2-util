@@ -19,7 +19,9 @@ class FirestoreController {
     final docSnapshot = await docRef.get();
 
     Map<String, dynamic>? data = docSnapshot.exists ? docSnapshot.data() : null;
-    FirestoreDataModel.entryGuilds = data;
+    SplayTreeMap<String, dynamic> entryGuilds = SplayTreeMap.from(
+        data!, (a, b) => a.toString().compareTo(b.toString()));
+    FirestoreDataModel.entryGuilds = entryGuilds;
 
     print('👑 GetEntryGuilds');
     print(FirestoreDataModel.entryGuilds);
@@ -201,6 +203,13 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getOwner() async {
+    final docRef = db.collection('data').doc('users');
+    final result = await docRef.get();
+
+    return result;
+  }
+
   static void setGuildInfo(
       {required guildId, required field, required data}) async {
     final docRef = db.collection('data').doc('guilds');
@@ -320,6 +329,7 @@ class FirestoreController {
     required uid,
     required currentGuildId,
     required currentGuildName,
+    isAdministrator = false,
   }) async {
     final docRef = db
         .collection('login_user')
@@ -330,13 +340,16 @@ class FirestoreController {
     await docRef.set({
       'guild_id': currentGuildId,
       'guild_name': currentGuildName,
+      'is_admin': isAdministrator,
     });
 
     await prefs.saveData('currentGuildId', currentGuildId);
     await prefs.saveData('currentGuildName', currentGuildName);
+    await prefs.saveBoolData('isAdministrator', isAdministrator);
 
     LoginUserModel.currentGuildId = currentGuildId;
     LoginUserModel.currentGuildName = currentGuildName;
+    LoginUserModel.isAdministrator = isAdministrator;
   }
 
   static removeTeacher({required guildId, required teacherName}) {

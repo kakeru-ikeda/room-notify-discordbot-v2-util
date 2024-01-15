@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
 
+import '../model/login_user_model.dart';
+
 /// ドロワー
 class CommonDrawer extends StatefulWidget {
   const CommonDrawer({Key? key}) : super(key: key);
@@ -54,62 +56,77 @@ class _CommonDrawerState extends State<CommonDrawer> {
               });
             },
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('管理者用ページ'),
+          Visibility(
+            visible: LoginUserModel.isAdministrator,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('管理者用ページ'),
+                ),
+                ListTile(
+                  title: Text('教員情報 登録'),
+                  leading: Icon(Icons.person),
+                  onTap: () {
+                    setState(() {
+                      MediaQuery.of(context).size.width <= 768
+                          ? Navigator.pop(context)
+                          : null;
+                      IndexPageController.screen.jumpToPage(3);
+                    });
+                  },
+                ),
+                ListTile(
+                  title: Text('科目チャネル 登録'),
+                  leading: Icon(Icons.subject),
+                  onTap: () {
+                    setState(() {
+                      MediaQuery.of(context).size.width <= 768
+                          ? Navigator.pop(context)
+                          : null;
+                      IndexPageController.screen.jumpToPage(4);
+                    });
+                  },
+                ),
+                ListTile(
+                  title: Text('教室通知 登録'),
+                  leading: Icon(Icons.note_alt),
+                  onTap: () {
+                    setState(() {
+                      MediaQuery.of(context).size.width <= 768
+                          ? Navigator.pop(context)
+                          : null;
+                      IndexPageController.screen.jumpToPage(5);
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            title: Text('教員情報 登録'),
-            leading: Icon(Icons.person),
-            onTap: () {
-              setState(() {
-                MediaQuery.of(context).size.width <= 768
-                    ? Navigator.pop(context)
-                    : null;
-                IndexPageController.screen.jumpToPage(3);
-              });
-            },
-          ),
-          ListTile(
-            title: Text('科目チャネル 登録'),
-            leading: Icon(Icons.subject),
-            onTap: () {
-              setState(() {
-                MediaQuery.of(context).size.width <= 768
-                    ? Navigator.pop(context)
-                    : null;
-                IndexPageController.screen.jumpToPage(4);
-              });
-            },
-          ),
-          ListTile(
-            title: Text('教室通知 登録'),
-            leading: Icon(Icons.note_alt),
-            onTap: () {
-              setState(() {
-                MediaQuery.of(context).size.width <= 768
-                    ? Navigator.pop(context)
-                    : null;
-                IndexPageController.screen.jumpToPage(5);
-              });
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('オーナー専用ページ'),
-          ),
-          ListTile(
-            title: Text('配信ギルド 設定'),
-            leading: Icon(Icons.settings),
-            onTap: () {
-              setState(() {
-                MediaQuery.of(context).size.width <= 768
-                    ? Navigator.pop(context)
-                    : null;
-                IndexPageController.screen.jumpToPage(6);
-              });
-            },
-          ),
+          Visibility(
+              visible: LoginUserModel.isOwner,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('オーナー専用ページ'),
+                  ),
+                  ListTile(
+                    title: Text('配信ギルド 設定'),
+                    leading: Icon(Icons.settings),
+                    onTap: () {
+                      setState(() {
+                        MediaQuery.of(context).size.width <= 768
+                            ? Navigator.pop(context)
+                            : null;
+                        IndexPageController.screen.jumpToPage(6);
+                      });
+                    },
+                  ),
+                ],
+              ))
         ],
       ),
     );
