@@ -37,29 +37,45 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
     );
   }
 
+  late String guildId;
+  late Map? kadaiData;
+
+  late DateTime selectedDateTime;
+  late TimeOfDay selectedTime;
+
+  late TextEditingController kadaiNumEditingController;
+  late TextEditingController kadaiTitleEditingController;
+  late TextEditingController kadaiMemoEditingController;
+
+  late String isSelectedSubject;
+  late String isSelectedTeacher;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    guildId = widget.guildId;
+    kadaiData = widget.kadaiData;
+
+    selectedDateTime =
+        kadaiData == null ? DateTime.now() : kadaiData!['deadline'].toDate();
+    selectedTime = kadaiData == null
+        ? TimeOfDay(hour: 23, minute: 59)
+        : TimeOfDay.fromDateTime(kadaiData!['deadline'].toDate());
+
+    kadaiNumEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData!['kadai_number'] : '');
+    kadaiTitleEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData!['kadai_title'] : '');
+    kadaiMemoEditingController = TextEditingController(
+        text: kadaiData != null ? kadaiData!['memo'] : '');
+
+    isSelectedSubject = kadaiData != null ? kadaiData!['subject'] : '';
+    isSelectedTeacher = kadaiData != null ? kadaiData!['teacher'] : '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    String guildId = widget.guildId;
-    Map? kadaiData = widget.kadaiData;
-
-    DateTime selectedDateTime =
-        kadaiData == null ? DateTime.now() : kadaiData['deadline'].toDate();
-    TimeOfDay selectedTime = kadaiData == null
-        ? TimeOfDay(hour: 23, minute: 59)
-        : TimeOfDay.fromDateTime(kadaiData['deadline'].toDate());
-
-    print('👑 kadaiDate: $kadaiData');
-
-    TextEditingController kadaiNumEditingController = TextEditingController(
-        text: kadaiData != null ? kadaiData['kadai_number'] : '');
-    TextEditingController kadaiTitleEditingController = TextEditingController(
-        text: kadaiData != null ? kadaiData['kadai_title'] : '');
-    TextEditingController kadaiMemoEditingController =
-        TextEditingController(text: kadaiData != null ? kadaiData['memo'] : '');
-
-    String isSelectedSubject = kadaiData != null ? kadaiData['subject'] : '';
-    String isSelectedTeacher = kadaiData != null ? kadaiData['teacher'] : '';
-
     double width = MediaQuery.of(context).size.width;
 
     return ModalContentsTemplate.setContents(
@@ -309,7 +325,7 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
 
                       final entryDate = kadaiData == null
                           ? DateTime.now()
-                          : kadaiData['entry_date'];
+                          : kadaiData!['entry_date'];
 
                       print('👑 runtimeType ${entryDate.runtimeType}');
 
