@@ -38,24 +38,40 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
     );
   }
 
+  late String guildId;
+  late Map? remindData;
+
+  late DateTime selectedDateTime;
+  late TimeOfDay selectedTime;
+
+  late TextEditingController remindMemoEditingController;
+
+  late String isSelectedSubject;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    guildId = widget.guildId;
+    remindData = widget.remindData;
+
+    selectedDateTime = remindData == null
+        ? DateTime.now().add(const Duration(days: 1))
+        : remindData!['deadline'].toDate();
+
+    selectedTime = remindData == null
+        ? TimeOfDay(hour: 12, minute: 0)
+        : TimeOfDay.fromDateTime(remindData!['deadline'].toDate());
+
+    remindMemoEditingController = TextEditingController(
+        text: remindData != null ? remindData!['memo'] : '');
+
+    isSelectedSubject = remindData != null ? remindData!['subject'] : '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    String guildId = widget.guildId;
-    Map? remindData = widget.remindData;
-
-    DateTime selectedDateTime = remindData == null
-        ? DateTime.now().add(const Duration(days: 1))
-        : remindData['deadline'].toDate();
-
-    TimeOfDay selectedTime = remindData == null
-        ? TimeOfDay(hour: 12, minute: 0)
-        : TimeOfDay.fromDateTime(remindData['deadline'].toDate());
-
-    TextEditingController remindMemoEditingController = TextEditingController(
-        text: remindData != null ? remindData['memo'] : '');
-
-    String isSelectedSubject = remindData != null ? remindData['subject'] : '';
-
     double width = MediaQuery.of(context).size.width;
 
     return ModalContentsTemplate.setContents(
@@ -215,7 +231,7 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
 
                       final entryDate = remindData == null
                           ? DateTime.now()
-                          : remindData['entry_date'];
+                          : remindData!['entry_date'];
 
                       FirestoreController.setRemindInfo(
                         guildId: guildId,

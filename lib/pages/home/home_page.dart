@@ -65,14 +65,13 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton.icon(
+                IconButton(
                   onPressed: () {
                     setState(() {
                       now = now.subtract(Duration(days: 1));
                     });
                   },
                   icon: Icon(Icons.chevron_left),
-                  label: Text("前の日へ"),
                 ),
                 Text(
                   "${now.month}" +
@@ -84,14 +83,13 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 24,
                   ),
                 ),
-                ElevatedButton.icon(
+                IconButton(
                   onPressed: () {
                     setState(() {
                       now = now.add(Duration(days: 1));
                     });
                   },
                   icon: Icon(Icons.chevron_right),
-                  label: Text("次の日へ"),
                 )
               ],
             ),
@@ -117,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: Text(
-                                    '今日のリマインド内容はありません',
+                                    '今日のリマインドはありません',
                                     style: TextStyle(fontSize: 25),
                                   ),
                                 ),
@@ -172,7 +170,7 @@ class _HomePageState extends State<HomePage> {
                                           child: Padding(
                                             padding: EdgeInsets.only(bottom: 8),
                                             child: Text(
-                                              '今日のリマインド内容はありません',
+                                              '今日のリマインドはありません',
                                               style: TextStyle(fontSize: 25),
                                             ),
                                           ),
