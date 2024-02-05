@@ -19,6 +19,73 @@ class CardKadai {
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
     final Timestamp entryDate = kadaiData['entry_date'];
 
+    double deviceWidth = MediaQuery.of(context).size.width;
+
+    Widget deadlineText = Row(
+      children: [
+        Text(isHomeView ? '' : '${formatter.format(deadline)} 迄'),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: isHomeView
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      constraints: BoxConstraints.expand(),
+                      enableDrag: false,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return KadaiModalContents(
+                          guildId: LoginUserModel.currentGuildId,
+                          kadaiData: kadaiData,
+                        );
+                      },
+                    );
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.black,
+                  )),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: isHomeView
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('課題を削除します'),
+                            content: Text('本当によろしいですか？'),
+                            actions: [
+                              TextButton(
+                                child: Text("Cancel"),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                child: Text("OK"),
+                                onPressed: () {
+                                  FirestoreController.removeKadai(
+                                      guildId: guildId,
+                                      kadaiId: entryDate.toString());
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  )),
+        )
+      ],
+    );
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -34,78 +101,22 @@ class CardKadai {
                     Text(subject),
                     Padding(
                       padding: const EdgeInsets.only(left: 8),
-                      child: Text('課題No.$kadaiNumber'),
+                      child: Text(kadaiNumber == '' ? '' : '課題No.$kadaiNumber'),
                     )
                   ],
                 ),
                 Text(kadaiTitle,
                     style:
                         TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                Visibility(
+                  visible: !(deviceWidth > 768) && isHomeView,
+                  child: deadlineText,
+                ),
               ],
             ),
-            Row(
-              children: [
-                Text('${formatter.format(deadline)} 迄'),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: isHomeView
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            showModalBottomSheet<void>(
-                              context: context,
-                              constraints: BoxConstraints.expand(),
-                              enableDrag: false,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return KadaiModalContents(
-                                  guildId: LoginUserModel.currentGuildId,
-                                  kadaiData: kadaiData,
-                                );
-                              },
-                            );
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.black,
-                          )),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: isHomeView
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('課題を削除します'),
-                                    content: Text('本当によろしいですか？'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text("Cancel"),
-                                        onPressed: () => Navigator.pop(context),
-                                      ),
-                                      TextButton(
-                                        child: Text("OK"),
-                                        onPressed: () {
-                                          FirestoreController.removeKadai(
-                                              guildId: guildId,
-                                              kadaiId: entryDate.toString());
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                });
-                          },
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          )),
-                )
-              ],
+            Visibility(
+              visible: deviceWidth > 768,
+              child: deadlineText,
             ),
           ],
         ),
