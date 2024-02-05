@@ -19,6 +19,73 @@ class CardRemind {
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm');
     final Timestamp entryDate = remindData['entry_date'];
 
+    double deviceWidth = MediaQuery.of(context).size.width;
+
+    Widget deadlineText = Row(
+      children: [
+        Text(formatter.format(deadline)),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: isHomeView
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    showModalBottomSheet<void>(
+                      context: context,
+                      constraints: BoxConstraints.expand(),
+                      enableDrag: false,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return RemindEntryModalContents(
+                          guildId: LoginUserModel.currentGuildId,
+                          remindData: remindData,
+                        );
+                      },
+                    );
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.black,
+                  )),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: isHomeView
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('リマインドを削除します'),
+                            content: Text('本当によろしいですか？'),
+                            actions: [
+                              TextButton(
+                                child: Text("Cancel"),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                child: Text("OK"),
+                                onPressed: () {
+                                  FirestoreController.removeRemind(
+                                      guildId: guildId,
+                                      remindId: entryDate.toString());
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  )),
+        )
+      ],
+    );
+
     return Card(
       child: Container(
         padding: EdgeInsets.all(16),
@@ -28,12 +95,7 @@ class CardRemind {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(subject),
-                  ],
-                ),
+                Text(subject),
                 Container(
                   width: deviceWidth * 0.6,
                   child: Text(remindMemo,
@@ -42,71 +104,15 @@ class CardRemind {
                           fontWeight: FontWeight.bold,
                           overflow: TextOverflow.ellipsis)),
                 ),
+                Visibility(
+                  visible: !(deviceWidth > 768) && isHomeView,
+                  child: deadlineText,
+                ),
               ],
             ),
-            Row(
-              children: [
-                Text(formatter.format(deadline)),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: isHomeView
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            showModalBottomSheet<void>(
-                              context: context,
-                              constraints: BoxConstraints.expand(),
-                              enableDrag: false,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return RemindEntryModalContents(
-                                  guildId: LoginUserModel.currentGuildId,
-                                  remindData: remindData,
-                                );
-                              },
-                            );
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.black,
-                          )),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: isHomeView
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('リマインドを削除します'),
-                                    content: Text('本当によろしいですか？'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text("Cancel"),
-                                        onPressed: () => Navigator.pop(context),
-                                      ),
-                                      TextButton(
-                                        child: Text("OK"),
-                                        onPressed: () {
-                                          FirestoreController.removeRemind(
-                                              guildId: guildId,
-                                              remindId: entryDate.toString());
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                });
-                          },
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          )),
-                )
-              ],
+            Visibility(
+              visible: deviceWidth > 768,
+              child: deadlineText,
             ),
           ],
         ),

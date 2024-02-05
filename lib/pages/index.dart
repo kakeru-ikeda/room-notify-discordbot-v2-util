@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:room_notify_discordbot_v2_util/component/style/material_color_name.dart';
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/admin/entry/room_notify/room_notify_entry_page.dart';
@@ -125,10 +126,17 @@ class _IndexPageState extends State<IndexPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Scaffold(
+              resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: const Text('教室通知くんv2'),
+                title: Text(
+                  '教室通知くんv2',
+                  style: TextStyle(
+                      color: MaterialColorName.mcgpalette0.shade50,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500),
+                ),
                 elevation: 0,
-                backgroundColor: Colors.amber,
+                backgroundColor: MaterialColorName.mcgpalette0,
                 centerTitle: false,
                 automaticallyImplyLeading:
                     MediaQuery.of(context).size.width <= 768,

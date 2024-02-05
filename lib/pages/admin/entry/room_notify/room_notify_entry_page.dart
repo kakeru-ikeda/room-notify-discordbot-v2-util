@@ -94,64 +94,67 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
               }),
             ],
           ),
-          Row(
-            children: [
-              Column(
-                children: [
-                  for (int i = 1; i <= 6; i++) ...{
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      child: SizedBox(
-                        height: 80,
-                        width: 80,
-                        child: Center(child: Text('$i限')),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Column(
+                  children: [
+                    for (int i = 1; i <= 6; i++) ...{
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: Center(child: Text('$i限')),
+                        ),
                       ),
-                    ),
-                  }
-                ],
-              ),
-              Row(
-                children: [
-                  for (int i = 1; i <= WEEK.length; i++) ...{
-                    SizedBox(
-                      height: 600,
-                      width: 200,
-                      child: StreamBuilder(
-                        stream: FirestoreController.getRoomNotify(
-                            guildId: LoginUserModel.currentGuildId,
-                            week: WEEK[i]),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Text(WEEKS_JP[i]!),
-                                ),
-                                for (int j = 1;
-                                    j <= snapshot.data!.data()!.length;
-                                    j++) ...{
-                                  CardRoomNotify.setCard(
-                                    context: context,
-                                    guildId: LoginUserModel.currentGuildId,
-                                    roomNotifyData:
-                                        snapshot.data!.data()!['$j'],
-                                    week: WEEK[i],
-                                    period: j,
+                    }
+                  ],
+                ),
+                Row(
+                  children: [
+                    for (int i = 1; i <= WEEK.length; i++) ...{
+                      SizedBox(
+                        height: 600,
+                        width: 200,
+                        child: StreamBuilder(
+                          stream: FirestoreController.getRoomNotify(
+                              guildId: LoginUserModel.currentGuildId,
+                              week: WEEK[i]),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Text(WEEKS_JP[i]!),
                                   ),
-                                }
-                              ],
-                            );
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
-                        },
-                      ),
-                    )
-                  }
-                ],
-              ),
-            ],
+                                  for (int j = 1;
+                                      j <= snapshot.data!.data()!.length;
+                                      j++) ...{
+                                    CardRoomNotify.setCard(
+                                      context: context,
+                                      guildId: LoginUserModel.currentGuildId,
+                                      roomNotifyData:
+                                          snapshot.data!.data()!['$j'],
+                                      week: WEEK[i],
+                                      period: j,
+                                    ),
+                                  }
+                                ],
+                              );
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          },
+                        ),
+                      )
+                    }
+                  ],
+                ),
+              ],
+            ),
           )
         ],
       ),
