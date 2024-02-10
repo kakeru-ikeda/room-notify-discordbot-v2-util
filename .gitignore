@@ -680,3 +680,4 @@ node_modules/
 nodejs/bot/node_modules/
 nodejs/bot/config.json
 nodejs/bot/serviceAccount.json
+nodejs/bot/mode.json
