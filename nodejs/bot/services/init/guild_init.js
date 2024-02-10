@@ -238,6 +238,42 @@ module.exports.fetch = async () => {
             })
         })
 
+        const externalScholarSyncQuery = firestore.db.collection(`/notice/external/scholar_sync/guild_id/${guildId}/`).where('state', '==', true);
+        externalScholarSyncQuery.onSnapshot(querySnapshot => {
+            let externalScholarSync = [];
+            querySnapshot.forEach((e) => {
+                const externalScholarSyncData = e.data();
+
+                if (externalScholarSyncData['state']) {
+                    externalScholarSync.push(externalScholarSyncData);
+                }
+            })
+            fetchData.externalScholarSync[guildId] = externalScholarSync;
+
+            querySnapshot.docChanges().forEach(change => {
+                const changeData = change.doc.data();
+                if (change.type === 'added') {
+                    console.log('Add: ', changeData);
+                    if (changeData['entry_notify']) {
+                        return;
+                    }
+
+                    firestore.db.collection(`data/channels/${guildId}/`).where('subject', '==', changeData['subject']).get()
+                        .then(async (res) => {
+                            const channelId = res.docs[0].data()['channel_id'];
+                            messageController.send({ channel: channelId, isEmbeds: true, embedsMode: 'externalScholarSync', optionalData: changeData, isEvent: changeData['is_event'] })
+                            await firestore.db.collection(`/notice/external/scholar_sync/guild_id/${guildId}`).doc(change.doc.id).update({ 'entry_notify': true });
+                        });
+                }
+                if (change.type === 'modified') {
+                    console.log('Modified: ', change.doc.data());
+                }
+                if (change.type === 'removed') {
+                    console.log('Removed: ', change.doc.data());
+                }
+            })
+        })
+
     }
 
 

@@ -43,6 +43,19 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
                 )
                 .setTimestamp()
                 .setFooter({ text: '教室通知くんv2 license by Lily', iconURL: 'https://cdn.discordapp.com/attachments/862951519052627968/966499934440419348/unknown.png' })
+        } else if (embedsMode == 'externalScholarSync') {
+            embeds = new EmbedBuilder()
+                .setTitle('【ScholarSync新規通知】')
+                .setDescription(`${optionalData['title'] != '' ? optionalData['title'] : '新規通知が追加されました。'}`)
+                .setThumbnail('https://cdn.discordapp.com/attachments/1107499953753948180/1205862503888719982/Scholar_sync_3.png')
+                .addFields(
+                    { name: '日時', value: `${optionalData['entry_date'].toDate().toLocaleDateString('ja-JP')} ${optionalData['entry_date'].toDate().toLocaleTimeString('ja-JP')}` },
+                    { name: '投稿者', value: optionalData['entry_user_name'] },
+                    { name: '配信チャネル', value: optionalData['subject'] },
+                    { name: '本文', value: optionalData['memo'] != '' ? optionalData['memo'] : ' ' }
+                )
+                .setTimestamp()
+                .setFooter({ text: 'ScholarSync license by naruto1031', iconURL: 'https://cdn.discordapp.com/attachments/1107499953753948180/1205862503888719982/Scholar_sync_3.png' })
         }
         return embeds;
     }
@@ -82,7 +95,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
     if (mode == 'debug') {
         if (isEmbeds) {
             const embeds = embedsBuilder(embedsMode, optionalData);
-            bot.client.channels.cache.get('982998698239852634').send({ embeds: [embeds] });
+            bot.client.channels.cache.get('1205864930817875988').send({ embeds: [embeds] });
         } else {
             bot.client.channels.cache.get('982998698239852634').send(`${contents}`)
         }
