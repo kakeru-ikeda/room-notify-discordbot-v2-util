@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:room_notify_discordbot_v2_util/component/style/material_color_name.dart';
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
@@ -34,26 +35,23 @@ class _IndexPageState extends State<IndexPage> {
   String? userId;
   String? userName;
   String? userAvater;
-  bool? isAdministrator;
-  bool isOwner = false;
 
   Future<void> getPrfsData() async {
     userId = await prfs.getData('userId');
     userName = await prfs.getData('userName');
     userAvater = await prfs.getData('avater');
     userAvater = 'https://cdn.discordapp.com/avatars/$userId/$userAvater';
-    isAdministrator = await prfs.getBoolData('isAdministrator');
-    FirestoreController.getOwner()
-        .then((value) => isOwner = value.data()!['owner'] == userId);
-    print('👑 isOwner: $isOwner');
 
     LoginUserModel.userId = userId!;
     LoginUserModel.userName = userName!;
     LoginUserModel.userAvater = userAvater!;
-    LoginUserModel.isAdministrator = isAdministrator!;
-    LoginUserModel.isOwner = isOwner;
 
     await prfs.removeData('isAdministrator');
+  }
+
+  Future<PackageInfo> getVersionData() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo;
   }
 
   Future<void> checkLogin(User? user) async {
@@ -97,7 +95,6 @@ class _IndexPageState extends State<IndexPage> {
           uid: user.uid,
           currentGuildId: userEntryGuild.first.toString(),
           currentGuildName: currentGuildName,
-          isAdministrator: userDocData.data()!['is_admin'],
         );
 
         getPrfsData();
@@ -128,12 +125,33 @@ class _IndexPageState extends State<IndexPage> {
             return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: Text(
-                  '教室通知くんv2',
-                  style: TextStyle(
-                      color: MaterialColorName.mcgpalette0.shade50,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500),
+                title: Row(
+                  children: [
+                    Text('教室通知くん',
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: MaterialColorName.mcgpalette0[50])),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    FutureBuilder(
+                      future: getVersionData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          PackageInfo packageInfo =
+                              snapshot.data as PackageInfo;
+                          return Text(
+                            'v${packageInfo.version} (${packageInfo.buildNumber})',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: MaterialColorName.mcgpalette0[100]),
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  ],
                 ),
                 elevation: 0,
                 backgroundColor: MaterialColorName.mcgpalette0,
