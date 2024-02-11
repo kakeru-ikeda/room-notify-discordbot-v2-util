@@ -35,12 +35,30 @@ export class Remind {
         this.subject = subject;
     }
 
-    public getEmbeds() {
+    public getEmbeds({ changeType }: { changeType: string }) {
+        let title: string;
+        let description: string;
+        let thumbnail: string;
+
+        if (changeType === 'added') {
+            title = '【新規リマインド通知】';
+            description = `${this.subject}に新規リマインドが追加されました。`;
+            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media';
+        } else if (changeType === 'modified') {
+            title = '【リマインド変更通知】';
+            description = `${this.subject}のリマインドが変更されました。`;
+            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fmodified.png?alt=media';
+        } else {
+            title = '【リマインド削除通知】';
+            description = `${this.subject}のリマインドが削除されました。`;
+            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fremoved.png?alt=media';
+        }
+
         return new EmbedBuilder()
-            .setTitle('【新規リマインド通知】')
+            .setTitle(title)
             .setAuthor({ name: this.entry_user_name, iconURL: this.entry_user_avatar, url: 'https://discord.js.org' })
-            .setDescription(`${this.subject}に新規リマインドが追加されました。`)
-            .setThumbnail('https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media')
+            .setDescription(description)
+            .setThumbnail(thumbnail)
             .addFields(
                 { name: '科目記号', value: this.subject },
                 { name: 'リマインド日時', value: `${this.deadline}` },

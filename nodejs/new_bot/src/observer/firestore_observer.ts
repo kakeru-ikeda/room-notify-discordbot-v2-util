@@ -14,6 +14,7 @@ export class FirestoreObserver {
     private firestoreService: FirestoreService = new FirestoreService();
     private messageService: MessageService = new MessageService();
     private guild: Guild;
+    private debounce: boolean = false;
 
     constructor(guild: Guild) {
         this.guild = guild;
@@ -65,7 +66,7 @@ export class FirestoreObserver {
                 /// 通知する
                 this.messageService.sendMessage({
                     channel: channelId,
-                    embeds: doc.getEmbeds()
+                    embeds: doc.getEmbeds({ changeType: change.type })
                 });
 
                 /// scheduleEventsが有効の場合は登録する
@@ -78,19 +79,79 @@ export class FirestoreObserver {
                 }
 
                 /// 通知済みにする
-                this.firestoreService.updateDocument({
-                    collectionId: `notice/${docName}/${this.guild.id}`,
-                    documentId: change.doc.id,
-                    data: { entry_notify: true }
-                });
+                this.debounce = true;
+                try {
+                    await this.firestoreService.updateDocument({
+                        collectionId: doc instanceof ScholarSync
+                            ? `notice/external/scholar_sync/guild_id/${process.env.IH13B_GUILD_ID}`
+                            : `notice/${docName}/${this.guild.id}`,
+                        documentId: change.doc.id,
+                        data: { entry_notify: true },
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
             });
 
-            console.log(`New ${docName}}: `, change.doc.data());
+            console.log(`New ${docName}: `, change.doc.data());
         }
         if (change.type === 'modified') {
+            if (this.debounce) {
+                this.debounce = false;
+                return;
+            }
+
+            this.firestoreService.getCollection({
+                collectionId: `data/channels/${guildId}`,
+                where: { fieldPath: 'subject', opStr: '==', value: doc.subject }
+            }).then(async (channels) => {
+                const channelId = process.env.MODE == 'DEBUG'
+                    ? process.env.DEBUG_CHANNEL_ID
+                    : channels.docs[0].data()['channel_id'];
+
+                /// 通知する
+                this.messageService.sendMessage({
+                    channel: channelId,
+                    embeds: doc.getEmbeds({ changeType: change.type })
+                });
+
+                /// 通知済みにする
+                this.debounce = true;
+                try {
+                    await this.firestoreService.updateDocument({
+                        collectionId: doc instanceof ScholarSync
+                            ? `notice/external/scholar_sync/guild_id/${process.env.IH13B_GUILD_ID}`
+                            : `notice/${docName}/${this.guild.id}`,
+                        documentId: change.doc.id,
+                        data: { entry_notify: true },
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+
+                /// todo: scheduleEventsの更新
+            });
+
             console.log(`Modified ${docName}: `, change.doc.data());
         }
         if (change.type === 'removed') {
+            this.firestoreService.getCollection({
+                collectionId: `data/channels/${guildId}`,
+                where: { fieldPath: 'subject', opStr: '==', value: doc.subject }
+            }).then(async (channels) => {
+                const channelId = process.env.MODE == 'DEBUG'
+                    ? process.env.DEBUG_CHANNEL_ID
+                    : channels.docs[0].data()['channel_id'];
+
+                /// 通知する
+                this.messageService.sendMessage({
+                    channel: channelId,
+                    embeds: doc.getEmbeds({ changeType: change.type })
+                });
+
+                /// todo: scheduleEventsの削除
+            });
+
             console.log(`Removed ${docName}: `, change.doc.data());
         }
     }
@@ -125,7 +186,7 @@ export class FirestoreObserver {
 
     public async onScholarSyncCreate() {
         const scholarSyncRef = this.firestoreService.getCollectionRef({
-            collectionId: `notice/scholar_sync/${this.guild.id}`,
+            collectionId: `/notice/external/scholar_sync/guild_id/${this.guild.id}`,
             where: { fieldPath: 'state', opStr: '==', value: true }
         });
 

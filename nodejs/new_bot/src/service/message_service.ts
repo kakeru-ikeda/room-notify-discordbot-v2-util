@@ -37,9 +37,11 @@ export class MessageService {
 
     public static async sendLog({ message }: { message: string }) {
         const targetChannel: TextChannel | undefined = client.channels.cache.get(process.env.LOG_CHANNEL_ID!) as TextChannel;
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ").replace(/-/g, "/");
 
         try {
-            await targetChannel.send(message);
+            await targetChannel.send(`[${formattedDate}] ${message}`);
             console.log(message);
         } catch (error) {
             console.error(error);

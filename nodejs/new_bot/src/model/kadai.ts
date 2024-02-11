@@ -41,17 +41,35 @@ export class Kadai {
         this.teacher = teacher;
     }
 
-    public getEmbeds() {
+    public getEmbeds({ changeType }: { changeType: string }) {
+        let title: string;
+        let description: string;
+        let thumbnail: string;
+
+        if (changeType === 'added') {
+            title = '【新規課題通知】';
+            description = `${this.subject}に新規課題が追加されました。`;
+            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media';
+        } else if (changeType === 'modified') {
+            title = '【課題変更通知】';
+            description = `${this.subject}の課題${this.kadai_number}が変更されました。`;
+            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fmodified.png?alt=media';
+        } else {
+            title = '【課題削除通知】';
+            description = `${this.subject}の課題${this.kadai_number}が削除されました。`;
+            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fremoved.png?alt=media';
+        }
+
         return new EmbedBuilder()
-            .setTitle('【新規課題通知】')
+            .setTitle(title)
             .setAuthor({ name: this.entry_user_name, iconURL: this.entry_user_avatar, url: 'https://discord.js.org' })
-            .setDescription(`${this.subject}に新規課題が追加されました。`)
-            .setThumbnail('https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media')
+            .setDescription(description)
+            .setThumbnail(thumbnail)
             .addFields(
                 { name: '科目記号', value: this.subject },
                 { name: '課題No.', value: this.kadai_number },
                 { name: '課題主題', value: this.kadai_title },
-                { name: '納期', value: `${this.deadline}}` },
+                { name: '納期', value: `${this.deadline}` },
                 { name: '科目担当', value: this.teacher },
                 { name: 'メモ', value: this.memo }
             )
