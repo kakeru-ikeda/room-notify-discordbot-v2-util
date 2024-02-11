@@ -1,4 +1,4 @@
-import { Guild } from "discord.js";
+import { Guild, GuildMember, PartialGuildMember } from "discord.js";
 import { FirestoreService } from "../service/firestore_service";
 
 export class GuildController {
@@ -10,7 +10,7 @@ export class GuildController {
         this.guild = guild;
     }
 
-    public async channelInitialize() {
+    public async initializeChannel() {
         const channels = this.guild.channels.cache;
         console.log(`Connected to ${channels.size} channels in ${this.guild.name}`);
         console.log(`Channels: ${channels.map(c => c.name).join(', ')}`);
@@ -21,22 +21,33 @@ export class GuildController {
                 continue;
             }
 
-            /// 各チャネルの情報
-            const channelData = {
-                channel_id: channel.id,
-                channel_name: channel.name,
-                state: true,
-                subject: ''
-            };
-
-            /// チャネル情報をFirestoreに保存する
-            await this.firestoreService.updateDocument({
-                collectionId: `data/channels/${this.guild.id}`,
-                documentId: channel.id,
-                data: channelData,
-                isExistsMerge: true
-            });
+            this.addChannel(channel.id, channel.name);
         }
+    }
+
+    public async addChannel(channelId: string, channelName: string) {
+        const channelData = {
+            channel_id: channelId,
+            channel_name: channelName,
+            state: true,
+            subject: ''
+        };
+
+        /// チャネル情報をFirestoreに保存する
+        await this.firestoreService.updateDocument({
+            collectionId: `data/channels/${this.guild.id}`,
+            documentId: channelId,
+            data: channelData,
+            isExistsMerge: true
+        });
+    }
+
+    public async removeChannel(channelId: string) {
+        /// チャネル情報をFirestoreから削除する
+        await this.firestoreService.deleteDocument({
+            collectionId: `data/channels/${this.guild.id}`,
+            documentId: channelId
+        });
     }
 
     public async initializeMember() {
@@ -50,23 +61,51 @@ export class GuildController {
                 continue;
             }
 
-            /// 各メンバーの情報
-            const memberData = {
-                avatar: member.user.avatar,
-                user_global_name: member.user.globalName,
-                user_id: member.user.id,
-                user_name: member.user.username,
-                state: true
-            };
-
-            /// メンバー情報をFirestoreに保存する
-            await this.firestoreService.updateDocument({
-                collectionId: `data/users/${this.guild.id}`,
-                documentId: member.id,
-                data: memberData,
-                isExistsMerge: true
-            });
+            this.addMember(member);
         }
+    }
+
+    public async addMember(guildMember: GuildMember) {
+        const memberData = {
+            avatar: guildMember.user.avatar,
+            user_global_name: guildMember.user.globalName,
+            user_id: guildMember.user.id,
+            user_name: guildMember.user.username,
+            state: true
+        };
+
+        /// メンバー情報をFirestoreに保存する
+        await this.firestoreService.updateDocument({
+            collectionId: `data/users/${this.guild.id}`,
+            documentId: guildMember.id,
+            data: memberData,
+            isExistsMerge: true
+        });
+    }
+
+    public async updateMember(guildMember: GuildMember) {
+        const memberData = {
+            avatar: guildMember.user.avatar,
+            user_global_name: guildMember.user.globalName,
+            user_id: guildMember.user.id,
+            user_name: guildMember.user.username,
+            state: true
+        };
+
+        /// メンバー情報をFirestoreに保存する
+        await this.firestoreService.updateDocument({
+            collectionId: `data/users/${this.guild.id}`,
+            documentId: guildMember.id,
+            data: memberData,
+        });
+    }
+
+    public async removeMember(guildMember: GuildMember | PartialGuildMember) {
+        /// メンバー情報をFirestoreから削除する
+        await this.firestoreService.deleteDocument({
+            collectionId: `data/users/${this.guild.id}`,
+            documentId: guildMember.id
+        });
     }
 
     public async initializeRoomNotify() {
@@ -91,7 +130,7 @@ export class GuildController {
 
             /// 教室通知情報をFirestoreに保存する
             await this.firestoreService.updateDocument({
-                collectionId: `data/notify/${this.guild.id}`,
+                collectionId: `data/room_notify/${this.guild.id}`,
                 documentId: weekday,
                 data: entryRoomNotify,
                 isExistsMerge: true
@@ -101,8 +140,8 @@ export class GuildController {
         }
     }
 
-    public async initializeAll() {
-        await this.channelInitialize();
+    public async initializeGuild() {
+        await this.initializeChannel();
         await this.initializeMember();
         await this.initializeRoomNotify();
     }

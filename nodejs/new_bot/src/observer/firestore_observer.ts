@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv'
 import { Guild } from 'discord.js';
 import admin from 'firebase-admin';
-import { Kadai } from '../model/kadai';
 import { FirestoreService } from '../service/firestore_service';
 import { MessageService } from '../service/message_service';
 import { DoctypeEnum } from '../enum/doctype_enum';
+import { Kadai } from '../model/kadai';
 import { Remind } from '../model/remind';
 import { ScholarSync } from '../model/scholar_sync';
 

@@ -2,8 +2,8 @@ import { db } from '../module/firestore';
 
 export class FirestoreService {
     /// Firestoreの指定documentに値を追加する
-    public addDocument({ collectionId, documentId, data }: { collectionId: string, documentId: string, data: any }) {
-        db.collection(collectionId).doc(documentId).set(data);
+    public async setDocument({ collectionId, documentId, data }: { collectionId: string, documentId: string, data: any }) {
+        await db.collection(collectionId).doc(documentId).set(data);
     }
 
     /** Firestoreの指定documentの値を更新する
@@ -30,8 +30,8 @@ export class FirestoreService {
     }
 
     /// Firestoreの指定documentの値を削除する
-    public deleteDocument({ collectionId, documentId }: { collectionId: string, documentId: string }) {
-        db.collection(collectionId).doc(documentId).delete();
+    public async deleteDocument({ collectionId, documentId }: { collectionId: string, documentId: string }) {
+        await db.collection(collectionId).doc(documentId).delete();
     }
 
     /// Firestoreの指定documentの値を取得する
