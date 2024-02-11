@@ -46,11 +46,11 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         } else if (embedsMode == 'externalScholarSync') {
             embeds = new EmbedBuilder()
                 .setTitle('【ScholarSync新規通知】')
-                .setDescription(`${optionalData['title'] != '' ? optionalData['title'] : '新規通知が追加されました。'}`)
+                .setDescription(`${optionalData['teacher']}から新規通知が発行されました。`)
                 .setThumbnail('https://cdn.discordapp.com/attachments/1107499953753948180/1205862503888719982/Scholar_sync_3.png')
                 .addFields(
+                    { name: 'タイトル', value: optionalData['title'] },
                     { name: '日時', value: `${optionalData['entry_date'].toDate().toLocaleDateString('ja-JP')} ${optionalData['entry_date'].toDate().toLocaleTimeString('ja-JP')}` },
-                    { name: '投稿者', value: optionalData['entry_user_name'] },
                     { name: '配信チャネル', value: optionalData['subject'] },
                     { name: '本文', value: optionalData['memo'] != '' ? optionalData['memo'] : ' ' }
                 )

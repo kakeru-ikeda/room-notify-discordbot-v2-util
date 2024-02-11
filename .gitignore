@@ -682,3 +682,5 @@ nodejs/bot/config.json
 nodejs/bot/serviceAccount.json
 nodejs/bot/mode.json
 
+nodejs/new_bot/config.json
+nodejs/new_bot/serviceAccount.json
