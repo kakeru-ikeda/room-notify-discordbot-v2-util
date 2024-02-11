@@ -72,7 +72,7 @@ class _AuthGateState extends State<AuthGate> {
               discordId: id,
               userName: userName,
               globalUserName: globalUserName,
-              avater: avatar);
+              avatar: avatar);
 
           Future.delayed(const Duration(seconds: 2)).then((_) {
             context.go('/home');

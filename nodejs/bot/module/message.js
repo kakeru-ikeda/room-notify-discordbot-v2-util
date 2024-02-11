@@ -13,7 +13,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         if (embedsMode == 'kadai') {
             embeds = new EmbedBuilder()
                 .setTitle('【新規課題通知】')
-                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avater'] })
+                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avatar'] })
                 .setDescription(`${optionalData['subject']}に新規課題が追加されました。`)
                 .setThumbnail('https://cdn.discordapp.com/attachments/862951519052627968/966499934440419348/unknown.png')
                 .addFields(
@@ -31,7 +31,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         } else if (embedsMode == 'remind') {
             embeds = new EmbedBuilder()
                 .setTitle('【新規リマインド登録】')
-                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avater'], url: 'https://discord.js.org' })
+                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avatar'], url: 'https://discord.js.org' })
                 .setDescription(`リマインドが追加されました。`)
                 .setThumbnail('https://cdn.discordapp.com/attachments/862951519052627968/966499934440419348/unknown.png')
                 .addFields(
