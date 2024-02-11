@@ -85,7 +85,7 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '課題通知 新規登録',
+              kadaiData == null ? '課題通知 新規登録' : '課題通知 編集',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Padding(
