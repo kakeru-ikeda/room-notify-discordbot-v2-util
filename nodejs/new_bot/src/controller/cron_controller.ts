@@ -69,6 +69,7 @@ export class CronController {
                                 : roomNotifyChannel,
                             message: value['text']
                         });
+                        MessageService.sendLog({ message: `🏫 room notify has been sent to guild ID: ${guildId}.` })
                     }
                 }
             });
@@ -108,6 +109,7 @@ export class CronController {
                                 : channels.docs[0].data()['channel_id'],
                             message: message
                         });
+                        MessageService.sendLog({ message: `🧑‍💻 Today's kadai notify was sent to guild ID: ${guildId}.` });
                     });
                 }
 
@@ -119,6 +121,7 @@ export class CronController {
                         documentId: doc.id,
                         data: { state: false }
                     });
+                    MessageService.sendLog({ message: `💀 Guild ID: ${guildId} kadai has reached its deadline. ( ${kadai.kadai_title} )` })
                 }
 
                 /// 前日の夜21時にリマインドを配信する
@@ -143,6 +146,7 @@ export class CronController {
                                 : channels.docs[0].data()['channel_id'],
                             message: message
                         });
+                        MessageService.sendLog({ message: `🧑‍💻 The next day's kadai notify was sent to guild ID: ${guildId}.` });
                     });
                 }
             });
@@ -180,6 +184,7 @@ export class CronController {
                                 : channels.docs[0].data()['channel_id'],
                             message: message
                         });
+                        MessageService.sendLog({ message: `🎗️ A reminder has been sent to guild ID: ${guildId}.` });
                     });
                 }
             });

@@ -64,6 +64,7 @@ export class GuildObserver {
         const guildController = new GuildController(guild);
         await guildController.initializeGuild();
         await this.setEntryGuild(this.client.guilds.cache);
+        MessageService.sendLog({ message: `😘 Joined a new guild: ${guild.name} ( guildId: ${guild.id} )` });
     }
 
     private onGuildCreate() {
@@ -79,7 +80,7 @@ export class GuildObserver {
         this.client = client;
 
         await this.setEntryGuild(this.client.guilds.cache);
-        // this.stopObserve();
+        MessageService.sendLog({ message: `🥹 Left a guild: ${guild.name} ( guildId: ${guild.id} )` });
     }
 
     private onGuildDelete() {
@@ -95,7 +96,7 @@ export class GuildObserver {
         this.client = client;
 
         await this.setEntryGuild(this.client.guilds.cache);
-        // this.stopObserve();
+        MessageService.sendLog({ message: `😇 Guild is unavailable: ${guild.name} ( guildId: ${guild.id} )` });
     }
 
     private onGuildUnavailable() {
@@ -111,6 +112,7 @@ export class GuildObserver {
         console.log(`New member joined: ${member.user.username}`);
         const guildController = new GuildController(member.guild);
         await guildController.addMember(member);
+        MessageService.sendLog({ message: `🏁 ${member.user.displayName} came to the guild! ( guildId: ${member.guild.id} )` });
     }
 
     private onGuildMemberAdd() {
@@ -125,6 +127,7 @@ export class GuildObserver {
         console.log(`Member updated: ${newMember.user.username}`);
         const guildController = new GuildController(newMember.guild);
         await guildController.updateMember(newMember);
+        MessageService.sendLog({ message: `🏁 ${oldMember.displayName} updated his profile. ( guildId: ${newMember.guild.id} )` });
     }
 
     private onGuildMemberUpdate() {
@@ -139,6 +142,7 @@ export class GuildObserver {
         console.log(`Member left: ${member.user.username}`);
         const guildController = new GuildController(member.guild);
         await guildController.removeMember(member);
+        MessageService.sendLog({ message: `🏁 ${member.displayName} has left the guild. ( guildId: ${member.guild.id} )` });
     }
 
     private onGuildMemberRemove() {
@@ -155,10 +159,15 @@ export class GuildObserver {
         const guild = channel.guild;
         const guildController = new GuildController(guild);
         await guildController.addChannel(channel.id, channel.name);
+        MessageService.sendLog({ message: `💍 Channel created! ( guildId: ${guild.id} )` });
     }
 
     private onChannelCreate() {
         this.client.on('channelCreate', this.channelCreateHandler);
+    }
+
+    private offChannelCreate() {
+        this.client.off('channelCreate', this.channelCreateHandler);
     }
 
     private channelDeleteHandler = async (channel: DMChannel | NonThreadGuildBasedChannel) => {
@@ -166,6 +175,7 @@ export class GuildObserver {
         const guild = (channel as NonThreadGuildBasedChannel).guild;
         const guildController = new GuildController(guild);
         await guildController.removeChannel(channel.id);
+        MessageService.sendLog({ message: `💍 Channel deleted. ( guildId: ${guild.id} )` });
     }
 
     private onChannelDelete() {
@@ -196,6 +206,7 @@ export class GuildObserver {
         this.offGuildMemberAdd();
         this.offGuildMemberRemove();
         this.offGuildMemberUpdate();
+        this.offChannelCreate();
         this.offChannelDelete();
     }
 }

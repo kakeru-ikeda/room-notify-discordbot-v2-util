@@ -68,6 +68,7 @@ export class FirestoreObserver {
                     channel: channelId,
                     embeds: doc.getEmbeds({ changeType: change.type })
                 });
+                MessageService.sendLog({ message: `🔥 Added value to firestore. Contents: ${docName} ( guildId: ${guildId} )` });
 
                 /// scheduleEventsが有効の場合は登録する
                 /// docの型がKadaiまたはRemindの場合のみ
@@ -76,6 +77,7 @@ export class FirestoreObserver {
                         guildId: guildId!,
                         scheduleData: doc.getScheduledEvent()
                     });
+                    MessageService.sendLog({ message: `⏰ Scheduled events added. Contents: ${docName} ( guildId: ${guildId} )` });
                 }
 
                 /// 通知済みにする
@@ -90,8 +92,10 @@ export class FirestoreObserver {
                     });
                 } catch (error) {
                     console.error(error);
+                    MessageService.sendLog({ message: `⚠️ ${error}` });
                 }
             });
+
 
             console.log(`New ${docName}: `, change.doc.data());
         }
@@ -114,6 +118,7 @@ export class FirestoreObserver {
                     channel: channelId,
                     embeds: doc.getEmbeds({ changeType: change.type })
                 });
+                MessageService.sendLog({ message: `🔥 Modified value to firestore. Contents: ${docName} ( guildId: ${guildId} )` });
 
                 /// 通知済みにする
                 FirestoreObserver.debounce = true;
@@ -127,6 +132,7 @@ export class FirestoreObserver {
                     });
                 } catch (error) {
                     console.error(error);
+                    MessageService.sendLog({ message: `⚠️ ${error}` });
                 }
 
                 /// todo: scheduleEventsの更新
@@ -153,6 +159,7 @@ export class FirestoreObserver {
                     channel: channelId,
                     embeds: doc.getEmbeds({ changeType: change.type })
                 });
+                MessageService.sendLog({ message: `🔥 Removed value to firestore. Contents: ${docName} ( guildId: ${guildId} )` });
 
                 /// todo: scheduleEventsの削除
             });
