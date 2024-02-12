@@ -15,8 +15,6 @@ export class CronController {
 
     private cronTime: string = '* * * * *';
     private task: () => void = async () => {
-        console.log(`Task executed at ${new Date()}`);
-
         this.date = new Date();
         // this.date = new Date('2024-02-12 09:00:00');
         const [week, hour, minutes] = [this.date.getDay(), this.date.getHours(), this.date.getMinutes()]  // 曜・時・分

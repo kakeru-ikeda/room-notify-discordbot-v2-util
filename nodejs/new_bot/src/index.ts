@@ -8,6 +8,11 @@ import { MessageService } from './service/message_service';
 dotenv.config();
 
 async function main(): Promise<void> {
+    if (!process.env.MODE) {
+        console.error('MODE is not defined');
+        return;
+    }
+
     if (!process.env.BOT_TOKEN) {
         console.error('BOT_TOKEN is not defined');
         return;
@@ -19,6 +24,7 @@ async function main(): Promise<void> {
 function clientReady() {
     client.once(Events.ClientReady, async () => {
         MessageService.sendLog({ message: '🏃 Client is ready. Start to initialize.' });
+        MessageService.sendLog({ message: `🔨 Startup mode : ${process.env.MODE}` });
 
         const observer = new GuildObserver();
         const cron = new CronController();
