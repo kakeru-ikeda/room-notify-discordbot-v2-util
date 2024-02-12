@@ -47,7 +47,6 @@ export class GuildObserver {
                 guild_id: guild.id,
                 guild_icon: guild.icon,
                 guild_name: guild.name,
-                room_notify_channel: '',
                 state: true
             };
         }

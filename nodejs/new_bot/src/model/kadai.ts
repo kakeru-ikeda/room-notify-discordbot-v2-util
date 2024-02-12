@@ -38,7 +38,7 @@ export class Kadai {
         this.memo = memo != '' ? memo : ' ';
         this.state = state;
         this.subject = subject;
-        this.teacher = teacher;
+        this.teacher = teacher != '' ? teacher : '未設定';
     }
 
     public getEmbeds({ changeType }: { changeType: string }) {

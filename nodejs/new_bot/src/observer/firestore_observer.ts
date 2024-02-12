@@ -14,7 +14,7 @@ export class FirestoreObserver {
     private firestoreService: FirestoreService = new FirestoreService();
     private messageService: MessageService = new MessageService();
     private guild: Guild;
-    private debounce: boolean = false;
+    static debounce: boolean = false;
 
     constructor(guild: Guild) {
         this.guild = guild;
@@ -79,7 +79,7 @@ export class FirestoreObserver {
                 }
 
                 /// 通知済みにする
-                this.debounce = true;
+                FirestoreObserver.debounce = true;
                 try {
                     await this.firestoreService.updateDocument({
                         collectionId: doc instanceof ScholarSync
@@ -96,8 +96,8 @@ export class FirestoreObserver {
             console.log(`New ${docName}: `, change.doc.data());
         }
         if (change.type === 'modified') {
-            if (this.debounce) {
-                this.debounce = false;
+            if (FirestoreObserver.debounce) {
+                FirestoreObserver.debounce = false;
                 return;
             }
 
@@ -116,7 +116,7 @@ export class FirestoreObserver {
                 });
 
                 /// 通知済みにする
-                this.debounce = true;
+                FirestoreObserver.debounce = true;
                 try {
                     await this.firestoreService.updateDocument({
                         collectionId: doc instanceof ScholarSync
@@ -135,6 +135,11 @@ export class FirestoreObserver {
             console.log(`Modified ${docName}: `, change.doc.data());
         }
         if (change.type === 'removed') {
+            if (FirestoreObserver.debounce) {
+                FirestoreObserver.debounce = false;
+                return;
+            }
+
             this.firestoreService.getCollection({
                 collectionId: `data/channels/${guildId}`,
                 where: { fieldPath: 'subject', opStr: '==', value: doc.subject }
