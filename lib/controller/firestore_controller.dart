@@ -298,7 +298,7 @@ class FirestoreController {
     required discordId,
     required userName,
     required globalUserName,
-    required avater,
+    required avatar,
   }) async {
     final docRef = db.collection('login_user').doc(uid);
 
@@ -306,16 +306,16 @@ class FirestoreController {
       'id': discordId,
       'user_name': userName,
       'user_global_name': globalUserName,
-      'avater': avater
+      'avatar': avatar
     });
 
     await prefs.saveData('userId', discordId);
     await prefs.saveData('userName', globalUserName);
-    await prefs.saveData('avater', avater);
+    await prefs.saveData('avatar', avatar);
 
     LoginUserModel.userId = discordId;
     LoginUserModel.userName = globalUserName;
-    LoginUserModel.avatar = avater;
+    LoginUserModel.avatar = avatar;
   }
 
   static setLoginUserData({

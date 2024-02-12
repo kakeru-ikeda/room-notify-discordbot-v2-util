@@ -81,7 +81,7 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'リマインド 新規登録',
+              remindData == null ? 'リマインド 新規登録' : 'リマインド 更新',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Padding(
@@ -233,6 +233,8 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                           ? DateTime.now()
                           : remindData!['entry_date'];
 
+                      print('👑 runtimeType ${entryDate}');
+
                       FirestoreController.setRemindInfo(
                         guildId: guildId,
                         remindId: entryDate.runtimeType == Timestamp
@@ -253,7 +255,7 @@ class _RemindEntryModalContentsState extends State<RemindEntryModalContents> {
                           'entry_date': entryDate,
                           'entry_user_id': LoginUserModel.userId,
                           'entry_user_name': LoginUserModel.userName,
-                          'entry_user_avater': LoginUserModel.userAvater,
+                          'entry_user_avatar': LoginUserModel.userAvatar,
                           'attachment': 'URL(Comming soon...)',
                           'entry_notify': false,
                           'state': true,

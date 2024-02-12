@@ -34,17 +34,17 @@ class _IndexPageState extends State<IndexPage> {
   SharedPreferencesController prfs = SharedPreferencesController.instance;
   String? userId;
   String? userName;
-  String? userAvater;
+  String? userAvatar;
 
   Future<void> getPrfsData() async {
     userId = await prfs.getData('userId');
     userName = await prfs.getData('userName');
-    userAvater = await prfs.getData('avater');
-    userAvater = 'https://cdn.discordapp.com/avatars/$userId/$userAvater';
+    userAvatar = await prfs.getData('avatar');
+    userAvatar = 'https://cdn.discordapp.com/avatars/$userId/$userAvatar';
 
     LoginUserModel.userId = userId!;
     LoginUserModel.userName = userName!;
-    LoginUserModel.userAvater = userAvater!;
+    LoginUserModel.userAvatar = userAvatar!;
 
     await prfs.removeData('isAdministrator');
   }
@@ -161,7 +161,7 @@ class _IndexPageState extends State<IndexPage> {
                 actions: [
                   Row(
                     children: [
-                      Image.network('$userAvater'),
+                      Image.network('$userAvatar'),
                       Container(
                         height: double.infinity,
                         alignment: Alignment.center,

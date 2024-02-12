@@ -13,7 +13,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         if (embedsMode == 'kadai') {
             embeds = new EmbedBuilder()
                 .setTitle('【新規課題通知】')
-                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avater'] })
+                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avatar'] })
                 .setDescription(`${optionalData['subject']}に新規課題が追加されました。`)
                 .setThumbnail('https://cdn.discordapp.com/attachments/862951519052627968/966499934440419348/unknown.png')
                 .addFields(
@@ -31,7 +31,7 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         } else if (embedsMode == 'remind') {
             embeds = new EmbedBuilder()
                 .setTitle('【新規リマインド登録】')
-                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avater'], url: 'https://discord.js.org' })
+                .setAuthor({ name: optionalData['entry_user_name'], iconURL: optionalData['entry_user_avatar'], url: 'https://discord.js.org' })
                 .setDescription(`リマインドが追加されました。`)
                 .setThumbnail('https://cdn.discordapp.com/attachments/862951519052627968/966499934440419348/unknown.png')
                 .addFields(
@@ -46,11 +46,11 @@ module.exports.send = async ({ contents = '', optionalData, channel = '', isEven
         } else if (embedsMode == 'externalScholarSync') {
             embeds = new EmbedBuilder()
                 .setTitle('【ScholarSync新規通知】')
-                .setDescription(`${optionalData['title'] != '' ? optionalData['title'] : '新規通知が追加されました。'}`)
+                .setDescription(`${optionalData['teacher']}から新規通知が発行されました。`)
                 .setThumbnail('https://cdn.discordapp.com/attachments/1107499953753948180/1205862503888719982/Scholar_sync_3.png')
                 .addFields(
+                    { name: 'タイトル', value: optionalData['title'] },
                     { name: '日時', value: `${optionalData['entry_date'].toDate().toLocaleDateString('ja-JP')} ${optionalData['entry_date'].toDate().toLocaleTimeString('ja-JP')}` },
-                    { name: '投稿者', value: optionalData['entry_user_name'] },
                     { name: '配信チャネル', value: optionalData['subject'] },
                     { name: '本文', value: optionalData['memo'] != '' ? optionalData['memo'] : ' ' }
                 )

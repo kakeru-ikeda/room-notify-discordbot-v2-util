@@ -85,7 +85,7 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '課題通知 新規登録',
+              kadaiData == null ? '課題通知 新規登録' : '課題通知 編集',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Padding(
@@ -352,7 +352,7 @@ class _KadaiModalContentsState extends State<KadaiModalContents> {
                           'entry_date': entryDate,
                           'entry_user_id': LoginUserModel.userId,
                           'entry_user_name': LoginUserModel.userName,
-                          'entry_user_avater': LoginUserModel.userAvater,
+                          'entry_user_avatar': LoginUserModel.userAvatar,
                           'attachment': 'URL(Comming soon...)',
                           'entry_notify': false,
                           'state': true,
