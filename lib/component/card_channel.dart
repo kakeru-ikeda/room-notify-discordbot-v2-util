@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 
-import '../pages/admin/entry/channel/channel_modal_contents.dart';
+import '../pages/entry/channel/channel_modal_contents.dart';
 
 class CardChannel {
   static Widget setCard({required guildId, required channelData}) {

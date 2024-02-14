@@ -5,7 +5,7 @@ import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.d
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 
-import '../../../../component/page_template.dart';
+import '../../../component/page_template.dart';
 
 class RoomNotifyEntryPage extends StatefulWidget {
   const RoomNotifyEntryPage({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:room_notify_discordbot_v2_util/component/modal_contents_template.dart';
 
-import '../../../../controller/firestore_controller.dart';
+import '../../../controller/firestore_controller.dart';
 
 class RoomNotifyModalContents extends StatefulWidget {
   const RoomNotifyModalContents({

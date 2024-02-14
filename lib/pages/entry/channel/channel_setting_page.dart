@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_channel.dart';
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
-import 'package:room_notify_discordbot_v2_util/pages/admin/entry/channel/channel_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/channel/channel_modal_contents.dart';
 
-import '../../../../component/page_template.dart';
-import '../../../../controller/firestore_controller.dart';
-import '../../../../model/login_user_model.dart';
+import '../../../component/page_template.dart';
+import '../../../controller/firestore_controller.dart';
+import '../../../model/login_user_model.dart';
 
 class ChannelSettingPage extends StatefulWidget {
   const ChannelSettingPage({super.key});

@@ -4,9 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_teacher.dart';
 import 'package:room_notify_discordbot_v2_util/component/page_template.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
-import 'package:room_notify_discordbot_v2_util/pages/admin/entry/teacher/teacher_entry_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/teacher/teacher_entry_modal_contents.dart';
 
-import '../../../../controller/firestore_controller.dart';
+import '../../../controller/firestore_controller.dart';
 
 class TeacherEntryPage extends StatefulWidget {
   const TeacherEntryPage({super.key});
