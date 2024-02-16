@@ -15,6 +15,16 @@ class RoomNotifyEntryPage extends StatefulWidget {
 }
 
 class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
+ late String isSelectedChannel;
+
+  @override
+  void initState() {
+    super.initState();
+    Future(() async {
+      isSelectedChannel = await FirestoreController.getCurrentNotifyChannelData(guildId: LoginUserModel.currentGuildId);
+    },);
+  }
+
   @override
   Widget build(BuildContext context) {
     final WEEK = {
@@ -31,9 +41,8 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
       4: '木曜日',
       5: '金曜日',
     };
-
-    String isSelectedChannel = FirestoreDataModel
-        .entryGuilds![LoginUserModel.currentGuildId]['room_notify_channel'];
+  
+    
 
     return Padding(
       padding: const EdgeInsets.all(32),
