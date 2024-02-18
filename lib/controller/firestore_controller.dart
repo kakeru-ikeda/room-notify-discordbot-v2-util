@@ -81,6 +81,36 @@ class FirestoreController {
     return result;
   }
 
+  static getCurrentNotifyChannelData({required guildId}) async {
+    final docRef = db
+        .collection('data')
+        .doc('room_notify')
+        .collection('notify_channel')
+        .doc('default');
+    final docSnapshot = await docRef.get();
+
+    Map<String, dynamic> data = docSnapshot.data()!;
+    return data[guildId];
+  }
+
+  static setCurrentNotifyChannelData(
+      {required guildId, required channelId, required channelName}) async {
+    final docRef = db
+        .collection('data')
+        .doc('room_notify')
+        .collection('notify_channel')
+        .doc('default');
+    final docSnapshot = await docRef.get();
+
+    Map<String, dynamic> data = docSnapshot.data()!;
+    data[guildId] = {
+      'channel_id': channelId,
+      'channel_name': channelName,
+    };
+
+    await docRef.update(data);
+  }
+
   static Stream<DocumentSnapshot<Map<String, dynamic>>>? getRoomNotify(
       {required guildId, required week}) {
     print('👑 $guildId');
@@ -203,13 +233,6 @@ class FirestoreController {
     return snapshots;
   }
 
-  static Future<DocumentSnapshot<Map<String, dynamic>>> getOwner() async {
-    final docRef = db.collection('data').doc('users');
-    final result = await docRef.get();
-
-    return result;
-  }
-
   static void setGuildInfo(
       {required guildId, required field, required data}) async {
     final docRef = db.collection('data').doc('guilds');
@@ -305,7 +328,7 @@ class FirestoreController {
     required discordId,
     required userName,
     required globalUserName,
-    required avater,
+    required avatar,
   }) async {
     final docRef = db.collection('login_user').doc(uid);
 
@@ -313,23 +336,22 @@ class FirestoreController {
       'id': discordId,
       'user_name': userName,
       'user_global_name': globalUserName,
-      'avater': avater
+      'avatar': avatar
     });
 
     await prefs.saveData('userId', discordId);
     await prefs.saveData('userName', globalUserName);
-    await prefs.saveData('avater', avater);
+    await prefs.saveData('avatar', avatar);
 
     LoginUserModel.userId = discordId;
     LoginUserModel.userName = globalUserName;
-    LoginUserModel.avatar = avater;
+    LoginUserModel.avatar = avatar;
   }
 
   static setLoginUserData({
     required uid,
     required currentGuildId,
     required currentGuildName,
-    isAdministrator = false,
   }) async {
     final docRef = db
         .collection('login_user')
@@ -340,16 +362,13 @@ class FirestoreController {
     await docRef.set({
       'guild_id': currentGuildId,
       'guild_name': currentGuildName,
-      'is_admin': isAdministrator,
     });
 
     await prefs.saveData('currentGuildId', currentGuildId);
     await prefs.saveData('currentGuildName', currentGuildName);
-    await prefs.saveBoolData('isAdministrator', isAdministrator);
 
     LoginUserModel.currentGuildId = currentGuildId;
     LoginUserModel.currentGuildName = currentGuildName;
-    LoginUserModel.isAdministrator = isAdministrator;
   }
 
   static removeTeacher({required guildId, required teacherName}) {

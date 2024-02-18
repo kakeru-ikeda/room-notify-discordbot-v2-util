@@ -4,8 +4,6 @@ class LoginUserModel {
   static String userId = '';
   static String userName = '';
   static String avatar = '';
-  static String userAvater =
+  static String userAvatar =
       'https://cdn.discordapp.com/avatars/$userId/$avatar';
-  static bool isAdministrator = false;
-  static bool isOwner = false;
 }

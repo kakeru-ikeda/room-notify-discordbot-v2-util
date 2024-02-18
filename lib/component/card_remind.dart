@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:room_notify_discordbot_v2_util/pages/member/entry/remind/remind_entry_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/remind/remind_entry_modal_contents.dart';
 import '../controller/firestore_controller.dart';
 import '../model/login_user_model.dart';
 

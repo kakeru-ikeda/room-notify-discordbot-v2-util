@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
+import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthGate extends StatefulWidget {
@@ -20,6 +21,7 @@ class _AuthGateState extends State<AuthGate> {
   String? userName;
   String? globalUserName;
   String? avatar;
+  String? demoMode;
 
   String getFragment(String url) {
     return Uri.parse(url).fragment;
@@ -48,11 +50,23 @@ class _AuthGateState extends State<AuthGate> {
     String fragment = getFragment(url);
     Map<String, String> params = extractQueryParams(fragment);
 
-    id = params['id'];
-    email = params['email'];
-    userName = Uri.decodeFull(params['username'] ?? '');
-    globalUserName = Uri.decodeFull(params['global_name'] ?? '');
-    avatar = params['avatar'];
+    demoMode = params['demo'];
+
+    if (demoMode == 'true') {
+      print('👑 DemoMode');
+      id = 'demouser';
+      email = 'demo@demo.com';
+      userName = 'DemoUser';
+      globalUserName = 'DemoUser';
+      avatar = '';
+      LoginUserModel.currentGuildId = '1208808403925991434';
+    } else {
+      id = params['id'];
+      email = params['email'];
+      userName = Uri.decodeFull(params['username'] ?? '');
+      globalUserName = Uri.decodeFull(params['global_name'] ?? '');
+      avatar = params['avatar'];
+    }
   }
 
   @override
@@ -72,7 +86,7 @@ class _AuthGateState extends State<AuthGate> {
               discordId: id,
               userName: userName,
               globalUserName: globalUserName,
-              avater: avatar);
+              avatar: avatar);
 
           Future.delayed(const Duration(seconds: 2)).then((_) {
             context.go('/home');

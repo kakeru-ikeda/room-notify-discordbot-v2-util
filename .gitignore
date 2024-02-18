@@ -113,7 +113,6 @@ android/app/google-services.json
 # Google Maps API
 google_maps_api.xml
 # Web related
-lib/generated_plugin_registrant.dart
 # Obfuscation related
 app.*.map.json
 ### --------------------------- Dart.gitignore ------------------------- ###
@@ -681,3 +680,7 @@ node_modules/
 nodejs/bot/node_modules/
 nodejs/bot/config.json
 nodejs/bot/serviceAccount.json
+nodejs/bot/mode.json
+
+nodejs/new_bot/config.json
+nodejs/new_bot/serviceAccount.json

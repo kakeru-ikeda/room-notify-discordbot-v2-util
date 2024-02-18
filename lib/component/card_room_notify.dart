@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:room_notify_discordbot_v2_util/pages/admin/entry/room_notify/room_notify_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/room_notify/room_notify_modal_contents.dart';
 
 class CardRoomNotify {
   static Widget setCard({
