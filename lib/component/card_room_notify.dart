@@ -11,7 +11,6 @@ class CardRoomNotify {
     required period,
     bool isHomeView = false,
   }) {
-    print('👑 setCard');
     int roomNumber = roomNotifyData['room_number'];
     String subject = roomNotifyData['subject'];
     String type = roomNotifyData['type'];
@@ -22,9 +21,6 @@ class CardRoomNotify {
     String zoomUrl = roomNotifyData['zoom_url'];
     String contents = roomNotifyData['contents'];
     bool state = roomNotifyData['state'];
-
-    print('alartHour: $alartHour');
-    print('alartMin: $alartMin');
 
     Color cardColor =
         state ? (type == 'room' ? Colors.green : Colors.blue) : Colors.white;

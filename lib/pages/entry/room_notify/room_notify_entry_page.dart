@@ -72,12 +72,17 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                               FirestoreController.getCurrentNotifyChannelData(
                                   guildId: LoginUserModel.currentGuildId),
                           builder: (context, currentChannelSnapshot) {
-                            if (currentChannelSnapshot.hasData) {
-                              isSelectedChannel = isFirstLoad
-                                  ? (currentChannelSnapshot.data
-                                          as Map<String, dynamic>)['channel_id']
-                                      as String
-                                  : isSelectedChannel;
+                            if (currentChannelSnapshot.connectionState ==
+                                ConnectionState.done) {
+                              isSelectedChannel =
+                                  currentChannelSnapshot.data == null
+                                      ? ''
+                                      : isFirstLoad
+                                          ? (currentChannelSnapshot.data as Map<
+                                                  String,
+                                                  dynamic>)['channel_id'] ??
+                                              ''
+                                          : isSelectedChannel;
                               isFirstLoad = false;
 
                               return DropdownButton(
