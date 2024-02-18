@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:room_notify_discordbot_v2_util/controller/shared_preference_cont
 import 'package:room_notify_discordbot_v2_util/model/firestore_data_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/auth/auth_error_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/auth/user_undefind_error_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/home/home_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/index.dart';
 import 'dart:html' as html;
 import 'firebase_options.dart';
@@ -35,6 +37,22 @@ final GoRouter _router = GoRouter(
             future: Future.delayed(const Duration(seconds: 2)),
             builder: (context, snapshot) {
               print("👑 ${state.extra}");
+              String getFragment(String url) {
+                return Uri.parse(url).fragment;
+              }
+
+              Map<String, String> extractQueryParams(String fragment) {
+                Map<String, String> params = {};
+                List<String> pairs = fragment.split('&');
+                pairs.forEach((pair) {
+                  List<String> keyValue = pair.split('=');
+                  if (keyValue.length == 2) {
+                    params[keyValue[0].replaceFirst('/auth/?', '')] =
+                        keyValue[1];
+                  }
+                });
+                return params;
+              }
 
               if (userId != null) {
                 context.pushReplacement('/home');
@@ -45,6 +63,20 @@ final GoRouter _router = GoRouter(
                     SharedPreferencesController.instance;
                 userId = await prfs.getData('userId');
                 print('💎 User ID: $userId');
+
+                final String url = Uri.base.toString();
+                String fragment = getFragment(url);
+                Map<String, String> params = extractQueryParams(fragment);
+
+                print('👑 params: ${params}');
+
+                String? demoMode = params['demo'];
+                if (demoMode == 'true') {
+                  print('👑 DemoMode');
+                  context.go('/demo');
+                  return;
+                }
+
                 if (userId == null) {
                   context.go('/login');
                   return;
@@ -113,6 +145,32 @@ final GoRouter _router = GoRouter(
           path: 'user_undefind',
           builder: (BuildContext context, GoRouterState state) {
             return const UserUndefindErrorPage();
+          },
+        ),
+        GoRoute(
+          path: 'demo',
+          builder: (context, state) {
+            String id = 'demouser';
+            String email = 'demo@demo.com';
+            String userName = 'DemoUser';
+            String globalUserName = 'DemoUser';
+            String avatar = '';
+            Future(() async {
+              FirebaseAuth.instance
+                  .signInWithEmailAndPassword(email: email, password: id)
+                  .then((value) {
+                final userData = value.user;
+
+                FirestoreController.setLoginUser(
+                    uid: userData?.uid ?? '',
+                    discordId: id,
+                    userName: userName,
+                    globalUserName: globalUserName,
+                    avatar: avatar);
+              });
+            });
+
+            return const HomePage();
           },
         ),
       ],

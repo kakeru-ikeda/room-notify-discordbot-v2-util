@@ -103,18 +103,18 @@ class _CommonDrawerState extends State<CommonDrawer> {
               ],
             ),
           ),
-          ListTile(
-            title: Text('教室通知 登録'),
-            leading: Icon(Icons.note_alt),
-            onTap: () {
-              setState(() {
-                MediaQuery.of(context).size.width <= 768
-                    ? Navigator.pop(context)
-                    : null;
-                IndexPageController.screen.jumpToPage(5);
-              });
-            },
-          ),
+          // ListTile(
+          //   title: Text('教室通知 登録'),
+          //   leading: Icon(Icons.note_alt),
+          //   onTap: () {
+          //     setState(() {
+          //       MediaQuery.of(context).size.width <= 768
+          //           ? Navigator.pop(context)
+          //           : null;
+          //       IndexPageController.screen.jumpToPage(5);
+          //     });
+          //   },
+          // ),
           Container(
             child: Row(
               children: [
@@ -125,7 +125,7 @@ class _CommonDrawerState extends State<CommonDrawer> {
                 ),
                 Container(
                   height: 50,
-                  width: drawerWidth - 50 - 20,
+                  width: drawerWidth - 50 - 40,
                   alignment: Alignment.center,
                   color: Color.fromARGB(255, 218, 224, 225),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -133,9 +133,43 @@ class _CommonDrawerState extends State<CommonDrawer> {
                       style: TextStyle(color: Colors.black)),
                 ),
                 Container(
-                    width: 20,
-                    child: IconButton(
-                        onPressed: () {}, icon: Icon(Icons.change_circle))),
+                  width: 40,
+                  child: IconButton(
+                    onPressed: () {
+                      /// ダイアログ表示
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('ギルド切り替え'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                for (var guild in FirestoreDataModel
+                                    .entryGuilds!.keys) ...{
+                                  ListTile(
+                                    title: Text(FirestoreDataModel
+                                        .entryGuilds![guild]!['guild_name']),
+                                    onTap: () {
+                                      setState(() {
+                                        LoginUserModel.currentGuildId = guild;
+                                        LoginUserModel.currentGuildName =
+                                            FirestoreDataModel.entryGuilds![
+                                                guild]!['guild_name'];
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
+                                }
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    icon: Icon(Icons.change_circle),
+                  ),
+                ),
               ],
             ),
           )

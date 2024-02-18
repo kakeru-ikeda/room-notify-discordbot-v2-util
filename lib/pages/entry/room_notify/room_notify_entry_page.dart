@@ -60,6 +60,7 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                 child: Text('教室通知 配信チャネル:'),
               ),
               StatefulBuilder(builder: (context, changeValue) {
+                print('👠 ${LoginUserModel.currentGuildId}');
                 return FutureBuilder(
                   future: FirestoreController.getGuildChannelsData(
                       guildId: LoginUserModel.currentGuildId),
@@ -154,6 +155,7 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                               week: WEEK[i]),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
+                              print('👑 ${snapshot.data!.data()!.length}');
                               return Column(
                                 children: [
                                   Padding(
