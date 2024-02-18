@@ -1,0 +1,245 @@
+section {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  -webkit-transition: opacity 400ms;
+  -moz-transition: opacity 400ms;
+  transition: opacity 400ms;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 奇数sectionの色を変える */
+section:nth-child(odd) {
+  background-color: #00bbc1;
+}
+
+section:nth-child(odd) .circle {
+  background-color: #ffffff;
+}
+
+/* 偶数sectionの色を変える */
+section:nth-child(even) {
+  background-color: #ffffff;
+}
+
+section:nth-child(even) .circle {
+  background-color: #00bbc1;
+  left: 0%;
+}
+
+.circle {
+  width: 120vw;
+  height: 120vw;
+  border-radius: 50%;
+  background-color: #ffffff;
+  position: absolute;
+  top: 50vh;
+  left: 100vw;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+#title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+#logo {
+  width: 35vw;
+  margin-bottom: 10px;
+}
+
+.contentsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+.contentsWrapper:nth-child(odd) {
+  top: 50%;
+  left: 70%;
+}
+
+.contentsWrapper:nth-child(even) {
+  top: 50%;
+  left: 30%;
+}
+
+/*まずはお決まりのボックスサイズ算出をborer-boxに */
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  font-size: 62.5%;
+  /*rem算出をしやすくするために*/
+}
+
+.btn,
+a.btn,
+button.btn {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.5;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 4rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  color: #212529;
+  border-radius: 0.5rem;
+}
+
+a.btn--orange {
+  color: #fff;
+  background-color: #F49728;
+  border-bottom: 5px solid #a9691a;
+}
+
+a.btn--orange:hover {
+  margin-top: 3px;
+  color: #fff;
+  background: #f56500;
+  border-bottom: 2px solid #b84c00;
+}
+
+a.btn--shadow {
+  -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+}
+
+.flex {
+  display: flex;
+}
+
+.titleWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 30%;
+  height: 100%;
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+
+section .titleWrapper:nth-child(odd) {
+  top: 50%;
+  left: 80%;
+  align-items: start;
+}
+
+section .titleWrapper:nth-child(even) {
+  top: 50%;
+  left: 20%;
+  align-items: end;
+}
+
+.titleWrapper h1 {
+  font-size: 3.6rem;
+  font-weight: 700;
+  color: #363636;
+  margin-bottom: 20px;
+}
+
+.titleWrapper:nth-child(even) h1 {
+  color: #ffffff;
+  text-align: right;
+}
+
+.titleWrapper p {
+  width: 85%;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: #363636;
+  margin-bottom: 20px;
+}
+
+.titleWrapper p br {
+  display: block;
+  content: "";
+  padding: 7.5px 0;
+}
+
+.titleWrapper:nth-child(even) p {
+  color: #ffffff;
+}
+
+/* 上記のスタイルを、スマホサイズに対応させる */
+/* 円の表示位置は、スマホサイズでは一律で下側に半円だけ見えるように表示する */
+/* また、タイトルの表示位置は、スマホサイズでは一律で上側に表示する */
+/* テキストの表示が見切れることがないように、テキストの表示位置とサイズを適宜調整する */
+@media screen and (max-width: 767px) {
+  section {
+    height: 100vh;
+  }
+
+  section:nth-child(odd) .circle {
+    top: 100vh;
+  }
+
+  section:nth-child(even) .circle {
+    top: 100vh;
+  }
+
+  .contentsWrapper {
+    width: 80%;
+    top: 20%;
+    left: 50%;
+  }
+
+  .titleWrapper {
+    width: 80%;
+    top: 20%;
+    left: 50%;
+  }
+
+  .titleWrapper h1 {
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+  }
+
+  .titleWrapper p {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+}
