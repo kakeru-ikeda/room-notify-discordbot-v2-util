@@ -1,4 +1,4 @@
-import { Guild, GuildMember, PartialGuildMember } from "discord.js";
+import { ChannelType, Guild, GuildMember, PartialGuildMember } from "discord.js";
 import { FirestoreService } from "../service/firestore_service";
 
 export class GuildController {
@@ -17,7 +17,7 @@ export class GuildController {
 
         for (const [id, channel] of channels.entries()) {
             /// テキストチャネル以外は無視する
-            if (channel.type !== 0) {
+            if (channel.type !== ChannelType.GuildText) {
                 continue;
             }
 
