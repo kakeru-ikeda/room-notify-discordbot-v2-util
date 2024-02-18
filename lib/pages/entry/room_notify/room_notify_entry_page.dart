@@ -15,15 +15,12 @@ class RoomNotifyEntryPage extends StatefulWidget {
 }
 
 class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
- late String isSelectedChannel;
-
   @override
   void initState() {
     super.initState();
-    Future(() async {
-      isSelectedChannel = await FirestoreController.getCurrentNotifyChannelData(guildId: LoginUserModel.currentGuildId);
-    },);
   }
+
+  bool isFirstLoad = true;
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +38,8 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
       4: '木曜日',
       5: '金曜日',
     };
-  
-    
+
+    String isSelectedChannel = '';
 
     return Padding(
       padding: const EdgeInsets.all(32),
@@ -69,31 +66,55 @@ class _RoomNotifyEntryPageState extends State<RoomNotifyEntryPage> {
                   builder: (context, snapshot) {
                     print(snapshot.data);
                     if (snapshot.hasData) {
-                      return DropdownButton(
-                          value: isSelectedChannel,
-                          items: [
-                            ...snapshot.data!.docs
-                                .map((entry) => DropdownMenuItem(
-                                      value: entry.data()['channel_id'],
-                                      child: Text(
-                                          '${entry.data()['channel_name']}'),
-                                    ))
-                                .toList(),
-                            const DropdownMenuItem(
-                              value: '',
-                              child: Text('未設定'),
-                            )
-                          ],
-                          onChanged: (newValue) {
-                            changeValue(() {
-                              isSelectedChannel = newValue.toString();
+                      return FutureBuilder(
+                          future:
+                              FirestoreController.getCurrentNotifyChannelData(
+                                  guildId: LoginUserModel.currentGuildId),
+                          builder: (context, currentChannelSnapshot) {
+                            if (currentChannelSnapshot.hasData) {
+                              isSelectedChannel = isFirstLoad
+                                  ? (currentChannelSnapshot.data
+                                          as Map<String, dynamic>)['channel_id']
+                                      as String
+                                  : isSelectedChannel;
+                              isFirstLoad = false;
 
-                              FirestoreController.setGuildInfo(
-                                  guildId: LoginUserModel.currentGuildId,
-                                  field: 'room_notify_channel',
-                                  data: isSelectedChannel);
-                              Fluttertoast.showToast(msg: '情報を更新しました。');
-                            });
+                              return DropdownButton(
+                                  value: isSelectedChannel,
+                                  items: [
+                                    ...snapshot.data!.docs
+                                        .map((entry) => DropdownMenuItem(
+                                              value: entry.data()['channel_id'],
+                                              child: Text(
+                                                  '${entry.data()['channel_name']}'),
+                                            ))
+                                        .toList(),
+                                    const DropdownMenuItem(
+                                      value: '',
+                                      child: Text('未設定'),
+                                    )
+                                  ],
+                                  onChanged: (newValue) {
+                                    changeValue(() {
+                                      isSelectedChannel = newValue.toString();
+
+                                      FirestoreController
+                                          .setCurrentNotifyChannelData(
+                                              guildId:
+                                                  LoginUserModel.currentGuildId,
+                                              channelId: newValue.toString(),
+                                              channelName: snapshot.data!.docs
+                                                      .firstWhere((element) =>
+                                                          element.data()[
+                                                              'channel_id'] ==
+                                                          newValue)[
+                                                  'channel_name']);
+                                      Fluttertoast.showToast(msg: '情報を更新しました。');
+                                    });
+                                  });
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
                           });
                     } else {
                       return const CircularProgressIndicator();
