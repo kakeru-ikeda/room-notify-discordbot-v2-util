@@ -1,8 +1,8 @@
 {
   "hosting": [
     {
-      "target": "blog",
-      "public": "blog/dist"
+      "target": "util",
+      "public": "build/web"
     },
     {
       "target": "promotion",
