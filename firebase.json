@@ -1,12 +1,13 @@
 {
-  "hosting": {
-    "public": "build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+  "hosting": [ {
+    "target": "blog", 
+    "public": "blog/dist"
   },
+  {
+    "target": "promotion",
+    "public": "nodejs/promotion"
+  }
+],
   "functions": [
     {
       "source": "functions",
