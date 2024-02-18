@@ -13,8 +13,8 @@ import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/room_notify/room_notify_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/teacher/teacher_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/channel/channel_setting_page.dart';
-import 'package:room_notify_discordbot_v2_util/pages/member/entry/kadai/kadai_entry_page.dart';
-import 'package:room_notify_discordbot_v2_util/pages/member/entry/remind/remind_entry_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/kadai/kadai_entry_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/remind/remind_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/owner/setting/guilld/guild_setting_page.dart';
 import 'package:room_notify_discordbot_v2_util/component/common_drawer.dart';
 
