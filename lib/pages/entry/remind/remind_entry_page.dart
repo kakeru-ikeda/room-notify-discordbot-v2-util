@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_remind.dart';
-import 'package:room_notify_discordbot_v2_util/pages/member/entry/remind/remind_entry_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/remind/remind_entry_modal_contents.dart';
 
-import '../../../../component/page_template.dart';
-import '../../../../controller/firestore_controller.dart';
-import '../../../../model/login_user_model.dart';
+import '../../../component/page_template.dart';
+import '../../../controller/firestore_controller.dart';
+import '../../../model/login_user_model.dart';
 
 class RemindEntryPage extends StatefulWidget {
   const RemindEntryPage({super.key});

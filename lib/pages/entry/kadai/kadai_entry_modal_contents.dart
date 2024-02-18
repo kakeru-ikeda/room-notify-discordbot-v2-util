@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/modal_contents_template.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 
-import '../../../../controller/firestore_controller.dart';
+import '../../../controller/firestore_controller.dart';
 
 class KadaiModalContents extends StatefulWidget {
   const KadaiModalContents({super.key, required this.guildId, this.kadaiData});

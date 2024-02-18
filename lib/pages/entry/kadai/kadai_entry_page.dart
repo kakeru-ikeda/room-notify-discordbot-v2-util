@@ -4,9 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_kadai.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
-import 'package:room_notify_discordbot_v2_util/pages/member/entry/kadai/kadai_entry_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/kadai/kadai_entry_modal_contents.dart';
 
-import '../../../../component/page_template.dart';
+import '../../../component/page_template.dart';
 
 class KadaiEntryPage extends StatefulWidget {
   const KadaiEntryPage({super.key});

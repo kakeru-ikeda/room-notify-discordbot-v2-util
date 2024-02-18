@@ -1,8 +1,8 @@
-import { config } from 'dotenv';
+// import { config } from 'dotenv';
 import * as functions from 'firebase-functions';
 import * as express from 'express';
 
-config();
+// config();
 const app = express();
 
 async function getTokenResponse(isRelease: boolean, code: string): Promise<any> {
@@ -12,13 +12,13 @@ async function getTokenResponse(isRelease: boolean, code: string): Promise<any> 
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
-            client_id: process.env.CLIENT_ID as string,
-            client_secret: process.env.CLIENT_SECRET as string,
+            client_id: process.env.DISCORD_CLIENT_ID as string,
+            client_secret: process.env.DISCORD_CLIENT_SECRET as string,
             code: code,
             grant_type: 'authorization_code',
             redirect_uri: isRelease
-                ? process.env.REDIRECT_URI_RELEASE as string
-                : process.env.REDIRECT_URI_DEBUG as string
+                ? process.env.BOT_REDIRECT_URI_RELEASE as string
+                : process.env.BOT_REDIRECT_URI_DEVELOP as string
         })
     });
 

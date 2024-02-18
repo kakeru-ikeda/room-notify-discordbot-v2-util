@@ -82,11 +82,33 @@ class FirestoreController {
   }
 
   static getCurrentNotifyChannelData({required guildId}) async {
-    final docRef = db.collection('data').doc('room_notify').collection('notify_channel').doc('default');
+    final docRef = db
+        .collection('data')
+        .doc('room_notify')
+        .collection('notify_channel')
+        .doc('default');
     final docSnapshot = await docRef.get();
 
     Map<String, dynamic> data = docSnapshot.data()!;
     return data[guildId];
+  }
+
+  static setCurrentNotifyChannelData(
+      {required guildId, required channelId, required channelName}) async {
+    final docRef = db
+        .collection('data')
+        .doc('room_notify')
+        .collection('notify_channel')
+        .doc('default');
+    final docSnapshot = await docRef.get();
+
+    Map<String, dynamic> data = docSnapshot.data()!;
+    data[guildId] = {
+      'channel_id': channelId,
+      'channel_name': channelName,
+    };
+
+    await docRef.update(data);
   }
 
   static Stream<DocumentSnapshot<Map<String, dynamic>>>? getRoomNotify(
