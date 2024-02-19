@@ -50,7 +50,7 @@ export class CronController {
             collectionId: 'data/room_notify/notify_channel',
             documentId: 'default'
         }).then(doc => {
-            roomNotifyChannel = doc.data()![guildId];
+            roomNotifyChannel = doc.data()![guildId]['channel_id'];
         });
 
         /// 教室通知情報を取得する
