@@ -65,6 +65,12 @@ export class GuildObserver {
         await guildController.initializeGuild();
         await this.setEntryGuild(this.client.guilds.cache);
         MessageService.sendLog({ message: `😘 Joined a new guild: ${guild.name} ( guildId: ${guild.id} )` });
+
+        /// 登録時のIncomingメッセージを送信する
+        new MessageService().sendMessage({
+            channel: guild.systemChannelId!,
+            message: '「教室通知くんv2」をサーバーに追加して頂きありがとうございます！\n当Botは、主にHAL東京生向けに展開される、教室通知と課題・リマインド通知を行うBotです。\n専用のユーティリティツールと合わせてご利用ください！\nhttps://room-notify-v2.web.app/'
+        });
     }
 
     private onGuildCreate() {

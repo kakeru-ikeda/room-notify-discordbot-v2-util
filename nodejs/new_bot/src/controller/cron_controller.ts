@@ -25,19 +25,21 @@ export class CronController {
             documentId: 'guilds'
         });
 
-        /// 各ギルドに対して通知を配信する
-        for (const guildId in entryGuild.data()) {
+        /// entryGuildの内容の数だけループ
+        for (const [key, value] of Object.entries(entryGuild.data()!)) {
+            const guildId = key;
+
             /// 教室通知: 平日授業の教室番号及びZoomURLを配信する
             /// 土日はスキップ
             if (week >= 1 && week <= 5) {
-                await this.roomNotify(guildId);
+                this.roomNotify(guildId);
             }
 
             /// 課題通知: 課題の提出日の朝9時と前日の夜21時にリマインドを配信する
-            await this.kadaiNotify(guildId);
+            this.kadaiNotify(guildId);
 
             /// リマインド通知: リマインドの時刻にリマインドを配信する
-            await this.remindNotify(guildId);
+            this.remindNotify(guildId);
         }
     };
 
@@ -50,7 +52,11 @@ export class CronController {
             collectionId: 'data/room_notify/notify_channel',
             documentId: 'default'
         }).then(doc => {
-            roomNotifyChannel = doc.data()![guildId];
+            try {
+                roomNotifyChannel = doc.data()![guildId]['channel_id'];
+            } catch (error) {
+                roomNotifyChannel = process.env.DEBUG_CHANNEL_ID!;
+            }
         });
 
         /// 教室通知情報を取得する
