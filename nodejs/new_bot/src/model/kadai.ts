@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import { EmbedBuilder } from 'discord.js';
 import { firestore } from 'firebase-admin';
 import { client } from '../module/bot';
@@ -23,11 +23,30 @@ export class Kadai {
 
     constructor(documents: firestore.QueryDocumentSnapshot) {
         const data = documents.data();
-        const { attachment, deadline, entry_date, entry_user_avatar, entry_user_id, entry_user_name, guildId, is_event, kadai_number, kadai_title, memo, state, subject, teacher } = data;
+        const {
+            attachment,
+            deadline,
+            entry_date,
+            entry_user_avatar,
+            entry_user_id,
+            entry_user_name,
+            guildId,
+            is_event,
+            kadai_number,
+            kadai_title,
+            memo,
+            state,
+            subject,
+            teacher
+        } = data;
 
         this.attachment = attachment;
-        this.deadline = `${deadline.toDate().toLocaleDateString('ja-JP')} ${deadline.toDate().toLocaleTimeString('ja-JP')}`;
-        this.entry_date = `${entry_date.toDate().toLocaleDateString('ja-JP')} ${entry_date.toDate().toLocaleTimeString('ja-JP')}`;
+        this.deadline = `${deadline.toDate().toLocaleDateString('ja-JP')} ${deadline
+            .toDate()
+            .toLocaleTimeString('ja-JP')}`;
+        this.entry_date = `${entry_date.toDate().toLocaleDateString('ja-JP')} ${entry_date
+            .toDate()
+            .toLocaleTimeString('ja-JP')}`;
         this.entry_user_avatar = entry_user_avatar;
         this.entry_user_id = entry_user_id;
         this.entry_user_name = entry_user_name;
@@ -49,20 +68,27 @@ export class Kadai {
         if (changeType === 'added') {
             title = '【新規課題通知】';
             description = `${this.subject}に新規課題が追加されました。`;
-            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media';
+            thumbnail =
+                'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media';
         } else if (changeType === 'modified') {
             title = '【課題変更通知】';
             description = `${this.subject}の課題${this.kadai_number}が変更されました。`;
-            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fmodified.png?alt=media';
+            thumbnail =
+                'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fmodified.png?alt=media';
         } else {
             title = '【課題削除通知】';
             description = `${this.subject}の課題${this.kadai_number}が削除されました。`;
-            thumbnail = 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fremoved.png?alt=media';
+            thumbnail =
+                'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fremoved.png?alt=media';
         }
 
         return new EmbedBuilder()
             .setTitle(title)
-            .setAuthor({ name: this.entry_user_name, iconURL: this.entry_user_avatar, url: 'https://discord.js.org' })
+            .setAuthor({
+                name: this.entry_user_name,
+                iconURL: this.entry_user_avatar,
+                url: 'https://discord.js.org'
+            })
             .setDescription(description)
             .setThumbnail(thumbnail)
             .addFields(
@@ -74,7 +100,11 @@ export class Kadai {
                 { name: 'メモ', value: this.memo }
             )
             .setTimestamp()
-            .setFooter({ text: '教室通知くんv2 license by Lily', iconURL: 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media' });
+            .setFooter({
+                text: '教室通知くんv2 license by Lily',
+                iconURL:
+                    'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media'
+            });
     }
 
     public getScheduledEvent() {
@@ -85,10 +115,11 @@ export class Kadai {
             privacyLevel: 2,
             entityType: 3,
             scheduledEndTime: new Date(this.deadline).setHours(23, 59, 59),
-            channel: process.env.MODE == 'DEBUG'
-                ? client.channels.cache.get(`${process.env.DEBUG_GUILD_ID}`)
-                : client.channels.cache.get(`${this.guildId}`),
+            channel:
+                process.env.MODE == 'DEBUG'
+                    ? client.channels.cache.get(`${process.env.DEBUG_GUILD_ID}`)
+                    : client.channels.cache.get(`${this.guildId}`),
             entityMetadata: { location: this.subject }
-        }
+        };
     }
 }
