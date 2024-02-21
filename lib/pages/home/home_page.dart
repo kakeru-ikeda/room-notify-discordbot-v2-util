@@ -5,7 +5,9 @@ import 'package:room_notify_discordbot_v2_util/component/card_remind.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_room_notify.dart';
 import 'package:room_notify_discordbot_v2_util/component/card_room_notify_home.dart';
 import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
+import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
+import 'package:url_launcher/link.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -97,147 +99,219 @@ class _HomePageState extends State<HomePage> {
               width: deviceWidth * 0.9,
               height: deviceHeight * 0.7,
               child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            '今日の教室通知',
-                            style: TextStyle(fontSize: 20),
-                          ),
+                padding: EdgeInsets.all(10),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          '今日の教室通知',
+                          style: TextStyle(fontSize: 20),
                         ),
-                        (now.weekday == 6 || now.weekday == 7)
-                            ? Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Text(
-                                    '今日のリマインドはありません',
-                                    style: TextStyle(fontSize: 25),
-                                  ),
+                      ),
+                      (now.weekday == 6 || now.weekday == 7)
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Text(
+                                  '今日のリマインドはありません',
+                                  style: TextStyle(fontSize: 25),
                                 ),
-                              )
-                            : StreamBuilder(
-                                stream: FirestoreController.getRoomNotify(
-                                    guildId: LoginUserModel.currentGuildId,
-                                    week: WEEK[now.weekday]),
-                                builder: (content, snapshot) {
-                                  if (snapshot.hasData) {
-                                    return Column(
-                                      children: [
-                                        for (int j = 1;
-                                            j <= snapshot.data!.data()!.length;
-                                            j++) ...{
-                                          CardRoomNotifyHome.setCard(
-                                            context: context,
-                                            guildId:
-                                                LoginUserModel.currentGuildId,
-                                            roomNotifyData:
-                                                snapshot.data!.data()!['$j'],
-                                            week: WEEK[now.weekday],
-                                            period: j,
-                                          ),
-                                        }
-                                      ],
-                                    );
-                                  } else {
-                                    return const CircularProgressIndicator();
-                                  }
-                                }),
-                        Divider(),
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            '今日のリマインド',
-                            style: TextStyle(fontSize: 20),
-                          ),
+                              ),
+                            )
+                          : StreamBuilder(
+                              stream: FirestoreController.getRoomNotify(
+                                  guildId: LoginUserModel.currentGuildId,
+                                  week: WEEK[now.weekday]),
+                              builder: (content, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Column(
+                                    children: [
+                                      for (int j = 1;
+                                          j <= snapshot.data!.data()!.length;
+                                          j++) ...{
+                                        CardRoomNotifyHome.setCard(
+                                          context: context,
+                                          guildId:
+                                              LoginUserModel.currentGuildId,
+                                          roomNotifyData:
+                                              snapshot.data!.data()!['$j'],
+                                          week: WEEK[now.weekday],
+                                          period: j,
+                                        ),
+                                      }
+                                    ],
+                                  );
+                                } else {
+                                  return const CircularProgressIndicator();
+                                }
+                              }),
+                      Divider(),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          '今日のリマインド',
+                          style: TextStyle(fontSize: 20),
                         ),
-                        StreamBuilder(
-                          stream: FirestoreController.getRemindsHome(
-                            guildId: LoginUserModel.currentGuildId,
-                            isEnabled: true,
-                            remindStartDate: remindStartTimestamp,
-                            remindLastDate: remindLastTimestamp,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return SingleChildScrollView(
-                                  child: (snapshot.data!.docs.isEmpty)
-                                      ? Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.only(bottom: 8),
-                                            child: Text(
-                                              '今日のリマインドはありません',
-                                              style: TextStyle(fontSize: 25),
-                                            ),
-                                          ),
-                                        )
-                                      : Column(
-                                          children: snapshot.data!.docs
-                                              .map((user) => CardRemind.setCard(
-                                                  guildId: LoginUserModel
-                                                      .currentGuildId,
-                                                  context: context,
-                                                  remindData: user.data(),
-                                                  deviceWidth: deviceWidth,
-                                                  isHomeView: true))
-                                              .toList()));
-                            } else {
-                              return const CircularProgressIndicator();
-                            }
-                          },
+                      ),
+                      StreamBuilder(
+                        stream: FirestoreController.getRemindsHome(
+                          guildId: LoginUserModel.currentGuildId,
+                          isEnabled: true,
+                          remindStartDate: remindStartTimestamp,
+                          remindLastDate: remindLastTimestamp,
                         ),
-                        Divider(),
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            '今日の課題通知',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ),
-                        StreamBuilder(
-                          stream: FirestoreController.getKadaiHome(
-                              guildId: LoginUserModel.currentGuildId,
-                              isEnabled: true,
-                              remindStartDate: remindStartDate,
-                              remindLastDate: remindLastDate),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return SingleChildScrollView(
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return SingleChildScrollView(
                                 child: (snapshot.data!.docs.isEmpty)
                                     ? Center(
                                         child: Padding(
                                           padding: EdgeInsets.only(bottom: 8),
                                           child: Text(
-                                            '今日が期限の課題はありません',
+                                            '今日のリマインドはありません',
                                             style: TextStyle(fontSize: 25),
                                           ),
                                         ),
                                       )
                                     : Column(
                                         children: snapshot.data!.docs
-                                            .map((user) => CardKadai.setCard(
-                                                  guildId: LoginUserModel
-                                                      .currentGuildId,
-                                                  context: context,
-                                                  kadaiData: user.data(),
-                                                  deviceWidth: deviceWidth,
-                                                  isHomeView: true,
-                                                ))
-                                            .toList()),
-                              );
-                            } else {
-                              return const CircularProgressIndicator();
-                            }
-                          },
+                                            .map((user) => CardRemind.setCard(
+                                                guildId: LoginUserModel
+                                                    .currentGuildId,
+                                                context: context,
+                                                remindData: user.data(),
+                                                deviceWidth: deviceWidth,
+                                                isHomeView: true))
+                                            .toList()));
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                      ),
+                      Divider(),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          '今日の課題通知',
+                          style: TextStyle(fontSize: 20),
                         ),
-                      ],
-                    ),
-                  )),
-            )
+                      ),
+                      StreamBuilder(
+                        stream: FirestoreController.getKadaiHome(
+                            guildId: LoginUserModel.currentGuildId,
+                            isEnabled: true,
+                            remindStartDate: remindStartDate,
+                            remindLastDate: remindLastDate),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return SingleChildScrollView(
+                              child: (snapshot.data!.docs.isEmpty)
+                                  ? Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          '今日が期限の課題はありません',
+                                          style: TextStyle(fontSize: 25),
+                                        ),
+                                      ),
+                                    )
+                                  : Column(
+                                      children: snapshot.data!.docs
+                                          .map((user) => CardKadai.setCard(
+                                                guildId: LoginUserModel
+                                                    .currentGuildId,
+                                                context: context,
+                                                kadaiData: user.data(),
+                                                deviceWidth: deviceWidth,
+                                                isHomeView: true,
+                                              ))
+                                          .toList()),
+                            );
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            FutureBuilder(
+              future: SharedPreferencesController.instance.getBoolData('demo'),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == true) {
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (timeStamp) {
+                        Future.delayed(const Duration(milliseconds: 50))
+                            .then((_) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return WillPopScope(
+                                onWillPop: () async {
+                                  SharedPreferencesController.instance
+                                      .saveBoolData('demo', false);
+                                  return true;
+                                },
+                                child: AlertDialog(
+                                  title: Text('デモモード'),
+                                  content: SizedBox(
+                                    height: 160,
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Text(
+                                            '現在デモモードで実行しています。\nデモモードではアカウントの登録なしで「教室通知くん」の機能を体験できます。\n実際にデータを入れて、マテリアルデザインならではの操作感をお楽しみください。\nDiscordの連携は以下のサーバーで行っております。ゲスト参加設定になっておりますので、こちらも合わせてご覧ください。',
+                                            style: TextStyle(height: 1.75)),
+                                        Spacer(),
+                                        Link(
+                                          uri: Uri.parse(
+                                              'https://discord.gg/GuappTy4j3'),
+                                          target: LinkTarget.blank,
+                                          builder: (context, followLink) =>
+                                              ElevatedButton(
+                                            onPressed: followLink,
+                                            child: const Text('サーバーに参加する'),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        SharedPreferencesController.instance
+                                            .saveBoolData('demo', false);
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text('OK'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        });
+                      },
+                    );
+
+                    return Container();
+                  } else {
+                    return Container();
+                  }
+                } else {
+                  return Container();
+                }
+              },
+            ),
           ],
         ),
       ),
