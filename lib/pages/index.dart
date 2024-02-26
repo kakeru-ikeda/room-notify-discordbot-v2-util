@@ -11,6 +11,7 @@ import 'package:room_notify_discordbot_v2_util/component/style/material_color_na
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
 import 'package:room_notify_discordbot_v2_util/model/login_user_model.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/room_notify/room_notify_entry_page.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/slack_alignment/slack_alignment_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/teacher/teacher_entry_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/channel/channel_setting_page.dart';
 import 'package:room_notify_discordbot_v2_util/pages/entry/kadai/kadai_entry_page.dart';
@@ -196,7 +197,7 @@ class _IndexPageState extends State<IndexPage> {
                               TeacherEntryPage(),
                               ChannelSettingPage(),
                               RoomNotifyEntryPage(),
-                              GuildSettingPage(),
+                              SlackAlignmentPage(),
                             ],
                           );
                         } else {

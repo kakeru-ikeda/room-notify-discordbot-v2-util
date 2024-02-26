@@ -233,6 +233,15 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getSlackAlignment(
+      {required guildId}) {
+    final docRef =
+        db.collection('data').doc('slack_alignment').collection(guildId);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
   static void setGuildInfo(
       {required guildId, required field, required data}) async {
     final docRef = db.collection('data').doc('guilds');
@@ -371,6 +380,25 @@ class FirestoreController {
     LoginUserModel.currentGuildName = currentGuildName;
   }
 
+  static setSlackAlignmentData(
+      {required guildId,
+      required slackAlignmentId,
+      required slackToken,
+      required channelId}) {
+    final docRef = db
+        .collection('data')
+        .doc('slack_alignment')
+        .collection(guildId)
+        .doc(slackAlignmentId);
+
+    docRef.set({
+      'id': slackAlignmentId,
+      'slack_token': slackToken,
+      'channel_id': channelId,
+      'state': true,
+    });
+  }
+
   static removeTeacher({required guildId, required teacherName}) {
     final docRef = db
         .collection('data')
@@ -391,6 +419,16 @@ class FirestoreController {
   static removeRemind({required guildId, required remindId}) {
     final docRef =
         db.collection('notice').doc('remind').collection(guildId).doc(remindId);
+
+    docRef.delete();
+  }
+
+  static removeSlackAlignment({required guildId, required slackAlignmentId}) {
+    final docRef = db
+        .collection('data')
+        .doc('slack_alignment')
+        .collection(guildId)
+        .doc(slackAlignmentId);
 
     docRef.delete();
   }
