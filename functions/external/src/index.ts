@@ -61,10 +61,12 @@ app.post('/slack/:guildId/:externalId', async (request, response) => {
         }
 
         const channelId: string = data!.channel_id;
+        const subject = data!.subject;
         const slackExternalRef = db.collection(`notice/external/slack/guild_id/${guildId}`).doc();
 
         await slackExternalRef.set({
             channel_id: channelId,
+            subject: subject,
             slack_channel_name: body.channel_name,
             slack_channel_id: body.channel_id,
             text: body.text,
