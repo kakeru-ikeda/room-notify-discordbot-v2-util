@@ -31,7 +31,7 @@ export class CronController {
 
             /// 教室通知: 平日授業の教室番号及びZoomURLを配信する
             /// 土日はスキップ
-            if (week >= 1 && week <= 5) {
+            if (week <= 5) {
                 this.roomNotify(guildId);
             }
 
