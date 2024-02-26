@@ -40,9 +40,8 @@ class _SlackExternalModalContentsState
         'https://us-central1-room-notify-v2.cloudfunctions.net/external/slack/$guildId/${slackexternalIdController.text}';
     selectedChannelId =
         widget.externalData != null ? widget.externalData!['channel_id'] : '';
-    selectedChannelName = widget.externalData != null
-        ? widget.externalData!['channel_name']
-        : '未設定';
+    selectedChannelName =
+        widget.externalData != null ? widget.externalData!['subject'] : '未設定';
   }
 
   @override
