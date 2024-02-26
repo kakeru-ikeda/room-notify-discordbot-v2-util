@@ -23,7 +23,8 @@ class _SlackExternalModalContentsState
   late TextEditingController slackexternalIdController;
   late TextEditingController slackTokenEditingController;
   late String externalUrl;
-  late String isSelectedChannelId;
+  late String selectedChannelId;
+  late String selectedChannelName;
 
   @override
   void initState() {
@@ -37,8 +38,11 @@ class _SlackExternalModalContentsState
             : '');
     externalUrl =
         'https://us-central1-room-notify-v2.cloudfunctions.net/external/slack/$guildId/${slackexternalIdController.text}';
-    isSelectedChannelId =
+    selectedChannelId =
         widget.externalData != null ? widget.externalData!['channel_id'] : '';
+    selectedChannelName = widget.externalData != null
+        ? widget.externalData!['channel_name']
+        : '未設定';
   }
 
   @override
@@ -133,7 +137,7 @@ class _SlackExternalModalContentsState
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return DropdownButton(
-                              value: isSelectedChannelId,
+                              value: selectedChannelId,
                               items: [
                                 ...snapshot.data!.docs
                                     .map((entry) => DropdownMenuItem(
@@ -149,7 +153,11 @@ class _SlackExternalModalContentsState
                               ],
                               onChanged: (newValue) {
                                 setState(() {
-                                  isSelectedChannelId = newValue.toString();
+                                  selectedChannelId = newValue.toString();
+                                  selectedChannelName = snapshot.data!.docs
+                                      .firstWhere((element) =>
+                                          element.data()['channel_id'] ==
+                                          selectedChannelId)['channel_name'];
                                 });
                               });
                         } else {
@@ -192,7 +200,7 @@ class _SlackExternalModalContentsState
                     onPressed: () {
                       if (slackexternalIdController.text == '' ||
                           slackTokenEditingController.text == '' ||
-                          isSelectedChannelId == '') {
+                          selectedChannelId == '') {
                         Fluttertoast.showToast(
                             msg: '未入力の項目があります。',
                             webBgColor:
@@ -203,7 +211,8 @@ class _SlackExternalModalContentsState
                         guildId: guildId,
                         slackexternalId: slackexternalIdController.text,
                         slackToken: slackTokenEditingController.text,
-                        channelId: isSelectedChannelId,
+                        channelId: selectedChannelId,
+                        channelName: selectedChannelName,
                       );
                       Navigator.pop(context);
                       Fluttertoast.showToast(msg: '情報を更新しました。');
