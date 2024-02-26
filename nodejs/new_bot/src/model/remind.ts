@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { EmbedBuilder } from 'discord.js';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 import { firestore } from 'firebase-admin';
 import { client } from '../module/bot';
 
@@ -51,22 +51,26 @@ export class Remind {
         let title: string;
         let description: string;
         let thumbnail: string;
+        let color: ColorResolvable;
 
         if (changeType === 'added') {
             title = '【新規リマインド通知】';
             description = `${this.subject}に新規リマインドが追加されました。`;
             thumbnail =
                 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media';
+            color = '#228b22';
         } else if (changeType === 'modified') {
             title = '【リマインド変更通知】';
             description = `${this.subject}のリマインドが変更されました。`;
             thumbnail =
                 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fmodified.png?alt=media';
+            color = '#ffd700';
         } else {
             title = '【リマインド削除通知】';
             description = `${this.subject}のリマインドが削除されました。`;
             thumbnail =
                 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fremoved.png?alt=media';
+            color = '#ff4500';
         }
 
         return new EmbedBuilder()
@@ -80,6 +84,7 @@ export class Remind {
                 { name: 'リマインド内容', value: this.memo }
             )
             .setTimestamp()
+            .setColor(color)
             .setFooter({
                 text: '教室通知くんv2 license by Lily',
                 iconURL:

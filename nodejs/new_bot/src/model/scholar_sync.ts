@@ -57,6 +57,7 @@ export class ScholarSync {
                 { name: '本文', value: this.memo != '' ? this.memo : ' ' }
             )
             .setTimestamp()
+            .setColor('#4169e1')
             .setFooter({
                 text: 'ScholarSync license by naruto1031',
                 iconURL:
