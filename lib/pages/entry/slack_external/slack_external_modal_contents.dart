@@ -36,7 +36,7 @@ class _SlackExternalModalContentsState
             ? widget.externalData!['slack_token']
             : '');
     externalUrl =
-        'https://us-central1-room-notify-v2.cloudfunctions.net/alignment/slack/$guildId/${slackexternalIdController.text}';
+        'https://us-central1-room-notify-v2.cloudfunctions.net/external/slack/$guildId/${slackexternalIdController.text}';
     isSelectedChannelId =
         widget.externalData != null ? widget.externalData!['channel_id'] : '';
   }
@@ -81,7 +81,7 @@ class _SlackExternalModalContentsState
                       onChanged: (String? value) {
                         setState(() {
                           externalUrl =
-                              'https://us-central1-room-notify-v2.cloudfunctions.net/alignment/slack/$guildId/${slackexternalIdController.text}';
+                              'https://us-central1-room-notify-v2.cloudfunctions.net/external/slack/$guildId/${slackexternalIdController.text}';
                         });
                       },
                     ),
