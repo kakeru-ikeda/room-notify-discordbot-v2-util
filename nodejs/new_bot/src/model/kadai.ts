@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { EmbedBuilder } from 'discord.js';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 import { firestore } from 'firebase-admin';
 import { client } from '../module/bot';
 
@@ -64,22 +64,26 @@ export class Kadai {
         let title: string;
         let description: string;
         let thumbnail: string;
+        let color: ColorResolvable;
 
         if (changeType === 'added') {
             title = '【新規課題通知】';
             description = `${this.subject}に新規課題が追加されました。`;
             thumbnail =
                 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Froom_notify.png?alt=media';
+            color = '#228b22';
         } else if (changeType === 'modified') {
             title = '【課題変更通知】';
             description = `${this.subject}の課題${this.kadai_number}が変更されました。`;
             thumbnail =
                 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fmodified.png?alt=media';
+            color = '#ffd700';
         } else {
             title = '【課題削除通知】';
             description = `${this.subject}の課題${this.kadai_number}が削除されました。`;
             thumbnail =
                 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fremoved.png?alt=media';
+            color = '#ff4500';
         }
 
         return new EmbedBuilder()
@@ -100,6 +104,7 @@ export class Kadai {
                 { name: 'メモ', value: this.memo }
             )
             .setTimestamp()
+            .setColor(color)
             .setFooter({
                 text: '教室通知くんv2 license by Lily',
                 iconURL:

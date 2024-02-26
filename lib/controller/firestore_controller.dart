@@ -233,6 +233,15 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getSlackExternal(
+      {required guildId}) {
+    final docRef =
+        db.collection('data').doc('slack_external').collection(guildId);
+    final snapshots = docRef.snapshots();
+
+    return snapshots;
+  }
+
   static void setGuildInfo(
       {required guildId, required field, required data}) async {
     final docRef = db.collection('data').doc('guilds');
@@ -371,6 +380,27 @@ class FirestoreController {
     LoginUserModel.currentGuildName = currentGuildName;
   }
 
+  static setSlackExternalData(
+      {required guildId,
+      required slackexternalId,
+      required slackToken,
+      required channelId,
+      required channelName}) async {
+    final docRef = db
+        .collection('data')
+        .doc('slack_external')
+        .collection(guildId)
+        .doc(slackexternalId);
+
+    docRef.set({
+      'id': slackexternalId,
+      'slack_token': slackToken,
+      'channel_id': channelId,
+      'subject': channelName,
+      'state': true,
+    });
+  }
+
   static removeTeacher({required guildId, required teacherName}) {
     final docRef = db
         .collection('data')
@@ -391,6 +421,16 @@ class FirestoreController {
   static removeRemind({required guildId, required remindId}) {
     final docRef =
         db.collection('notice').doc('remind').collection(guildId).doc(remindId);
+
+    docRef.delete();
+  }
+
+  static removeSlackExternal({required guildId, required slackexternalId}) {
+    final docRef = db
+        .collection('data')
+        .doc('slack_external')
+        .collection(guildId)
+        .doc(slackexternalId);
 
     docRef.delete();
   }

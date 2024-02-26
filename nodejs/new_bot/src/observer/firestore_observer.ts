@@ -7,6 +7,7 @@ import { DoctypeEnum } from '../enum/doctype_enum';
 import { Kadai } from '../model/kadai';
 import { Remind } from '../model/remind';
 import { ScholarSync } from '../model/scholar_sync';
+import { Slack } from '../model/slack';
 
 dotenv.config();
 
@@ -25,7 +26,7 @@ export class FirestoreObserver {
         change: admin.firestore.DocumentChange<admin.firestore.DocumentData>
     ) {
         /// 通知するドキュメントの種類
-        type Doctype = Kadai | Remind | ScholarSync;
+        type Doctype = Kadai | Remind | ScholarSync | Slack;
         let doc: Doctype;
         let docName: string;
 
@@ -44,6 +45,10 @@ export class FirestoreObserver {
             case DoctypeEnum.SCHOLAR_SYNC:
                 docName = 'scholar_sync';
                 doc = new ScholarSync(change.doc);
+                break;
+            case DoctypeEnum.SLACK:
+                docName = 'slack';
+                doc = new Slack(change.doc);
                 break;
         }
 
@@ -95,7 +100,9 @@ export class FirestoreObserver {
                             collectionId:
                                 doc instanceof ScholarSync
                                     ? `notice/external/scholar_sync/guild_id/${process.env.IH13B_GUILD_ID}`
-                                    : `notice/${docName}/${this.guild.id}`,
+                                    : doc instanceof Slack
+                                        ? `notice/external/slack/guild_id/${this.guild.id}`
+                                        : `notice/${docName}/${this.guild.id}`,
                             documentId: change.doc.id,
                             data: { entry_notify: true }
                         });
@@ -140,7 +147,9 @@ export class FirestoreObserver {
                             collectionId:
                                 doc instanceof ScholarSync
                                     ? `notice/external/scholar_sync/guild_id/${process.env.IH13B_GUILD_ID}`
-                                    : `notice/${docName}/${this.guild.id}`,
+                                    : doc instanceof Slack
+                                        ? `notice/external/slack/guild_id/${this.guild.id}`
+                                        : `notice/${docName}/${this.guild.id}`,
                             documentId: change.doc.id,
                             data: { entry_notify: true }
                         });
@@ -229,11 +238,25 @@ export class FirestoreObserver {
         });
     }
 
+    public async onSlackCreate() {
+        const slackRef = this.firestoreService.getCollectionRef({
+            collectionId: `/notice/external/slack/guild_id/${this.guild.id}`
+        });
+
+        /// snapshotのdocumentに変更があった場合に発火する
+        slackRef.onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                this.observeProcess(DoctypeEnum.SLACK, change);
+            });
+        });
+    }
+
     public async observe() {
         console.log(`Start firestore observing...`);
 
         this.onKadaiCreate();
         this.onRemindCreate();
         this.onScholarSyncCreate();
+        this.onSlackCreate();
     }
 }
