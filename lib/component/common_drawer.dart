@@ -100,6 +100,21 @@ class _CommonDrawerState extends State<CommonDrawer> {
                     });
                   },
                 ),
+                ListTile(
+                  title: Text('Slack連携'),
+                  leading: Image.asset(
+                    'assets/images/slack.png',
+                    height: 24,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      MediaQuery.of(context).size.width <= 768
+                          ? Navigator.pop(context)
+                          : null;
+                      IndexPageController.screen.jumpToPage(6);
+                    });
+                  },
+                ),
               ],
             ),
           ),
