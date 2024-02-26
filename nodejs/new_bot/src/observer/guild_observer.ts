@@ -18,7 +18,7 @@ export class GuildObserver {
         /// ギルドの情報
         const guilds = client.guilds.cache;
         console.log(`Connected to ${guilds.size} guilds`);
-        console.log(`Guilds: ${guilds.map(g => g.name).join(', ')}`);
+        console.log(`Guilds: ${guilds.map((g) => g.name).join(', ')}`);
 
         /// エントリーされているギルドに対して初期化処理を行う
         for (const [id, guild] of guilds.entries()) {
@@ -36,7 +36,9 @@ export class GuildObserver {
         /// 監視を開始する
         this.observe();
 
-        MessageService.sendLog({ message: '👀 Guilds are initialized. Start observing...' });
+        MessageService.sendLog({
+            message: '👀 Guilds are initialized. Start observing...'
+        });
     }
 
     /// エントリー済みのギルド情報をFirestoreに保存する
@@ -54,7 +56,7 @@ export class GuildObserver {
         await this.firestoreService.setDocument({
             collectionId: 'data',
             documentId: 'guilds',
-            data: entrieGuilds,
+            data: entrieGuilds
         });
     }
 
@@ -64,14 +66,17 @@ export class GuildObserver {
         const guildController = new GuildController(guild);
         await guildController.initializeGuild();
         await this.setEntryGuild(this.client.guilds.cache);
-        MessageService.sendLog({ message: `😘 Joined a new guild: ${guild.name} ( guildId: ${guild.id} )` });
+        MessageService.sendLog({
+            message: `😘 Joined a new guild: ${guild.name} ( guildId: ${guild.id} )`
+        });
 
         /// 登録時のIncomingメッセージを送信する
         new MessageService().sendMessage({
             channel: guild.systemChannelId!,
-            message: '「教室通知くんv2」をサーバーに追加して頂きありがとうございます！\n当Botは、主にHAL東京生向けに展開される、教室通知と課題・リマインド通知を行うBotです。\n専用のユーティリティツールと合わせてご利用ください！\nhttps://room-notify-v2.web.app/'
+            message:
+                '「教室通知くんv2」をサーバーに追加して頂きありがとうございます！\n当Botは、主にHAL東京生向けに展開される、教室通知と課題・リマインド通知を行うBotです。\n専用のユーティリティツールと合わせてご利用ください！\nhttps://room-notify-v2.web.app/'
         });
-    }
+    };
 
     private onGuildCreate() {
         this.client.on('guildCreate', this.guildCreateHandler);
@@ -86,8 +91,10 @@ export class GuildObserver {
         this.client = client;
 
         await this.setEntryGuild(this.client.guilds.cache);
-        MessageService.sendLog({ message: `🥹 Left a guild: ${guild.name} ( guildId: ${guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `🥹 Left a guild: ${guild.name} ( guildId: ${guild.id} )`
+        });
+    };
 
     private onGuildDelete() {
         this.client.on('guildDelete', this.guildDeleteHandler);
@@ -102,8 +109,10 @@ export class GuildObserver {
         this.client = client;
 
         await this.setEntryGuild(this.client.guilds.cache);
-        MessageService.sendLog({ message: `😇 Guild is unavailable: ${guild.name} ( guildId: ${guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `😇 Guild is unavailable: ${guild.name} ( guildId: ${guild.id} )`
+        });
+    };
 
     private onGuildUnavailable() {
         this.client.on('guildUnavailable', this.guildUnavailableHandler);
@@ -118,8 +127,10 @@ export class GuildObserver {
         console.log(`New member joined: ${member.user.username}`);
         const guildController = new GuildController(member.guild);
         await guildController.addMember(member);
-        MessageService.sendLog({ message: `🏁 ${member.user.displayName} came to the guild! ( guildId: ${member.guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `🏁 ${member.user.displayName} came to the guild! ( guildId: ${member.guild.id} )`
+        });
+    };
 
     private onGuildMemberAdd() {
         this.client.on('guildMemberAdd', this.guildMemberAddHandler);
@@ -133,8 +144,10 @@ export class GuildObserver {
         console.log(`Member updated: ${newMember.user.username}`);
         const guildController = new GuildController(newMember.guild);
         await guildController.updateMember(newMember);
-        MessageService.sendLog({ message: `🏁 ${oldMember.displayName} updated his profile. ( guildId: ${newMember.guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `🏁 ${oldMember.displayName} updated his profile. ( guildId: ${newMember.guild.id} )`
+        });
+    };
 
     private onGuildMemberUpdate() {
         this.client.on('guildMemberUpdate', this.guildMemberUpdateHandler);
@@ -148,8 +161,10 @@ export class GuildObserver {
         console.log(`Member left: ${member.user.username}`);
         const guildController = new GuildController(member.guild);
         await guildController.removeMember(member);
-        MessageService.sendLog({ message: `🏁 ${member.displayName} has left the guild. ( guildId: ${member.guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `🏁 ${member.displayName} has left the guild. ( guildId: ${member.guild.id} )`
+        });
+    };
 
     private onGuildMemberRemove() {
         this.client.on('guildMemberRemove', this.guildMemberRemoveHandler);
@@ -165,8 +180,10 @@ export class GuildObserver {
         const guild = channel.guild;
         const guildController = new GuildController(guild);
         await guildController.addChannel(channel.id, channel.name);
-        MessageService.sendLog({ message: `💍 Channel created! ( guildId: ${guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `💍 Channel created! ( guildId: ${guild.id} )`
+        });
+    };
 
     private onChannelCreate() {
         this.client.on('channelCreate', this.channelCreateHandler);
@@ -181,8 +198,10 @@ export class GuildObserver {
         const guild = (channel as NonThreadGuildBasedChannel).guild;
         const guildController = new GuildController(guild);
         await guildController.removeChannel(channel.id);
-        MessageService.sendLog({ message: `💍 Channel deleted. ( guildId: ${guild.id} )` });
-    }
+        MessageService.sendLog({
+            message: `💍 Channel deleted. ( guildId: ${guild.id} )`
+        });
+    };
 
     private onChannelDelete() {
         this.client.on('channelDelete', this.channelDeleteHandler);

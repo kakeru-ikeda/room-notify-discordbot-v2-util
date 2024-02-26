@@ -1,8 +1,8 @@
-import { ChannelType, Guild, GuildMember, PartialGuildMember } from "discord.js";
-import { FirestoreService } from "../service/firestore_service";
+import { ChannelType, Guild, GuildMember, PartialGuildMember } from 'discord.js';
+import { FirestoreService } from '../service/firestore_service';
 
 export class GuildController {
-    private firestoreService: FirestoreService;;
+    private firestoreService: FirestoreService;
     private guild: Guild;
 
     constructor(guild: Guild) {
@@ -13,7 +13,7 @@ export class GuildController {
     public async initializeChannel() {
         const channels = this.guild.channels.cache;
         console.log(`Connected to ${channels.size} channels in ${this.guild.name}`);
-        console.log(`Channels: ${channels.map(c => c.name).join(', ')}`);
+        console.log(`Channels: ${channels.map((c) => c.name).join(', ')}`);
 
         for (const [id, channel] of channels.entries()) {
             /// テキストチャネル以外は無視する
@@ -53,7 +53,7 @@ export class GuildController {
     public async initializeMember() {
         const members = await this.guild.members.fetch();
         console.log(`Connected to ${members.size} members in ${this.guild.name}`);
-        console.log(`Members: ${members.map(m => m.user.username).join(', ')}`);
+        console.log(`Members: ${members.map((m) => m.user.username).join(', ')}`);
 
         for (const [id, member] of members.entries()) {
             /// ボットは無視する
@@ -96,7 +96,7 @@ export class GuildController {
         await this.firestoreService.updateDocument({
             collectionId: `data/users/${this.guild.id}`,
             documentId: guildMember.id,
-            data: memberData,
+            data: memberData
         });
     }
 
@@ -126,7 +126,7 @@ export class GuildController {
                     contents: '',
                     state: false
                 };
-            };
+            }
 
             /// 教室通知情報をFirestoreに保存する
             await this.firestoreService.updateDocument({

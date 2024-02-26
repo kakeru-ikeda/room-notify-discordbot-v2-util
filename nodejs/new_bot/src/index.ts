@@ -1,8 +1,8 @@
-import * as dotenv from 'dotenv'
-import { Events } from "discord.js";
-import { CronController } from "./controller/cron_controller";
-import { client } from "./module/bot";
-import { GuildObserver } from "./observer/guild_observer";
+import * as dotenv from 'dotenv';
+import { Events } from 'discord.js';
+import { CronController } from './controller/cron_controller';
+import { client } from './module/bot';
+import { GuildObserver } from './observer/guild_observer';
 import { MessageService } from './service/message_service';
 
 dotenv.config();

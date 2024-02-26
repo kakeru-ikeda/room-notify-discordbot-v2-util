@@ -155,10 +155,10 @@ final GoRouter _router = GoRouter(
             String userName = 'DemoUser';
             String globalUserName = 'DemoUser';
             String avatar = '';
-            Future(() async {
+            Future(() {
               FirebaseAuth.instance
                   .signInWithEmailAndPassword(email: email, password: id)
-                  .then((value) {
+                  .then((value) async {
                 final userData = value.user;
 
                 FirestoreController.setLoginUser(

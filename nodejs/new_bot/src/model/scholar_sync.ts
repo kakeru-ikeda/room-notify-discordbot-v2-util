@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import { EmbedBuilder } from 'discord.js';
 import { firestore } from 'firebase-admin';
 
@@ -18,7 +18,18 @@ export class ScholarSync {
 
     constructor(documents: firestore.QueryDocumentSnapshot) {
         const data = documents.data();
-        const { entry_date, entry_user_avatar, entry_user_id, entry_user_name, guildId, memo, state, subject, teacher, title } = data;
+        const {
+            entry_date,
+            entry_user_avatar,
+            entry_user_id,
+            entry_user_name,
+            guildId,
+            memo,
+            state,
+            subject,
+            teacher,
+            title
+        } = data;
 
         this.entry_date = `${entry_date.toDate().toLocaleDateString('ja-JP')} ${entry_date.toDate().toLocaleTimeString('ja-JP')}`;
         this.entry_user_avatar = entry_user_avatar;
@@ -36,7 +47,9 @@ export class ScholarSync {
         return new EmbedBuilder()
             .setTitle('【ScholarSync新規通知】')
             .setDescription(`${this.teacher}から新規通知が発行されました。`)
-            .setThumbnail('https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fscholar_sync.png?alt=media')
+            .setThumbnail(
+                'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fscholar_sync.png?alt=media'
+            )
             .addFields(
                 { name: 'タイトル', value: this.title },
                 { name: '日時', value: `${this.entry_date}` },
@@ -44,6 +57,10 @@ export class ScholarSync {
                 { name: '本文', value: this.memo != '' ? this.memo : ' ' }
             )
             .setTimestamp()
-            .setFooter({ text: 'ScholarSync license by naruto1031', iconURL: 'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fscholar_sync.png?alt=media' });
+            .setFooter({
+                text: 'ScholarSync license by naruto1031',
+                iconURL:
+                    'https://firebasestorage.googleapis.com/v0/b/room-notify-v2.appspot.com/o/icons%2Fscholar_sync.png?alt=media'
+            });
     }
 }

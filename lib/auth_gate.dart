@@ -60,6 +60,11 @@ class _AuthGateState extends State<AuthGate> {
       globalUserName = 'DemoUser';
       avatar = '';
       LoginUserModel.currentGuildId = '1208808403925991434';
+      Future(
+        () async {
+          await SharedPreferencesController.instance.saveBoolData('demo', true);
+        },
+      );
     } else {
       id = params['id'];
       email = params['email'];
