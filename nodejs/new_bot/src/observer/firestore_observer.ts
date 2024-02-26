@@ -238,11 +238,25 @@ export class FirestoreObserver {
         });
     }
 
+    public async onSlackCreate() {
+        const slackRef = this.firestoreService.getCollectionRef({
+            collectionId: `/notice/external/slack/guild_id/${this.guild.id}`
+        });
+
+        /// snapshotのdocumentに変更があった場合に発火する
+        slackRef.onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                this.observeProcess(DoctypeEnum.SLACK, change);
+            });
+        });
+    }
+
     public async observe() {
         console.log(`Start firestore observing...`);
 
         this.onKadaiCreate();
         this.onRemindCreate();
         this.onScholarSyncCreate();
+        this.onSlackCreate();
     }
 }
