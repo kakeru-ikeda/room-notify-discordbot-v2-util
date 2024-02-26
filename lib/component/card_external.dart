@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:room_notify_discordbot_v2_util/pages/entry/slack_alignment/slack_alignment_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/slack_external/slack_external_modal_contents.dart';
 
 import '../controller/firestore_controller.dart';
 
-class CardAlignment {
+class CardExternal {
   static Widget setCard({
     required guildId,
     required context,
-    required Map alignmentData,
+    required Map externalData,
   }) {
-    final String alignmentId = alignmentData['id'];
-    final String channelId = alignmentData['channel_id'];
-    final String slackToken = alignmentData['slack_token'];
+    final String externalId = externalData['id'];
 
     return Card(
       child: Row(
@@ -21,7 +19,7 @@ class CardAlignment {
           Padding(
             padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
             child: Text(
-              alignmentId,
+              externalId,
               style: TextStyle(fontSize: 18),
             ),
           ),
@@ -34,9 +32,9 @@ class CardAlignment {
                       constraints: BoxConstraints.expand(),
                       enableDrag: false,
                       builder: (context) {
-                        return SlackAlignmentModalContents(
+                        return SlackExternalModalContents(
                           guildId: guildId,
-                          alignmentData: alignmentData,
+                          externalData: externalData,
                         );
                       },
                     );
@@ -61,9 +59,9 @@ class CardAlignment {
                             TextButton(
                               child: Text("OK"),
                               onPressed: () {
-                                FirestoreController.removeSlackAlignment(
+                                FirestoreController.removeSlackExternal(
                                     guildId: guildId,
-                                    slackAlignmentId: alignmentId);
+                                    slackexternalId: externalId);
                                 Fluttertoast.showToast(msg: '削除が完了しました');
                                 Navigator.pop(context);
                               },

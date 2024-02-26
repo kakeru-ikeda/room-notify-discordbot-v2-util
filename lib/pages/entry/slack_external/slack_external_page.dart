@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:room_notify_discordbot_v2_util/component/card_alignment.dart';
-import 'package:room_notify_discordbot_v2_util/pages/entry/slack_alignment/slack_alignment_modal_contents.dart';
+import 'package:room_notify_discordbot_v2_util/component/card_external.dart';
+import 'package:room_notify_discordbot_v2_util/pages/entry/slack_external/slack_external_modal_contents.dart';
 
 import '../../../component/page_template.dart';
 import '../../../controller/firestore_controller.dart';
 import '../../../model/login_user_model.dart';
 
-class SlackAlignmentPage extends StatefulWidget {
-  const SlackAlignmentPage({super.key});
+class SlackExternalPage extends StatefulWidget {
+  const SlackExternalPage({super.key});
 
   @override
-  State<SlackAlignmentPage> createState() => _SlackAlignmentPageState();
+  State<SlackExternalPage> createState() => _SlackExternalPageState();
 }
 
-class _SlackAlignmentPageState extends State<SlackAlignmentPage> {
+class _SlackExternalPageState extends State<SlackExternalPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -34,7 +34,7 @@ class _SlackAlignmentPageState extends State<SlackAlignmentPage> {
                   constraints: BoxConstraints.expand(),
                   enableDrag: false,
                   builder: (BuildContext context) {
-                    return SlackAlignmentModalContents(
+                    return SlackExternalModalContents(
                       guildId: LoginUserModel.currentGuildId,
                     );
                   },
@@ -54,7 +54,7 @@ class _SlackAlignmentPageState extends State<SlackAlignmentPage> {
               child: Divider(),
             ),
             StreamBuilder(
-              stream: FirestoreController.getSlackAlignment(
+              stream: FirestoreController.getSlackExternal(
                   guildId: LoginUserModel.currentGuildId),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
@@ -67,10 +67,10 @@ class _SlackAlignmentPageState extends State<SlackAlignmentPage> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           children: snapshot.data!.docs
-                              .map((data) => CardAlignment.setCard(
+                              .map((data) => CardExternal.setCard(
                                     guildId: LoginUserModel.currentGuildId,
                                     context: context,
-                                    alignmentData: data.data(),
+                                    externalData: data.data(),
                                   ))
                               .toList(),
                         )));

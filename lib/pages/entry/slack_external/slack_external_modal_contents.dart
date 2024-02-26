@@ -6,39 +6,39 @@ import 'package:room_notify_discordbot_v2_util/component/modal_contents_template
 
 import '../../../controller/firestore_controller.dart';
 
-class SlackAlignmentModalContents extends StatefulWidget {
-  const SlackAlignmentModalContents(
-      {super.key, required this.guildId, this.alignmentData});
+class SlackExternalModalContents extends StatefulWidget {
+  const SlackExternalModalContents(
+      {super.key, required this.guildId, this.externalData});
   final String guildId;
-  final Map? alignmentData;
+  final Map? externalData;
 
   @override
-  State<SlackAlignmentModalContents> createState() =>
-      _SlackAlignmentModalContentsState();
+  State<SlackExternalModalContents> createState() =>
+      _SlackExternalModalContentsState();
 }
 
-class _SlackAlignmentModalContentsState
-    extends State<SlackAlignmentModalContents> {
+class _SlackExternalModalContentsState
+    extends State<SlackExternalModalContents> {
   late String guildId;
-  late TextEditingController slackAlignmentIdController;
+  late TextEditingController slackexternalIdController;
   late TextEditingController slackTokenEditingController;
-  late String alignmentUrl;
+  late String externalUrl;
   late String isSelectedChannelId;
 
   @override
   void initState() {
     super.initState();
     guildId = widget.guildId;
-    slackAlignmentIdController = TextEditingController(
-        text: widget.alignmentData != null ? widget.alignmentData!['id'] : '');
+    slackexternalIdController = TextEditingController(
+        text: widget.externalData != null ? widget.externalData!['id'] : '');
     slackTokenEditingController = TextEditingController(
-        text: widget.alignmentData != null
-            ? widget.alignmentData!['slack_token']
+        text: widget.externalData != null
+            ? widget.externalData!['slack_token']
             : '');
-    alignmentUrl =
-        'https://us-central1-room-notify-v2.cloudfunctions.net/alignment/slack/$guildId/${slackAlignmentIdController.text}';
+    externalUrl =
+        'https://us-central1-room-notify-v2.cloudfunctions.net/alignment/slack/$guildId/${slackexternalIdController.text}';
     isSelectedChannelId =
-        widget.alignmentData != null ? widget.alignmentData!['channel_id'] : '';
+        widget.externalData != null ? widget.externalData!['channel_id'] : '';
   }
 
   @override
@@ -68,7 +68,7 @@ class _SlackAlignmentModalContentsState
                   SizedBox(
                     width: 180,
                     child: TextField(
-                      controller: slackAlignmentIdController,
+                      controller: slackexternalIdController,
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                             RegExp(r'[a-zA-Z0-9]')),
@@ -80,8 +80,8 @@ class _SlackAlignmentModalContentsState
                       ),
                       onChanged: (String? value) {
                         setState(() {
-                          alignmentUrl =
-                              'https://us-central1-room-notify-v2.cloudfunctions.net/alignment/slack/$guildId/${slackAlignmentIdController.text}';
+                          externalUrl =
+                              'https://us-central1-room-notify-v2.cloudfunctions.net/alignment/slack/$guildId/${slackexternalIdController.text}';
                         });
                       },
                     ),
@@ -169,13 +169,13 @@ class _SlackAlignmentModalContentsState
                   Padding(
                     padding: const EdgeInsets.only(left: 16),
                     child: Text(
-                      '連携用URL: $alignmentUrl',
+                      '連携用URL: $externalUrl',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(text: alignmentUrl));
+                      Clipboard.setData(ClipboardData(text: externalUrl));
                       Fluttertoast.showToast(msg: 'コピーしました');
                     },
                     child: Text('コピー'),
@@ -190,7 +190,7 @@ class _SlackAlignmentModalContentsState
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
-                      if (slackAlignmentIdController.text == '' ||
+                      if (slackexternalIdController.text == '' ||
                           slackTokenEditingController.text == '' ||
                           isSelectedChannelId == '') {
                         Fluttertoast.showToast(
@@ -199,9 +199,9 @@ class _SlackAlignmentModalContentsState
                                 'linear-gradient(to right, #c93d3d, #c93d3d)');
                         return;
                       }
-                      FirestoreController.setSlackAlignmentData(
+                      FirestoreController.setSlackExternalData(
                         guildId: guildId,
-                        slackAlignmentId: slackAlignmentIdController.text,
+                        slackexternalId: slackexternalIdController.text,
                         slackToken: slackTokenEditingController.text,
                         channelId: isSelectedChannelId,
                       );

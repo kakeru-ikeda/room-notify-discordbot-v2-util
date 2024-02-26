@@ -233,10 +233,10 @@ class FirestoreController {
     return snapshots;
   }
 
-  static Stream<QuerySnapshot<Map<String, dynamic>>> getSlackAlignment(
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getSlackExternal(
       {required guildId}) {
     final docRef =
-        db.collection('data').doc('slack_alignment').collection(guildId);
+        db.collection('data').doc('slack_external').collection(guildId);
     final snapshots = docRef.snapshots();
 
     return snapshots;
@@ -380,19 +380,19 @@ class FirestoreController {
     LoginUserModel.currentGuildName = currentGuildName;
   }
 
-  static setSlackAlignmentData(
+  static setSlackExternalData(
       {required guildId,
-      required slackAlignmentId,
+      required slackexternalId,
       required slackToken,
       required channelId}) {
     final docRef = db
         .collection('data')
-        .doc('slack_alignment')
+        .doc('slack_external')
         .collection(guildId)
-        .doc(slackAlignmentId);
+        .doc(slackexternalId);
 
     docRef.set({
-      'id': slackAlignmentId,
+      'id': slackexternalId,
       'slack_token': slackToken,
       'channel_id': channelId,
       'state': true,
@@ -423,12 +423,12 @@ class FirestoreController {
     docRef.delete();
   }
 
-  static removeSlackAlignment({required guildId, required slackAlignmentId}) {
+  static removeSlackExternal({required guildId, required slackexternalId}) {
     final docRef = db
         .collection('data')
-        .doc('slack_alignment')
+        .doc('slack_external')
         .collection(guildId)
-        .doc(slackAlignmentId);
+        .doc(slackexternalId);
 
     docRef.delete();
   }
