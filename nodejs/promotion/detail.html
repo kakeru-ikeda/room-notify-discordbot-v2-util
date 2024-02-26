@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/favicon.ico">
+    <title>教室通知くん - 技術詳細</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #00bbc1;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 70px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding: 0;
+        }
+
+        li {
+            margin-left: 30px;
+            margin-bottom: 5px;
+        }
+
+        footer {
+            background-color: #00bbc1;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="flex">
+            <img src="images/logo.png" alt="教室通知くん" style="width: 180px;">
+            <h1 style="padding-left: 20px;">技術詳細</h1>
+        </div>
+
+    </header>
+
+    <main>
+        <section>
+            <h2>はじめに</h2>
+            <p>
+                ご覧いただきありがとうございます。<br>
+                このページでは、「教室通知くんv2」の技術面について詳しくご説明いたします。<br>
+                GitHubリポジトリは、<a href="https://github.com/kakeru-ikeda/room-notify-discordbot-v2-util"
+                    target="_blank">こちら</a>をご参照ください。
+            </p>
+        </section>
+
+        <section>
+            <h2>全体構造</h2>
+            <p>
+                「教室通知くんv2」の全体の構造図を提示いたします。適宜ご参照ください。
+            </p>
+            <img src="images/structure.png" alt="全体構造図" style="width: 60%;">
+            <p>
+                「教室通知くんv2」は、データの登録・更新・削除を行うユーティリティツールと、ユーザーに情報を通知するBotサーバを、Firebaseクラウドサービスで繋いで構成されています。<br>
+                クラウド上にデータベースを構築することで、フロントエンドとバックエンドの通信、さらに外部APIとの連携を効率化し、高速かつ安全なロジックを実現しています。
+            </p>
+        </section>
+
+        <section>
+            <h2>使用技術</h2>
+            <ul>
+                <li>
+                    フロントエンド
+                    <ul>
+                        <li>Flutter v3.10.5</li>
+                        <li>Dart v3.0.5</li>
+                    </ul>
+                </li>
+                <li>
+                    バックエンド
+                    <ul>
+                        <li>Node.js v18.19.0</li>
+                        <li>TypeScript v5.3.3</li>
+                        <li>discord.js v14.13.0</li>
+                        <li>node-cron v3.0.2</li>
+                    </ul>
+                </li>
+                <li>
+                    クラウドサービス
+                    <ul>
+                        <li>Google Compute Engine</li>
+                        <li>Firebase Cloud Firestore</li>
+                        <li>Firebase Cloud Functions</li>
+                        <li>Firebase Authentication</li>
+                        <li>Firebase Hosting</li>
+                    </ul>
+                </li>
+                <li>
+                    その他
+                    <ul>
+                        <li>GitHub</li>
+                        <li>Discord API</li>
+                        <li>Slack API</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>フロントエンド設計</h2>
+            <p>
+                ユーザーが値を入力するユーティリティツールには、Flutterを採用し、ユーザーが直感的に操作できるUI/UXを実現しました。<br>
+            </p>
+            <img src="images/flutter.png" alt="Flutter" style="width: 25%;">
+            <p>
+                Flutterは、Googleが開発したオープンソースのUIツールキットで、モバイルアプリケーションを開発するためのフレームワークです。<br>
+                iOS、Android、Web、Windows、macOS、Linuxなど、多くのプラットフォームに対応しており、一度の開発で多くのプラットフォームに対応したアプリケーションを開発することができます。<br>
+                今回は、Webアプリケーションとしての利用を想定しており、Flutter Webを採用しました。<br>
+            </p>
+            <p>
+                マテリアルデザインに準拠したUIの構築が、Flutterを利用すると容易に行えます。<br>
+                モバイルアプリケーションと同じような操作感をWebアプリケーションで実現しました。<br>
+                スマートフォンやタブレットからのアクセスにも対応しており、大きなコード変更無しに、レスポンシブデザインを実装することができました。<br>
+            </p>
+            <img src="images/top_image.png" alt="Material Design" style="width: 50%;">
+            <p>
+                また、アプリケーション内部の画面遷移にはGoRouterを採用しました。<br>
+                GoRouterは、Flutterの画面遷移を簡単に実装するためのライブラリで、状態管理やパラメータの受け渡しを簡単に行うことができます。<br>
+                ルーティングの設定をJavaScriptのExpressと同じ感覚で行うことができ、自身の開発効率を向上させました。<br>
+            </p>
+        </section>
+
+        <section>
+            <h2>バックエンド設計</h2>
+            <p>
+                ユーザーに情報を通知するBotサーバのバックエンドには、Node.js + TypeScriptを採用し、高速かつ安全なロジックを実現しました。<br>
+            </p>
+            <div style="display: flex; align-items: baseline;">
+                <img src="images/nodejs.svg" alt="Node.js" style="width: 25%;">
+                <div style="padding: 0 20px;"></div>
+                <img src="images/typescript.png" alt="TypeScript" style="width: 5vw; height: 5vw;">
+            </div>
+            <p>
+                Node.jsは、非同期I/Oをサポートするイベント駆動のJavaScriptランタイムで、高速なネットワークアプリケーションを構築するために設計されています。<br>
+                また、TypeScriptは、JavaScriptに静的型付けを追加したプログラミング言語で、JavaScriptの拡張言語として設計されています。<br>
+                TypeScriptは、JavaScriptの機能に加えて、静的型付け、クラス、インターフェース、モジュールなどの機能を提供し、大規模なアプリケーションの開発を支援します。<br>
+                今回は、Node.js + TypeScriptを採用し、高速かつ安全なロジックを実現しました。<br>
+            </p>
+            <!-- <img src="images/screenshot_01.png" alt="Node.js + TypeScript" style="width: 40%;"> -->
+            <p>
+                今回がTypeScriptを利用してのサーバ開発は初めてでしたが、静的型付けによるコードの安全性や、IDEの補完機能による開発効率の向上を実感しました。<br>
+                「教室通知くんv1」の開発時には、JavaScriptを利用していましたが、TypeScriptを利用することで、コードの可読性や保守性が向上しました。<br><br>
+            </p>
+            <p>
+                本プロジェクトでのバックエンドサーバの機能は、大きく分けて以下の3つです。<br>
+                1. Discord APIを利用した通知機能<br>
+                2. Cronジョブによる定期的な実行<br>
+                3. Cloud Firestoreデータベースの値の監視<br><br>
+            </p>
+            <p>
+                サーバの本質的な機能は、Discord APIを利用した通知機能となります。<br>
+                「教室通知くん」の名前の通り、ユーザーに情報を通知することがプロジェクト自体の大きな目的です。<br>
+                そのため、様々な条件に応じて、サーバはDiscordに通知を送信する必要があります。<br>
+            </p>
+            <p>
+                サーバはCronジョブによる定期的な実行を行います。<br>
+                例えば、課題の締め切りが近づいた場合、サーバはその情報を監視し、締め切りが近づいた課題に対してDiscordに通知を送信します。<br>
+                このような定期的な実行は、Node.jsのnode-cronライブラリを利用することで実現しました。<br>
+            </p>
+            <img src="images/screenshot_02.png" alt="Cron Job" style="width: 40%;">
+            <p>
+                また、サーバはFirestoreデータベースの値を常に監視し、値が変更された場合にはその値に応じてDiscordに通知を送信します。<br>
+                例えば、フロントエンドのユーティリティツールから新しい課題情報が登録された場合、情報はFirestoreデータベースに保存され、サーバはその情報を監視し、Discordに通知を送信します。<br>
+            </p>
+            <img src="images/screenshot_03.png" alt="Discord API" style="width: 40%;">
+        </section>
+
+        <section>
+            <h2>クラウドサービス設計</h2>
+            <p>
+                「教室通知くんv2」は、Google Cloudサービスに付随する、Firebaseクラウドサービスを利用しています。<br>
+                Firebaseは、Googleが提供するモバイルアプリケーション開発プラットフォームで、モバイルアプリケーションの開発、テスト、モニタリング、マーケティングを行うためのツールを提供しています。<br>
+                今回は早い段階からGoogle Cloudサービスを根底に据えることを決定していたため、全体を通してクラウドベース設計で開発が進められました。<br>
+                開発を通して学習を積み重ね、最終的には「教室通知くんv1」時代からの悲願であった、プロジェクトの完全クラウド化を実現しました。<br>
+            </p>
+            <img src="images/firebase.png" alt="Firebase" style="width: 25%;">
+            <p>
+                Firebase Cloud Firestoreは、FirebaseのNoSQLクラウドデータベースで、リアルタイムデータベースとして利用することができます。<br>
+                Firestoreは、データの同期がリアルタイムに行われるため、リアルタイムなWebアプリケーションの開発に適しています。<br>
+                主にユーティリティツールとBotサーバのデータの同期を行いました。<br>
+            </p>
+            <p>
+                Firebase Cloud Functionsは、サーバレスのバックエンドプラットフォームで、サーバの管理やスケーリングを行う必要がなく、コードのデプロイと実行を行うことができます。<br>
+                Discord APIのOAuth認証のエンドポイントと、Slack APIのOutGoing WebhookのエンドポイントをFirebase Cloud Functionsで実装しました。<br>
+            </p>
+            <p>
+                Firebase Authenticationは、Firebaseの認証サービスで、ユーザーの認証を簡単に行うことができます。<br>
+                ユーティリティツールのログイン機能にFirebase Authenticationを利用しました。<br>
+            </p>
+            <p>
+                Firebase Hostingは、Firebaseの静的Webホスティングサービスで、高速で安全なWebホスティングを提供しています。<br>
+                ユーティリティツールのWebアプリケーションと当プロモーション用サイトを、それぞれFirebase Hostingでホスティングしました。<br><br>
+            </p>
+            <p>
+                また、バックエンドのサーバは、Google Compute Engineを利用しています。<br>
+                Google Compute Engineは、Google Cloud PlatformのIaaS（Infrastructure as a Service）で、仮想マシンを提供しています。<br>
+                開発環境では自宅のサーバPCを利用していましたが、本番環境ではGoogle Compute Engineを利用し、高速かつ安定したサーバを提供しています。<br>
+            </p>
+            <img src="images/gce.jpg" alt="Google Compute Engine" style="width: 25%;">
+        </section>
+    </main>
+
+    <footer>
+        <p>東京IT038 教室通知くん</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        /// axiosの記述
+        axios.get('https://us-central1-room-notify-v2.cloudfunctions.net/visitCounter/detail')
+            .then(function (response) {
+                console.log(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    </script>
+</body>
+
+</html>
