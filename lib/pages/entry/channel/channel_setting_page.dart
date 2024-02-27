@@ -27,8 +27,8 @@ class _ChannelSettingPageState extends State<ChannelSettingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           PageTemplate.setPageTitle(
-              title: '科目チャネル 登録',
-              caption: '課題通知とリマインドの配信先となるチャネルの設定です。Adminユーザーのみ編集可能です。'),
+              title: '配信先チャネル 登録',
+              caption: '各種通知の配信先となるチャネルの設定です。教室通知くんは、この設定に従って配信先チャネルを指定できます。'),
           // Guild
           PageTemplate.setGuildInfoTitle(),
           ElevatedButton.icon(

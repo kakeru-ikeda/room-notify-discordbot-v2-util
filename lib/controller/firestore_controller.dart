@@ -385,7 +385,7 @@ class FirestoreController {
       required slackexternalId,
       required slackToken,
       required channelId,
-      required channelName}) async {
+      required subject}) async {
     final docRef = db
         .collection('data')
         .doc('slack_external')
@@ -396,7 +396,7 @@ class FirestoreController {
       'id': slackexternalId,
       'slack_token': slackToken,
       'channel_id': channelId,
-      'subject': channelName,
+      'subject': subject,
       'state': true,
     });
   }
