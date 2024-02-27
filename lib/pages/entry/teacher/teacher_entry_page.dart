@@ -25,7 +25,7 @@ class _TeacherEntryPageState extends State<TeacherEntryPage> {
           children: [
             PageTemplate.setPageTitle(
               title: '教員情報 登録',
-              caption: '課題通知に利用される教員の情報を登録します。Adminユーザーのみ編集可能です',
+              caption: '課題通知に利用される教員の情報を登録します。',
             ),
             PageTemplate.setGuildInfoTitle(
                 guildId: LoginUserModel.currentGuildId),

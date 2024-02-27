@@ -31,15 +31,33 @@ export class CronController {
 
             /// 教室通知: 平日授業の教室番号及びZoomURLを配信する
             /// 土日はスキップ
-            if (week <= 5) {
-                this.roomNotify(guildId);
+            try {
+                if (week >= 1 && week <= 5) {
+                    this.roomNotify(guildId);
+                }
+            } catch (error) {
+                MessageService.sendLog({
+                    message: `🚨 Error occurred in room notify. ( ${error} )`
+                });
             }
 
             /// 課題通知: 課題の提出日の朝9時と前日の夜21時にリマインドを配信する
-            this.kadaiNotify(guildId);
+            try {
+                this.kadaiNotify(guildId);
+            } catch (error) {
+                MessageService.sendLog({
+                    message: `🚨 Error occurred in kadai notify. ( ${error} )`
+                });
+            }
 
             /// リマインド通知: リマインドの時刻にリマインドを配信する
-            this.remindNotify(guildId);
+            try {
+                this.remindNotify(guildId);
+            } catch (error) {
+                MessageService.sendLog({
+                    message: `🚨 Error occurred in remind notify. ( ${error} )`
+                });
+            }
         }
     };
 
@@ -222,7 +240,7 @@ export class CronController {
                                 collectionId: `data/channels/${guildId}`,
                                 where: { fieldPath: 'subject', opStr: '==', value: remind.subject }
                             })
-                            .then((channels) => {
+                            .then( async (channels) => {
                                 /// チャネルにリマインドを配信
                                 this.messageService.sendMessage({
                                     channel:
@@ -230,6 +248,14 @@ export class CronController {
                                             ? process.env.DEBUG_CHANNEL_ID!
                                             : channels.docs[0].data()['channel_id'],
                                     message: message
+                                });
+                                
+                                /// 当日のリマインド時刻になったらstateをfalseにする
+                                FirestoreObserver.debounce = true;
+                                await this.firestoreService.updateDocument({
+                                    collectionId: `notice/remind/${guildId}`,
+                                    documentId: doc.id,
+                                    data: { state: false }
                                 });
                                 MessageService.sendLog({
                                     message: `🎗️ A reminder has been sent to guild ID: ${guildId}.`

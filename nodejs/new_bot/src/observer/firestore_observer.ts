@@ -107,8 +107,7 @@ export class FirestoreObserver {
                             data: { entry_notify: true }
                         });
                     } catch (error) {
-                        console.error(error);
-                        MessageService.sendLog({ message: `⚠️ ${error}` });
+                        MessageService.sendLog({ message: `🚨 ${error}` });
                     }
                 });
 
@@ -154,8 +153,7 @@ export class FirestoreObserver {
                             data: { entry_notify: true }
                         });
                     } catch (error) {
-                        console.error(error);
-                        MessageService.sendLog({ message: `⚠️ ${error}` });
+                        MessageService.sendLog({ message: `🚨 ${error}` });
                     }
 
                     /// todo: scheduleEventsの更新
@@ -205,7 +203,11 @@ export class FirestoreObserver {
         /// snapshotのdocumentに変更があった場合に発火する
         kadaiRef.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                this.observeProcess(DoctypeEnum.KADAI, change);
+                try {
+                    this.observeProcess(DoctypeEnum.KADAI, change);
+                } catch (error) {
+                    MessageService.sendLog({ message: `🚨 Error occurred in kadai observer : ${error}` });
+                }
             });
         });
     }
@@ -219,7 +221,11 @@ export class FirestoreObserver {
         /// snapshotのdocumentに変更があった場合に発火する
         remindRef.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                this.observeProcess(DoctypeEnum.REMIND, change);
+                try {
+                    this.observeProcess(DoctypeEnum.REMIND, change);
+                } catch (error) {
+                    MessageService.sendLog({ message: `🚨 Error occurred in remind observer : ${error}` });
+                }
             });
         });
     }
@@ -233,7 +239,11 @@ export class FirestoreObserver {
         /// snapshotのdocumentに変更があった場合に発火する
         scholarSyncRef.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                this.observeProcess(DoctypeEnum.SCHOLAR_SYNC, change);
+                try {
+                    this.observeProcess(DoctypeEnum.SCHOLAR_SYNC, change);
+                } catch (error) {
+                    MessageService.sendLog({ message: `🚨 Error occurred in scholarSync observer : ${error}` });
+                }
             });
         });
     }
@@ -246,7 +256,11 @@ export class FirestoreObserver {
         /// snapshotのdocumentに変更があった場合に発火する
         slackRef.onSnapshot((snapshot) => {
             snapshot.docChanges().forEach((change) => {
-                this.observeProcess(DoctypeEnum.SLACK, change);
+                try {
+                    this.observeProcess(DoctypeEnum.SLACK, change);
+                } catch (error) {
+                    MessageService.sendLog({ message: `🚨 Error occurred in slack observer : ${error}` });
+                }
             });
         });
     }
