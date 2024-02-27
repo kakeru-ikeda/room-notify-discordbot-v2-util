@@ -77,7 +77,7 @@ class _CommonDrawerState extends State<CommonDrawer> {
                   },
                 ),
                 ListTile(
-                  title: Text('科目チャネル 登録'),
+                  title: Text('配信先チャネル 登録'),
                   leading: Icon(Icons.subject),
                   onTap: () {
                     setState(() {

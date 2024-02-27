@@ -130,8 +130,8 @@ class _SlackExternalModalContentsState
                     ),
                   ),
                   StatefulBuilder(builder: (context, setState) {
-                    return FutureBuilder(
-                      future: FirestoreController.getGuildChannelsData(
+                    return StreamBuilder(
+                      stream: FirestoreController.getSubjectEnabledForChannels(
                           guildId: guildId),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
@@ -142,7 +142,7 @@ class _SlackExternalModalContentsState
                                     .map((entry) => DropdownMenuItem(
                                           value: entry.data()['channel_id'],
                                           child: Text(
-                                              '${entry.data()['channel_name']}'),
+                                              '${entry.data()['subject']}'),
                                         ))
                                     .toList(),
                                 const DropdownMenuItem(
@@ -156,7 +156,7 @@ class _SlackExternalModalContentsState
                                   selectedChannelName = snapshot.data!.docs
                                       .firstWhere((element) =>
                                           element.data()['channel_id'] ==
-                                          selectedChannelId)['channel_name'];
+                                          selectedChannelId)['subject'];
                                 });
                               });
                         } else {
@@ -211,7 +211,7 @@ class _SlackExternalModalContentsState
                         slackexternalId: slackexternalIdController.text,
                         slackToken: slackTokenEditingController.text,
                         channelId: selectedChannelId,
-                        channelName: selectedChannelName,
+                        subject: selectedChannelName,
                       );
                       Navigator.pop(context);
                       Fluttertoast.showToast(msg: '情報を更新しました。');
