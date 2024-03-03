@@ -99,7 +99,7 @@ export class FirestoreObserver {
                         await this.firestoreService.updateDocument({
                             collectionId:
                                 doc instanceof ScholarSync
-                                    ? `notice/external/scholar_sync/guild_id/${process.env.IH13B_GUILD_ID}`
+                                    ? `notice/external/scholar_sync/guild_id/${process.env.HEW_GUILD_ID}`
                                     : doc instanceof Slack
                                         ? `notice/external/slack/guild_id/${this.guild.id}`
                                         : `notice/${docName}/${this.guild.id}`,
@@ -145,7 +145,7 @@ export class FirestoreObserver {
                         await this.firestoreService.updateDocument({
                             collectionId:
                                 doc instanceof ScholarSync
-                                    ? `notice/external/scholar_sync/guild_id/${process.env.IH13B_GUILD_ID}`
+                                    ? `notice/external/scholar_sync/guild_id/${process.env.HEW_GUILD_ID}`
                                     : doc instanceof Slack
                                         ? `notice/external/slack/guild_id/${this.guild.id}`
                                         : `notice/${docName}/${this.guild.id}`,
