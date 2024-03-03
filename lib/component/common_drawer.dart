@@ -115,6 +115,21 @@ class _CommonDrawerState extends State<CommonDrawer> {
                     });
                   },
                 ),
+                ListTile(
+                  title: Text('ScholarSync連携'),
+                  leading: Image.asset(
+                    'assets/images/scholar_sync.png',
+                    height: 24,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      MediaQuery.of(context).size.width <= 768
+                          ? Navigator.pop(context)
+                          : null;
+                      IndexPageController.screen.jumpToPage(7);
+                    });
+                  },
+                ),
               ],
             ),
           ),
