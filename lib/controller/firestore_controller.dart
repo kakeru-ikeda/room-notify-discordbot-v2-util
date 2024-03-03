@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:js_interop';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -240,6 +241,27 @@ class FirestoreController {
     final snapshots = docRef.snapshots();
 
     return snapshots;
+  }
+
+  static getScholarSyncStatus({required guildId}) async {
+    try {
+      final docRef = db
+          .collection('notice')
+          .doc('external')
+          .collection('scholar_sync')
+          .doc('guild_id')
+          .collection(guildId);
+      final docSnapshot = await docRef.get();
+
+      for (var doc in docSnapshot.docs) {
+        print('👑 ${doc.id}');
+        print('👑 ${doc.data()}');
+      }
+
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   static void setGuildInfo(

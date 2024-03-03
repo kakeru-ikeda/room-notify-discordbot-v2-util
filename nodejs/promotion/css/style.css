@@ -204,42 +204,82 @@ section .titleWrapper:nth-child(even) {
   color: #ffffff;
 }
 
-/* 上記のスタイルを、スマホサイズに対応させる */
-/* 円の表示位置は、スマホサイズでは一律で下側に半円だけ見えるように表示する */
-/* また、タイトルの表示位置は、スマホサイズでは一律で上側に表示する */
-/* テキストの表示が見切れることがないように、テキストの表示位置とサイズを適宜調整する */
-@media screen and (max-width: 767px) {
+/* ここまでのスタイルをスマートフォンサイズに対応したレスポンシブデザインにします */
+/* 各sectionの直下に配置したcircleは、画面の下部に配置する */
+/* 各section内のh1, pは、画面からはみ出ないように割合で指定する */
+
+/* 画面幅が768px以下の場合 */
+@media screen and (max-width: 768px) {
   section {
-    height: 100vh;
+    height: 100%;
   }
 
-  section:nth-child(odd) .circle {
-    top: 100vh;
+  .circle {
+    width: 200vw;
+    height: 200vw;
+    top: 115vh !important;
+    left: 50vw !important;
   }
 
-  section:nth-child(even) .circle {
-    top: 100vh;
+  #title {
+    left: 50%;
+    top: 35%;
+  }
+
+  #title #logo {
+    width: 75vw;
+  }
+
+  #title .flex {
+    flex-direction: column;
+  }
+
+  #title .flex a {
+    margin-bottom: 20px !important;
   }
 
   .contentsWrapper {
-    width: 80%;
-    top: 20%;
-    left: 50%;
+    width: 100%;
+    transform: translate(-70%, -25%);
+    -webkit-transform: translate(-70%, -25%);
+    -ms-transform: translate(-70%, -25%);
+  }
+
+  .contentsWrapper iframe {
+    width: 360px;
+    height: 202px;
+  }
+
+  .contentsWrapper img {
+    height: 100%;
+  }
+
+  .contentsWrapper {
+    top: 77% !important;
+    left: 70% !important;
+    height: 30% !important;
   }
 
   .titleWrapper {
-    width: 80%;
-    top: 20%;
-    left: 50%;
+    width: 90%;
+    top: 40% !important;
+    left: 52% !important;
+    align-items: center !important;
   }
 
   .titleWrapper h1 {
     font-size: 2.4rem;
-    margin-bottom: 10px;
+    text-align: left !important;
   }
 
   .titleWrapper p {
     font-size: 1.4rem;
-    margin-bottom: 10px;
   }
+
+  .btn {
+    font-size: 1.4rem;
+    padding: 1rem 2rem;
+  }
+
+
 }
