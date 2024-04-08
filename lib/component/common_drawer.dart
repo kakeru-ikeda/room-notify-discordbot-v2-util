@@ -44,6 +44,16 @@ class _CommonDrawerState extends State<CommonDrawer> {
                     });
                   },
                 ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                  child: Text('通知登録',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      )),
+                ),
                 ListTile(
                   title: Text('課題 新規登録'),
                   leading: Icon(Icons.add),
@@ -67,6 +77,16 @@ class _CommonDrawerState extends State<CommonDrawer> {
                       IndexPageController.screen.jumpToPage(2);
                     });
                   },
+                ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Text('配信設定',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      )),
                 ),
                 ListTile(
                   title: Text('教員情報 登録'),
@@ -103,6 +123,16 @@ class _CommonDrawerState extends State<CommonDrawer> {
                       IndexPageController.screen.jumpToPage(5);
                     });
                   },
+                ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Text('外部連携',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      )),
                 ),
                 ListTile(
                   title: Text('Slack連携'),
