@@ -137,18 +137,14 @@ class _CommonDrawerState extends State<CommonDrawer> {
               ],
             ),
           ),
-          // ListTile(
-          //   title: Text('教室通知 登録'),
-          //   leading: Icon(Icons.note_alt),
-          //   onTap: () {
-          //     setState(() {
-          //       MediaQuery.of(context).size.width <= 768
-          //           ? Navigator.pop(context)
-          //           : null;
-          //       IndexPageController.screen.jumpToPage(5);
-          //     });
-          //   },
-          // ),
+          ListTile(
+            title: Text('お問い合わせ'),
+            leading: Icon(Icons.mail),
+            onTap: () {
+              html.window
+                  .open('https://forms.gle/BzSadesvTq75ENFY6', 'お問い合わせフォーム');
+            },
+          ),
           Container(
             child: Row(
               children: [
