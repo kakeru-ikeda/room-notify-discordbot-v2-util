@@ -33,22 +33,22 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  SharedPreferencesController prfs = SharedPreferencesController.instance;
+  SharedPreferencesController prefs = SharedPreferencesController.instance;
   String? userId;
   String? userName;
   String? userAvatar;
 
   Future<void> getPrfsData() async {
-    userId = await prfs.getData('userId');
-    userName = await prfs.getData('userName');
-    userAvatar = await prfs.getData('avatar');
+    userId = await prefs.getData('userId');
+    userName = await prefs.getData('userName');
+    userAvatar = await prefs.getData('avatar');
     userAvatar = 'https://cdn.discordapp.com/avatars/$userId/$userAvatar';
 
     LoginUserModel.userId = userId!;
     LoginUserModel.userName = userName!;
     LoginUserModel.userAvatar = userAvatar!;
 
-    await prfs.removeData('isAdministrator');
+    await prefs.removeData('isAdministrator');
   }
 
   Future<PackageInfo> getVersionData() async {
@@ -90,12 +90,14 @@ class _IndexPageState extends State<IndexPage> {
 
         final guildDocData = await FirestoreController.getGuildData();
 
-        final currentGuildName =
-            guildDocData.data()![userEntryGuild.first.toString()]['guild_name'];
+        final currentGuildId = await prefs.getData('currentGuildId') ??
+            userEntryGuild.first.toString();
+        final currentGuildName = await prefs.getData('currentGuildName') ??
+            guildDocData.data()![currentGuildId]['guild_name'];
 
         await FirestoreController.setLoginUserData(
           uid: user.uid,
-          currentGuildId: userEntryGuild.first.toString(),
+          currentGuildId: currentGuildId,
           currentGuildName: currentGuildName,
         );
 
