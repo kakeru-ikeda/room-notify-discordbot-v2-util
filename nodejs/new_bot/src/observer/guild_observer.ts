@@ -62,20 +62,27 @@ export class GuildObserver {
 
     /// ギルドに関するイベントを監視する
     private guildCreateHandler = async (guild: Guild) => {
-        console.log(`Joined a new guild: ${guild.name}`);
-        const guildController = new GuildController(guild);
-        await guildController.initializeGuild();
-        await this.setEntryGuild(this.client.guilds.cache);
-        MessageService.sendLog({
-            message: `😘 Joined a new guild: ${guild.name} ( guildId: ${guild.id} )`
-        });
+        try {
+            console.log(`Joined a new guild: ${guild.name}`);
+            const guildController = new GuildController(guild);
+            await guildController.initializeGuild();
+            await this.setEntryGuild(this.client.guilds.cache);
+            MessageService.sendLog({
+                message: `😘 Joined a new guild: ${guild.name} ( guildId: ${guild.id} )`
+            });
 
-        /// 登録時のIncomingメッセージを送信する
-        new MessageService().sendMessage({
-            channel: guild.systemChannelId!,
-            message:
-                '「教室通知くんv2」をサーバーに追加して頂きありがとうございます！\n当Botは、主にHAL東京生向けに展開される、教室通知と課題・リマインド通知を行うBotです。\n専用のユーティリティツールと合わせてご利用ください！\nhttps://room-notify-v2.web.app/'
-        });
+            /// 登録時のIncomingメッセージを送信する
+            new MessageService().sendMessage({
+                channel: guild.systemChannelId!,
+                message:
+                    '「教室通知くんv2」をサーバーに追加して頂きありがとうございます！\n当Botは、主にHAL東京生向けに展開される、教室通知と課題・リマインド通知を行うBotです。\n専用のユーティリティツールと合わせてご利用ください！\nhttps://room-notify-v2.web.app/'
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while joining a new guild: ${guild.name} ( guildId: ${guild.id} )`
+            });
+        }
     };
 
     private onGuildCreate() {
@@ -87,13 +94,20 @@ export class GuildObserver {
     }
 
     private guildDeleteHandler = async (guild: Guild) => {
-        console.log(`Left a guild: ${guild.name}`);
-        this.client = client;
+        try {
+            console.log(`Left a guild: ${guild.name}`);
+            this.client = client;
 
-        await this.setEntryGuild(this.client.guilds.cache);
-        MessageService.sendLog({
-            message: `🥹 Left a guild: ${guild.name} ( guildId: ${guild.id} )`
-        });
+            await this.setEntryGuild(this.client.guilds.cache);
+            MessageService.sendLog({
+                message: `🥹 Left a guild: ${guild.name} ( guildId: ${guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while leaving a guild: ${guild.name} ( guildId: ${guild.id} )`
+            });
+        }
     };
 
     private onGuildDelete() {
@@ -105,13 +119,20 @@ export class GuildObserver {
     }
 
     private guildUnavailableHandler = async (guild: Guild) => {
-        console.log(`Guild is unavailable: ${guild.name}`);
-        this.client = client;
+        try {
+            console.log(`Guild is unavailable: ${guild.name}`);
+            this.client = client;
 
-        await this.setEntryGuild(this.client.guilds.cache);
-        MessageService.sendLog({
-            message: `😇 Guild is unavailable: ${guild.name} ( guildId: ${guild.id} )`
-        });
+            await this.setEntryGuild(this.client.guilds.cache);
+            MessageService.sendLog({
+                message: `😇 Guild is unavailable: ${guild.name} ( guildId: ${guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while guild is unavailable: ${guild.name} ( guildId: ${guild.id} )`
+            });
+        }
     };
 
     private onGuildUnavailable() {
@@ -124,12 +145,19 @@ export class GuildObserver {
 
     /// ギルドメンバーに関するイベントを監視する
     private guildMemberAddHandler = async (member: GuildMember) => {
-        console.log(`New member joined: ${member.user.username}`);
-        const guildController = new GuildController(member.guild);
-        await guildController.addMember(member);
-        MessageService.sendLog({
-            message: `🏁 ${member.user.displayName} came to the guild! ( guildId: ${member.guild.id} )`
-        });
+        try {
+            console.log(`New member joined: ${member.user.username}`);
+            const guildController = new GuildController(member.guild);
+            await guildController.addMember(member);
+            MessageService.sendLog({
+                message: `🏁 ${member.user.displayName} came to the guild! ( guildId: ${member.guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while new member joined: ${member.user.username} ( guildId: ${member.guild.id} )`
+            });
+        }
     };
 
     private onGuildMemberAdd() {
@@ -141,12 +169,19 @@ export class GuildObserver {
     }
 
     private guildMemberUpdateHandler = async (oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) => {
-        console.log(`Member updated: ${newMember.user.username}`);
-        const guildController = new GuildController(newMember.guild);
-        await guildController.updateMember(newMember);
-        MessageService.sendLog({
-            message: `🏁 ${oldMember.displayName} updated his profile. ( guildId: ${newMember.guild.id} )`
-        });
+        try {
+            console.log(`Member updated: ${newMember.user.username}`);
+            const guildController = new GuildController(newMember.guild);
+            await guildController.updateMember(newMember);
+            MessageService.sendLog({
+                message: `🏁 ${oldMember.displayName} updated his profile to ${newMember.user.username}. ( guildId: ${newMember.guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while member updated: ${newMember.user.username} ( guildId: ${newMember.guild.id} )`
+            });
+        }
     };
 
     private onGuildMemberUpdate() {
@@ -158,12 +193,19 @@ export class GuildObserver {
     }
 
     private guildMemberRemoveHandler = async (member: GuildMember | PartialGuildMember) => {
-        console.log(`Member left: ${member.user.username}`);
-        const guildController = new GuildController(member.guild);
-        await guildController.removeMember(member);
-        MessageService.sendLog({
-            message: `🏁 ${member.displayName} has left the guild. ( guildId: ${member.guild.id} )`
-        });
+        try {
+            console.log(`Member left: ${member.user.username}`);
+            const guildController = new GuildController(member.guild);
+            await guildController.removeMember(member);
+            MessageService.sendLog({
+                message: `🏁 ${member.displayName} has left the guild. ( guildId: ${member.guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while member left: ${member.user.username} ( guildId: ${member.guild.id} )`
+            });
+        }
     };
 
     private onGuildMemberRemove() {
@@ -176,13 +218,20 @@ export class GuildObserver {
 
     /// チャネルに関するイベントを監視する
     private channelCreateHandler = async (channel: NonThreadGuildBasedChannel) => {
-        console.log(`Channel created: ${channel.id}`);
-        const guild = channel.guild;
-        const guildController = new GuildController(guild);
-        await guildController.addChannel(channel.id, channel.name);
-        MessageService.sendLog({
-            message: `💍 Channel created! ( guildId: ${guild.id} )`
-        });
+        try {
+            console.log(`Channel created: ${channel.id}`);
+            const guild = channel.guild;
+            const guildController = new GuildController(guild);
+            await guildController.addChannel(channel.id, channel.name);
+            MessageService.sendLog({
+                message: `💍 Channel created! ( guildId: ${guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while channel created: ${channel.id} ( guildId: ${channel.guild.id} )`
+            });
+        }
     };
 
     private onChannelCreate() {
@@ -194,13 +243,20 @@ export class GuildObserver {
     }
 
     private channelDeleteHandler = async (channel: DMChannel | NonThreadGuildBasedChannel) => {
-        console.log(`Channel deleted: ${channel.id}`);
-        const guild = (channel as NonThreadGuildBasedChannel).guild;
-        const guildController = new GuildController(guild);
-        await guildController.removeChannel(channel.id);
-        MessageService.sendLog({
-            message: `💍 Channel deleted. ( guildId: ${guild.id} )`
-        });
+        try {
+            console.log(`Channel deleted: ${channel.id}`);
+            const guild = (channel as NonThreadGuildBasedChannel).guild;
+            const guildController = new GuildController(guild);
+            await guildController.removeChannel(channel.id);
+            MessageService.sendLog({
+                message: `💍 Channel deleted. ( guildId: ${guild.id} )`
+            });
+        } catch (error) {
+            console.error(error);
+            MessageService.sendLog({
+                message: `🚨 Error occurred while channel deleted: ${channel.id}`
+            });
+        }
     };
 
     private onChannelDelete() {

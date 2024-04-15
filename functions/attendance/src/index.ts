@@ -9,10 +9,12 @@ const db = admin.firestore();
 interface Attendance {
     title: string;
     type: Type;
+    version?: string;
     body: string;
     image_url?: string;
     access_token: string;
-    notify?: boolean;
+    entry_notify?: boolean;
+    debugmode?: boolean;
 }
 
 const enum Type {
@@ -44,10 +46,12 @@ app.post('/', async (request, response) => {
         await db.collection(collectionName).add({
             title: body.title,
             type: body.type,
+            version: body.version || 'null',
             body: body.body,
             image_url: body.image_url || 'null',
             timestamp: new Date().getTime(),
-            notify: body.notify || true
+            entry_notify: body.entry_notify || false,
+            debugmode: body.debugmode || false
         });
 
         response.status(200).send("OK");

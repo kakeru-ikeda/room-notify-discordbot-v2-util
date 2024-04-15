@@ -240,7 +240,7 @@ export class CronController {
                                 collectionId: `data/channels/${guildId}`,
                                 where: { fieldPath: 'subject', opStr: '==', value: remind.subject }
                             })
-                            .then( async (channels) => {
+                            .then(async (channels) => {
                                 /// チャネルにリマインドを配信
                                 this.messageService.sendMessage({
                                     channel:
@@ -249,7 +249,7 @@ export class CronController {
                                             : channels.docs[0].data()['channel_id'],
                                     message: message
                                 });
-                                
+
                                 /// 当日のリマインド時刻になったらstateをfalseにする
                                 FirestoreObserver.debounce = true;
                                 await this.firestoreService.updateDocument({

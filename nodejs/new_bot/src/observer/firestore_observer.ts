@@ -8,6 +8,8 @@ import { Kadai } from '../model/kadai';
 import { Remind } from '../model/remind';
 import { ScholarSync } from '../model/scholar_sync';
 import { Slack } from '../model/slack';
+import { Attendance } from '../model/attendance';
+import { client } from '../module/bot';
 
 dotenv.config();
 
@@ -101,8 +103,8 @@ export class FirestoreObserver {
                                 doc instanceof ScholarSync
                                     ? `notice/external/scholar_sync/guild_id/${process.env.HEW_GUILD_ID}`
                                     : doc instanceof Slack
-                                        ? `notice/external/slack/guild_id/${this.guild.id}`
-                                        : `notice/${docName}/${this.guild.id}`,
+                                      ? `notice/external/slack/guild_id/${this.guild.id}`
+                                      : `notice/${docName}/${this.guild.id}`,
                             documentId: change.doc.id,
                             data: { entry_notify: true }
                         });
@@ -147,8 +149,8 @@ export class FirestoreObserver {
                                 doc instanceof ScholarSync
                                     ? `notice/external/scholar_sync/guild_id/${process.env.HEW_GUILD_ID}`
                                     : doc instanceof Slack
-                                        ? `notice/external/slack/guild_id/${this.guild.id}`
-                                        : `notice/${docName}/${this.guild.id}`,
+                                      ? `notice/external/slack/guild_id/${this.guild.id}`
+                                      : `notice/${docName}/${this.guild.id}`,
                             documentId: change.doc.id,
                             data: { entry_notify: true }
                         });
@@ -265,6 +267,68 @@ export class FirestoreObserver {
         });
     }
 
+    public async onAttendanceCreate() {
+        const attendanceRef = this.firestoreService.getCollectionRef({
+            collectionId: `notice/attendance/${new Date().getFullYear()}`
+        });
+
+        /// snapshotのdocumentに変更があった場合に発火する
+        attendanceRef.onSnapshot(async (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                try {
+                    const doc = new Attendance(change.doc);
+                    const guildId: string = process.env.MODE == 'DEBUG' ? process.env.DEBUG_GUILD_ID! : this.guild.id;
+
+                    if (change.type === 'added') {
+                        /// 既に通知済みの場合は無視する
+                        if (change.doc.data()['entry_notify']) {
+                            console.log(`This Attendance is already notified`);
+                            return;
+                        }
+
+                        /// デバッグモードの場合は指定のギルドのみ通知する
+                        if (
+                            (process.env.MODE == 'DEBUG' || doc.debugmode) &&
+                            this.guild.id != process.env.DEBUG_GUILD_ID
+                        ) {
+                            return;
+                        }
+
+                        this.firestoreService
+                            .getCollection({
+                                collectionId: `data/channels/${guildId}`
+                            })
+                            .then(async () => {
+                                const guild: Guild = client.guilds.cache.get(guildId)!;
+
+                                this.messageService.sendMessage({
+                                    channel: guild.systemChannelId!,
+                                    embeds: doc.getEmbeds()
+                                });
+                                MessageService.sendLog({
+                                    message: `🐔 Attendance message sent. (guildId: ${guildId})`
+                                });
+                            });
+
+                        /// 通知済みにする
+                        FirestoreObserver.debounce = true;
+                        try {
+                            await this.firestoreService.updateDocument({
+                                collectionId: `notice/attendance/${new Date().getFullYear()}`,
+                                documentId: change.doc.id,
+                                data: { entry_notify: true }
+                            });
+                        } catch (error) {
+                            MessageService.sendLog({ message: `🚨 ${error}` });
+                        }
+                    }
+                } catch (error) {
+                    MessageService.sendLog({ message: `🚨 Error occurred in attendance observer : ${error}` });
+                }
+            });
+        });
+    }
+
     public async observe() {
         console.log(`Start firestore observing...`);
 
@@ -272,5 +336,6 @@ export class FirestoreObserver {
         this.onRemindCreate();
         this.onScholarSyncCreate();
         this.onSlackCreate();
+        this.onAttendanceCreate();
     }
 }
