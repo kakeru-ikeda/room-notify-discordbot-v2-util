@@ -62,6 +62,24 @@ class FirestoreController {
     return snapshots;
   }
 
+  static Future<List<String>> getAffiliationGuild({required userId}) async {
+    final docRef = db.collection('data').doc('users');
+
+    final guilds = await getGuildData();
+
+    List<String> affiliationGuilds = [];
+
+    for (var guild in guilds.data()!.keys) {
+      final userDocSnapshot = await docRef.collection(guild).doc(userId).get();
+      if (userDocSnapshot.exists) {
+        affiliationGuilds.add(guild);
+      }
+    }
+
+    affiliationGuilds.sort((a, b) => a.compareTo(b));
+    return affiliationGuilds;
+  }
+
   static Stream<QuerySnapshot<Map<String, dynamic>>>
       getSubjectEnabledForChannels({required guildId}) {
     final docRef = db
@@ -379,7 +397,7 @@ class FirestoreController {
     LoginUserModel.avatar = avatar;
   }
 
-  static setLoginUserData({
+  static Future<void> setLoginUserData({
     required uid,
     required currentGuildId,
     required currentGuildName,
@@ -390,10 +408,19 @@ class FirestoreController {
         .collection('user_data')
         .doc('current');
 
-    await docRef.set({
-      'guild_id': currentGuildId,
-      'guild_name': currentGuildName,
-    });
+    final data = await docRef.get();
+
+    if (data.exists) {
+      await docRef.update({
+        'guild_id': currentGuildId,
+        'guild_name': currentGuildName,
+      });
+    } else {
+      await docRef.set({
+        'guild_id': currentGuildId,
+        'guild_name': currentGuildName,
+      });
+    }
 
     await prefs.saveData('currentGuildId', currentGuildId);
     await prefs.saveData('currentGuildName', currentGuildName);

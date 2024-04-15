@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:room_notify_discordbot_v2_util/component/style/material_color_name.dart';
+import 'package:go_router/go_router.dart';
+import 'package:room_notify_discordbot_v2_util/controller/firestore_controller.dart';
 import 'package:room_notify_discordbot_v2_util/controller/page_controller.dart';
+import 'package:room_notify_discordbot_v2_util/controller/shared_preference_controller.dart';
+import 'dart:html' as html;
 
 import '../model/firestore_data_model.dart';
 import '../model/login_user_model.dart';
@@ -40,6 +44,16 @@ class _CommonDrawerState extends State<CommonDrawer> {
                     });
                   },
                 ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                  child: Text('通知登録',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      )),
+                ),
                 ListTile(
                   title: Text('課題 新規登録'),
                   leading: Icon(Icons.add),
@@ -63,6 +77,16 @@ class _CommonDrawerState extends State<CommonDrawer> {
                       IndexPageController.screen.jumpToPage(2);
                     });
                   },
+                ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Text('配信設定',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      )),
                 ),
                 ListTile(
                   title: Text('教員情報 登録'),
@@ -100,6 +124,16 @@ class _CommonDrawerState extends State<CommonDrawer> {
                     });
                   },
                 ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Text('外部連携',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      )),
+                ),
                 ListTile(
                   title: Text('Slack連携'),
                   leading: Image.asset(
@@ -133,18 +167,14 @@ class _CommonDrawerState extends State<CommonDrawer> {
               ],
             ),
           ),
-          // ListTile(
-          //   title: Text('教室通知 登録'),
-          //   leading: Icon(Icons.note_alt),
-          //   onTap: () {
-          //     setState(() {
-          //       MediaQuery.of(context).size.width <= 768
-          //           ? Navigator.pop(context)
-          //           : null;
-          //       IndexPageController.screen.jumpToPage(5);
-          //     });
-          //   },
-          // ),
+          ListTile(
+            title: Text('お問い合わせ'),
+            leading: Icon(Icons.mail),
+            onTap: () {
+              html.window
+                  .open('https://forms.gle/BzSadesvTq75ENFY6', 'お問い合わせフォーム');
+            },
+          ),
           Container(
             child: Row(
               children: [
@@ -165,8 +195,13 @@ class _CommonDrawerState extends State<CommonDrawer> {
                 Container(
                   width: 40,
                   child: IconButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      List<String> affiliationList =
+                          await FirestoreController.getAffiliationGuild(
+                              userId: LoginUserModel.userId);
+
                       /// ダイアログ表示
+                      // ignore: use_build_context_synchronously
                       showDialog(
                         context: context,
                         builder: (context) {
@@ -175,22 +210,48 @@ class _CommonDrawerState extends State<CommonDrawer> {
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                for (var guild in FirestoreDataModel
-                                    .entryGuilds!.keys) ...{
+                                for (var guild in affiliationList) ...{
                                   ListTile(
                                     title: Text(FirestoreDataModel
                                         .entryGuilds![guild]!['guild_name']),
-                                    onTap: () {
-                                      setState(() {
-                                        LoginUserModel.currentGuildId = guild;
-                                        LoginUserModel.currentGuildName =
-                                            FirestoreDataModel.entryGuilds![
-                                                guild]!['guild_name'];
-                                        Navigator.pop(context);
-                                      });
+                                    onTap: () async {
+                                      LoginUserModel.currentGuildId = guild;
+                                      LoginUserModel.currentGuildName =
+                                          FirestoreDataModel.entryGuilds![
+                                              guild]!['guild_name'];
+
+                                      await FirestoreController
+                                          .setLoginUserData(
+                                        uid: FirebaseAuth
+                                            .instance.currentUser!.uid,
+                                        currentGuildId: guild,
+                                        currentGuildName: FirestoreDataModel
+                                            .entryGuilds![guild]!['guild_name'],
+                                      );
+
+                                      html.window.location.reload();
                                     },
                                   ),
-                                }
+                                },
+                                Divider(),
+                                ListTile(
+                                  title: Text('ログアウト',
+                                      style: TextStyle(color: Colors.red)),
+                                  onTap: () async {
+                                    await FirebaseAuth.instance.signOut();
+                                    final prefs =
+                                        SharedPreferencesController.instance;
+                                    await prefs.removeData('userId');
+                                    await prefs.removeData('userName');
+                                    await prefs.removeData('avatar');
+
+                                    await prefs.removeData('currentGuildId');
+                                    await prefs.removeData('currentGuildName');
+
+                                    context.go('/login');
+                                    html.window.location.reload();
+                                  },
+                                )
                               ],
                             ),
                           );
