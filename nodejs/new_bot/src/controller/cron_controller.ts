@@ -13,7 +13,7 @@ export class CronController {
     private messageService: MessageService = new MessageService();
     private date: Date = new Date();
 
-    private cronTime: string = '* * * * *';
+    private cronTime: string = '0,5,10,15,20,25,30,35,40,45,50,55 * * * *';
     private task: () => void = async () => {
         this.date = new Date();
         // this.date = new Date('2024-02-12 09:00:00');
